@@ -1,13 +1,12 @@
 import argparse
-from thirdparty.yannt.registry import get_commands
+from thirdparty.yannt.cli.registry import get_commands, load_entrypoint_plugins
 from thirdparty.yannt.plugins import builtin
-from thirdparty.yannt.plugins.loader import load_entrypoint_plugins
 
 def main():
     parser = argparse.ArgumentParser(prog="yannt")
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(dest="yannt_command", required=True)
 
-    load_entrypoint_plugins()
+    load_entrypoint_plugins("yannt_command")
 
     # Load plugins
     for registrar in get_commands():

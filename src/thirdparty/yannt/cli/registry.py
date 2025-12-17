@@ -1,3 +1,4 @@
+from importlib.metadata import entry_points
 from typing import Callable, Dict
 
 CommandRegistrar = Callable[[object], None]
@@ -11,3 +12,9 @@ def register_command(name: str, registrar: CommandRegistrar):
 
 def get_commands():
     return _COMMANDS.values()
+
+def load_entrypoint_plugins(entrypoint_group):
+    eps = entry_points(group=entrypoint_group)
+    for ep in eps:
+        register = ep.load()
+        register_command(ep.name, register)
