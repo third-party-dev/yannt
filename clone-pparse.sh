@@ -1,7 +1,7 @@
 #!/bin/sh
 
-if [ -e "extern/pparse" ]; then
-  echo "'extern/pparse' already exists. Remove to continue."
+if [ -e "extern/thirdparty_pparse" ]; then
+  echo "'extern/thirdparty_pparse' already exists. Remove to continue."
   exit 1
 fi
 
@@ -11,4 +11,4 @@ if [ -z "$ORIGIN" ]; then
 fi
 
 mkdir -p extern
-git clone $ORIGIN extern/pparse
+git clone $ORIGIN extern/thirdparty_pparse
