@@ -1,7 +1,7 @@
 clutter/
 dist/
 bundles/
-pparse/
+extern/
 **.whl
 **.tar.gz
 **.egg-info
