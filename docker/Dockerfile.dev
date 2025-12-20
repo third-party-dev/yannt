@@ -1,0 +1,10 @@
+FROM debian:13-slim
+
+RUN apt-get update && apt-get install -y python3 python3-venv python3-pip
+
+ARG VENV_PATH=/work/ml-dev-venv
+ENV PATH="$VENV_PATH/bin:$PATH"
+
+
+
+

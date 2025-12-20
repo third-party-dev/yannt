@@ -2,21 +2,25 @@
 
 EXTERN_DIR="./extern"
 
+# Required for developer container
+ML_VENV_NAME=${ML_VENV_NAME:-ml-venv}
+
 ARG1="$1"
 
-export PS1_TAG="(ml-venv) "
+export PS1_TAG="(${ML_VENV_NAME}) "
 export PS1="${PS1_TAG}${PS1:-\$ }"
 
+# TODO: Consider other options for dev container build
 cd docker; ./download.sh; cd ..
 
 PIP_INSTALL_FLAGS="--no-index --find-links docker/context/pip_pkgs"
 
-if [ ! -e "./ml-venv" ]; then
-  python3 -m venv ./ml-venv
+if [ ! -e "./${ML_VENV_NAME}" ]; then
+  python3 -m venv ./${ML_VENV_NAME}
   [ $? -ne 0 ] && { echo "Failed to create venv"; exit 1; }
-  ./ml-venv/bin/pip install --upgrade $PIP_INSTALL_FLAGS pip setuptools wheel build pytest
+  ./${ML_VENV_NAME}/bin/pip install --upgrade $PIP_INSTALL_FLAGS pip setuptools wheel build pytest
 fi
-source ./ml-venv/bin/activate
+source ./${ML_VENV_NAME}/bin/activate
 
 # TODO: These dependencies should be managed by pyproject.toml.
 echo Checking dependencies.

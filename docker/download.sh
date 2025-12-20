@@ -1,5 +1,8 @@
 #!/bin/sh
 
+PROJ_ROOT_PATH=$(realpath $(dirname $0)/..)
+cd $PROJ_ROOT_PATH/docker
+
 mkdir -p context/pip_pkgs
 
 # Download CPU-only Torch separately
