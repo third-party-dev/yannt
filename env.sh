@@ -7,12 +7,9 @@ ARG1="$1"
 export PS1_TAG="(ml-venv) "
 export PS1="${PS1_TAG}${PS1:-\$ }"
 
-PIP_INSTALL_FLAGS=""
-TORCH_FLAGS="--index-url https://download.pytorch.org/whl/cpu"
-if [ "$ARG1" == "offline" ]; then
-  PIP_INSTALL_FLAGS="--no-index --find-links docker/context/pip_pkgs"
-  TORCH_FLAGS=""
-fi
+cd docker; ./download.sh; cd ..
+
+PIP_INSTALL_FLAGS="--no-index --find-links docker/context/pip_pkgs"
 
 if [ ! -e "./ml-venv" ]; then
   python3 -m venv ./ml-venv
@@ -23,11 +20,6 @@ source ./ml-venv/bin/activate
 
 # TODO: These dependencies should be managed by pyproject.toml.
 echo Checking dependencies.
-# pip show pytest &>/dev/null || pip install $PIP_INSTALL_FLAGS pytest
-# pip show protobuf &>/dev/null || pip install $PIP_INSTALL_FLAGS protobuf
-# pip show numpy &>/dev/null || pip install $PIP_INSTALL_FLAGS numpy
-# pip show transformers &>/dev/null || pip install $PIP_INSTALL_FLAGS transformers
-# pip show torch &>/dev/null || pip install $PIP_INSTALL_FLAGS torch $TORCH_FLAGS
 
 pip show thirdparty_yannt &>/dev/null || pip install $PIP_INSTALL_FLAGS -e yannt
 
@@ -35,7 +27,7 @@ pip show thirdparty_yannt &>/dev/null || pip install $PIP_INSTALL_FLAGS -e yannt
 mkdir -p "$EXTERN_DIR"
 for pkgpath in "$EXTERN_DIR"/*; do
   if [ -d "$pkgpath" ]; then
-    pip show $(basename "$pkgpath") &>/dev/null || pip install $PIP_INSTALL_FLAGS $TORCH_FLAGS -e $pkgpath
+    pip show $(basename "$pkgpath") &>/dev/null || pip install $PIP_INSTALL_FLAGS -e $pkgpath
   fi
 done
 

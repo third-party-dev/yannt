@@ -9,7 +9,7 @@ LOCAL_DIR="./docker/context/local_pkgs"
 mkdir -p context/bin
 
 # pip download dependencies so we can build offline (ok to fail)
-./downlogfad.sh
+./download.sh
 
 cd ..
     # Do each build in extern
