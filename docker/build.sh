@@ -1,23 +1,24 @@
 #!/bin/sh
 
+# Define EXCLUDE_PKG as list of whitespace separated packages to exclude.
+
 SRC_DIR="./extern"
-DEST_DIR="./docker/context/pip_pkgs"
+LOCAL_DIR="./docker/context/local_pkgs"
 
-ARG1=$1
+# Ensure there is a bin catch all folder
+mkdir -p context/bin
 
-
+# pip download dependencies so we can build offline (ok to fail)
+./downlogfad.sh
 
 cd ..
-
     # Do each build in extern
-    mkdir -p "$DEST_DIR"
+    mkdir -p "$LOCAL_DIR"
     mkdir -p "$SRC_DIR"
+    rm -rf "$LOCAL_DIR"/*
 
     for pkgpath in "$SRC_DIR"/*; do
         if [ -d "$pkgpath" ]; then
-
-            # Clean any previous build
-            rm -rf "$pkgpath/dist"
 
             # Skip if pkgname is in EXCLUDE_PKG list
             pkgname=$(basename "$pkgpath")
@@ -28,33 +29,20 @@ cd ..
             [ "$skip" -eq 1 ] && continue
 
             echo "Building $pkgpath..."
-            (cd "$pkgpath" && python3 -m build)
+            (cd "$pkgpath" && python3 -m build >/dev/null 2>&1)
 
-            # Copy contents of dist/ to DEST_DIR
+            # Copy contents of dist/ to PIP_DIR
             if [ -d "$pkgpath/dist" ]; then
-                cp -r "$pkgpath/dist/"* "$DEST_DIR/"
+                cp -r "$pkgpath"/dist/* "$LOCAL_DIR"/
             fi
         fi
     done
 
     # Special case for yannt
-    (cd "yannt" && python3 -m build)
-    cp -r "yannt/dist/"* "$DEST_DIR/"
-
+    echo "Building yannt..."
+    (cd "yannt" && python3 -m build >/dev/null 2>&1)
+    cp -r "yannt/dist/"* "$LOCAL_DIR"/
 cd docker
 
-mkdir -p context/bin
-
 # Now run the Dockerfile build process.
-
-if [ "$ARG1" = "offline" ]; then
-    echo "Building with offline mode."
-    docker build -t yannt \
-      --build-arg PIP_INSTALL_FLAGS="--no-index --find-links /opt/pip_pkgs/" \
-      --build-arg TORCH_FLAGS="" \
-      -f Dockerfile context
-    exit 1
-fi
-
 docker build -t yannt -f Dockerfile context
-
