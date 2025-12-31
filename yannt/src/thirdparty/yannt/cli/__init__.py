@@ -1,7 +1,7 @@
 import argparse
 from thirdparty.yannt.cli.registry import get_commands, load_entrypoint_plugins
 from thirdparty.yannt.plugins import builtin
-
+import argcomplete
 import sys
 
 def main():
@@ -13,6 +13,8 @@ def main():
     # Load plugins
     for registrar in get_commands():
         registrar(subparsers)
+
+    argcomplete.autocomplete(parser)
 
     args = parser.parse_args()
     args.func(args)

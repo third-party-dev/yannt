@@ -18,7 +18,7 @@ PIP_INSTALL_FLAGS="--no-index --find-links docker/context/pip_pkgs"
 if [ ! -e "./${ML_VENV_NAME}" ]; then
   python3 -m venv ./${ML_VENV_NAME}
   [ $? -ne 0 ] && { echo "Failed to create venv"; exit 1; }
-  ./${ML_VENV_NAME}/bin/pip install --upgrade $PIP_INSTALL_FLAGS pip setuptools wheel build pytest
+  ./${ML_VENV_NAME}/bin/pip install --upgrade $PIP_INSTALL_FLAGS pip setuptools wheel build pytest argcomplete
 fi
 source ./${ML_VENV_NAME}/bin/activate
 
@@ -36,6 +36,13 @@ for pkgpath in "$EXTERN_DIR"/*; do
 done
 
 echo
-echo  "The environment is now ready. Try 'yannt --help' for information."
+echo "The environment is now ready. Try 'yannt --help' for information."
 
-exec bash -i
+# Include yannt tab completion.
+TMP_RC="$(mktemp)"
+cat >> "$TMP_RC" <<'EOF'
+source ~/.bashrc
+eval "$(register-python-argcomplete yannt)"
+EOF
+
+exec bash --rcfile "$TMP_RC" -i
