@@ -18,7 +18,7 @@ PIP_INSTALL_FLAGS="--no-index --find-links docker/context/pip_pkgs"
 if [ ! -e "./${ML_VENV_NAME}" ]; then
   python3 -m venv ./${ML_VENV_NAME}
   [ $? -ne 0 ] && { echo "Failed to create venv"; exit 1; }
-  ./${ML_VENV_NAME}/bin/pip install --upgrade $PIP_INSTALL_FLAGS pip setuptools wheel build pytest argcomplete
+  ./${ML_VENV_NAME}/bin/pip install --upgrade $PIP_INSTALL_FLAGS pip setuptools wheel build pytest
 fi
 source ./${ML_VENV_NAME}/bin/activate
 
@@ -31,7 +31,7 @@ pip show thirdparty_yannt &>/dev/null || pip install $PIP_INSTALL_FLAGS -e yannt
 mkdir -p "$EXTERN_DIR"
 for pkgpath in "$EXTERN_DIR"/*; do
   if [ -d "$pkgpath" ]; then
-    pip show $(basename "$pkgpath") &>/dev/null || pip install $PIP_INSTALL_FLAGS -e $pkgpath
+    pip show $(basename "$pkgpath") &>/dev/null || pip install -U $PIP_INSTALL_FLAGS -e $pkgpath
   fi
 done
 

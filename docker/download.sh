@@ -11,6 +11,6 @@ docker run -ti --rm -v $(pwd)/context/pip_pkgs:/work -w /work python:3.13-slim \
 
 # Download all the other dependencies
 docker run -ti --rm -v $(pwd)/context/pip_pkgs:/work -w /work python:3.13-slim \
-  pip download pip setuptools wheel build pytest transformers numpy protobuf
+  pip download pip setuptools wheel build pytest transformers numpy protobuf argcomplete
 
 # TODO: It would be preferred to dynamically determine this based on yannt and plugins.

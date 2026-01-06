@@ -9,6 +9,10 @@ description = "Yet Another NN Tool"
 # Note: No idea the real version required at this time.
 requires-python = ">=3.11"
 
+dependencies = [
+    "argcomplete",
+]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 namespaces = true

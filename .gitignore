@@ -2,6 +2,7 @@ clutter/
 dist/
 bundles/
 extern/
+upstream/
 **.whl
 **.tar.gz
 **.egg-info

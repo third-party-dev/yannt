@@ -1,8 +1,11 @@
 import argparse
+import sys
+
+import argcomplete
+
 from thirdparty.yannt.cli.registry import get_commands, load_entrypoint_plugins
 from thirdparty.yannt.plugins import builtin
-import argcomplete
-import sys
+
 
 def main():
     parser = argparse.ArgumentParser(prog="yannt")
@@ -32,4 +35,3 @@ def main():
 #             for choice_key, parser_value in action.choices.items():
 #                 #print(f"{indent} - {choice_key}")
 #                 dump_parser_actions(parser_value, depth+2)
-
