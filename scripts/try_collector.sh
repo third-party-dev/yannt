@@ -4,6 +4,7 @@ PROJ_PATH=$(realpath $(dirname $0)/..)
 PY_VER=${PY_VER:-$(python3 --version | awk '{print $2}' | cut -d. -f1,2)}
 
 # Detect if we can run the collector
+# BUG: Logic should be reversed so we know _all_ URLs work.
 CAN_ACCESS_UPSTREAM=${CAN_ACCESS_UPSTREAM:-false}
 for url in https://download.pytorch.org/whl/cpu https://pypi.org/simple; do
     if curl -fsI "$url" >/dev/null 2>&1; then

@@ -20,27 +20,22 @@ if [ ! -e "${PROJ_PATH}/venv/${ML_VENV_NAME}" ]; then
 fi
 source ${PROJ_PATH}/venv/${ML_VENV_NAME}/bin/activate
 
-# TODO: These dependencies should be managed by pyproject.toml.
-echo Checking dependencies.
+mkdir -p ${PROJ_PATH}/pip_pkgs/yannt/${PY_VER}
 
-pip show thirdparty_yannt &>/dev/null || pip install $PIP_ARGS -e yannt
+cd ${PROJ_PATH}/yannt
+python -m build --sdist
+python -m build --wheel
+cp dist/* ${PROJ_PATH}/pip_pkgs/yannt/${PY_VER}/
+
 
 # pip install for each extern
 mkdir -p ${EXTERN_DIR}
 for pkgpath in ${EXTERN_DIR}/*; do
   if [ -d "$pkgpath" ]; then
-    pip show $(basename "$pkgpath") &>/dev/null || pip install -U $PIP_ARGS -e $pkgpath
+    echo "------ BUILDING: $pkgpath ------"
+    cd $pkgpath
+    python -m build --sdist
+    python -m build --wheel
+    cp dist/* ${PROJ_PATH}/pip_pkgs/yannt/${PY_VER}/
   fi
 done
-
-echo
-echo "The environment is now ready. Try 'yannt --help' for information."
-
-# Include yannt tab completion.
-TMP_RC="$(mktemp)"
-cat >> "$TMP_RC" <<'EOF'
-[ -f "~/.bashrc" ] && source ~/.bashrc
-eval "$(register-python-argcomplete yannt)"
-EOF
-
-exec bash --rcfile "$TMP_RC" -i

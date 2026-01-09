@@ -9,3 +9,5 @@ upstream/
 **/__pycache__/
 .cache/
 .bash*
+venv/
+**/build/

@@ -8,6 +8,6 @@ cd ${PROJ_PATH}
 
 find . -type d \( -name "__pycache__" -o -name "*.egg-info" \) -prune -exec rm -rf {} +
 
-rm -rf ml-venv
+rm -rf venv
 
 # TODO: Do dist folders too.
