@@ -6,7 +6,7 @@ PROJ_PATH=$(realpath $(dirname $0)/..)
 
 export PY_VER=${PY_VER:-$(python3 --version | awk '{print $2}' | cut -d. -f1,2)}
 
-${PROJ_PATH}/scripts/try_collector.sh
+[ -z "$SKIP_COLLECT" ] && ${PROJ_PATH}/scripts/try_collector.sh
 
 # Allow user to assign venv name and tag shell prompt
 export ML_VENV_NAME=${ML_VENV_NAME:-ml-venv-${PY_VER}-dld}

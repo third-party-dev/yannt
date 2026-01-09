@@ -4,7 +4,7 @@
 
 
 
-pip download $PIP_ARGS pip setuptools wheel build pytest
+pip download $PIP_ARGS pip setuptools wheel build pytest ipykernel
 
 for arg in "$@"; do
     pip download $PIP_ARGS $arg

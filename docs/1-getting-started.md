@@ -16,11 +16,32 @@ There are a number of different ways to setup or use yannt. The follow sections 
 
 ## Jupyter
 
-TBD
+I'm currently unsure of the user workflows within Jupyter, therefore I've constructed a minimal viable thing to test code in Jupyter. Roughly, you must start a Jupyter docker image with the `yannt` project mounted. Connect to the Jupyter instance and manually install yannt as if it was on a local host. The following example shows the scripts to run to install with pip.
+
+Build yannt Project for version in Jupyter: `PY_VER=3.9 ./scripts/build-docker-local-prod.sh`
+
+Start the Jupyter docker container: ./scripts/start-docker-local-jupyter.sh
+
+Inspect the Jupyter logs to get the token to access the localhost instance. Once connected, open a terminal and change directory (`cd`) into yannt folder. Then install with pip by running: `SKIP_COLLECT=1 ./scripts/install-host-local-pip.sh`.
+
+Optionally, enable tab completion in the temrinal with: `source ./scripts/bash-tab-complete.sh`.
 
 ## Pipx
 
-TBD
+Before using `pipx`, please ensure its installed and within your path:
+
+- Install pipx on Debian: `sudo apt update && sudo apt install pipx python3-pip`
+- Install pipx on other systems: `python3 -m pip install --user pipx`
+
+Since there is currently no upstream yannt, you must first build the yannt packages and then install via pipx from a local folder. You can choose to install with localized (offline) dependencies or upstream dependencies.
+
+Build yannt Project: `./scripts/build-docker-local-prod.sh`
+
+Offline yannt pipx Install: `SKIP_COLLECT=1 ./scripts/install-host-local-pipx.sh`
+
+Online yannt pipx install: `./scripts/install-host-upstream-pipx.sh`
+
+Now you should have `yannt` as a command in your normal (user) system environment.
 
 ## Developer Environment Setup
 
@@ -43,6 +64,16 @@ cd ..
 ```
 
 Once you have the environment cloned locally into the workspace (thirdparty-ws) or project (yannt) folders, you'll want to initialize the environment for developer activities. See the following sections for the options.
+
+### Offline **Builder** Docker Environment
+
+Environment designed to build yannt sdist and wheel packages by running within a docker environment within an offline system (i.e. no internet). The Docker container is only for managing the build environment, all modified files (with the docker `/work` mount) happen on the host system. Dependencies are expected to be pre-collected from an internet connected system and then prestaged into the same output folder (`pip_pkgs`) in the offline system. 
+
+To initialize, from top level `yannt` folder: `./scripts/build-docker-local-prod.sh`
+
+Optionally, select a specific python version: `PY_VER=3.9 ./scripts/build-docker-local-prod.sh`
+
+If successful, (assuming `python3 --version` is `3.13`) this will create: `./pip_pkgs/yannt/3.13` where all output ends up.
 
 ### Offline Developer Docker Environment
 

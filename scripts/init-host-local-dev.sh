@@ -9,7 +9,7 @@ export PS1_TAG="(${ML_VENV_NAME}) "
 export PS1="${PS1_TAG}${PS1:-\$ }"
 
 # Default to using system python version. Expecting only major.minor (e.g 3.13)
-${PROJ_PATH}/scripts/try_collector.sh
+[ -z "$SKIP_COLLECT" ] && ${PROJ_PATH}/scripts/try_collector.sh
 
 # Do the local install
 PIP_ARGS="--no-index --find-links pip_pkgs/${PY_VER}" \

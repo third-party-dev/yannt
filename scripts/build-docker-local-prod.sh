@@ -7,7 +7,7 @@ PROJ_PATH=$(realpath $(dirname $0)/..)
 export PY_VER=${PY_VER:-$(python3 --version | awk '{print $2}' | cut -d. -f1,2)}
 
 # TODO: Only download the build requirements!
-${PROJ_PATH}/scripts/try_collector.sh
+[ -z "$SKIP_COLLECT" ] && ${PROJ_PATH}/scripts/try_collector.sh
 
 # Allow user to assign venv name and tag shell prompt
 export ML_VENV_NAME=${ML_VENV_NAME:-ml-venv-${PY_VER}-bdlp}
@@ -25,6 +25,4 @@ docker run -ti --rm \
   -e PS1="${PS1}" \
   -e PY_VER="${PY_VER}" \
   python:${PY_VER}-slim \
-  /bin/bash
-
-  #/work/scripts/build-packages.sh
+  /work/scripts/build-packages.sh
