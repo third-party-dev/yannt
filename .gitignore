@@ -7,3 +7,5 @@ upstream/
 **.tar.gz
 **.egg-info
 **/__pycache__/
+.cache/
+.bash*

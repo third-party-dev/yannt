@@ -4,6 +4,8 @@
 
 PROJ_PATH=$(realpath $(dirname $0)/..)
 
+export PY_VER=${PY_VER:-$(python3 --version | awk '{print $2}' | cut -d. -f1,2)}
+
 # Allow user to assign venv name and tag shell prompt
 export ML_VENV_NAME=${ML_VENV_NAME:-ml-venv}
 export PS1_TAG="(${ML_VENV_NAME}) "
@@ -21,5 +23,5 @@ docker run -ti --rm \
   -v ${PROJ_PATH}:/work -w /work \
   -e PIP_ARGS="${PIP_ARGS}" \
   -e HOME=/work \
-  python:${PY_VER:-3.13}-slim \
+  python:${PY_VER}-slim \
   /work/scripts/build-dev-venv.sh

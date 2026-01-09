@@ -7,7 +7,7 @@ name = "thirdparty-yannt"
 version = "0.0.1"
 description = "Yet Another NN Tool"
 # Note: No idea the real version required at this time.
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 
 dependencies = [
     "argcomplete",
@@ -19,6 +19,3 @@ namespaces = true
 
 [project.scripts]
 yannt = "thirdparty.yannt.cli:main"
-
-
-
