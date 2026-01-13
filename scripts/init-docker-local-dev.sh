@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+#sudo apt install python3.13-venv
+#sudo apt install python3-argcomplete
+#sudo apt install python3-pip
+
+set -e
+
 # TODO: Check if PY_VER is set.
 
 PROJ_PATH=$(realpath $(dirname $0)/..)
@@ -13,6 +19,11 @@ export ML_VENV_NAME=${ML_VENV_NAME:-ml-venv-${PY_VER}-dld}
 export PS1_TAG="(${ML_VENV_NAME}) "
 export PS1="${PS1_TAG}${PS1:-\$ }"
 
+
+docker build -t init-docker-local-dev:${PY_VER}-slim --build-arg PY_VER="${PY_VER}" \
+  -f ${PROJ_PATH}/scripts/init-docker-local-dev.dockerfile \
+  ${PROJ_PATH}/scripts/context
+
 # Run the environment
 docker run -ti --rm \
   -u $(id -u):$(id -g) \
@@ -23,5 +34,5 @@ docker run -ti --rm \
   -e PY_VER="${PY_VER}" \
   -e PS1_TAG="${PS1_TAG}" \
   -e PS1="${PS1}" \
-  python:${PY_VER}-slim \
+  init-docker-local-dev:${PY_VER}-slim \
   /work/scripts/build-dev-venv.sh

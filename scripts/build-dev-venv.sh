@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
+set -e
+
 PROJ_PATH=$(realpath $(dirname $0)/..)
+cd $PROJ_PATH
 
 EXTERN_DIR=${PROJ_PATH}/extern
 
@@ -29,6 +32,7 @@ pip show thirdparty_yannt &>/dev/null || pip install $PIP_ARGS -e yannt
 mkdir -p ${EXTERN_DIR}
 for pkgpath in ${EXTERN_DIR}/*; do
   if [ -d "$pkgpath" ]; then
+    echo pip install -U $PIP_ARGS -e $pkgpath
     pip show $(basename "$pkgpath") &>/dev/null || pip install -U $PIP_ARGS -e $pkgpath
   fi
 done
