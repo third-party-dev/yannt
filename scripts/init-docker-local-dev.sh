@@ -19,7 +19,7 @@ export ML_VENV_NAME=${ML_VENV_NAME:-ml-venv-${PY_VER}-dld}
 export PS1_TAG="(${ML_VENV_NAME}) "
 export PS1="${PS1_TAG}${PS1:-\$ }"
 
-
+mkdir -p ${PROJ_PATH}/scripts/context
 docker build -t init-docker-local-dev:${PY_VER}-slim --build-arg PY_VER="${PY_VER}" \
   -f ${PROJ_PATH}/scripts/init-docker-local-dev.dockerfile \
   ${PROJ_PATH}/scripts/context
