@@ -38,4 +38,5 @@ docker run -ti --rm \
   /work/scripts/download_deps_for.sh \
     /work/yannt \
     /work/extern/thirdparty_pparse \
-    /work/extern/thirdparty_yannt_transformers
+    /work/extern/thirdparty_yannt_transformers \
+    /work/extern/thirdparty_yannt_yolo
