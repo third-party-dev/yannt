@@ -39,4 +39,5 @@ docker run -ti --rm \
     /work/yannt \
     /work/extern/thirdparty_pparse \
     /work/extern/thirdparty_yannt_transformers \
-    /work/extern/thirdparty_yannt_yolo
+    /work/extern/thirdparty_yannt_yolo \
+    /work/extern/thirdparty_yannt_sysscan
