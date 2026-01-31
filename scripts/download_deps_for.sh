@@ -14,7 +14,9 @@ fi
 
 echo PIP_ARGS: ${PIP_ARGS}
 
-pip download $PIP_ARGS $PY_CONSTRAINTS_ARGS pip setuptools wheel build pytest ipykernel cmake
+pip download $PIP_ARGS $PY_CONSTRAINTS_ARGS \
+  pip setuptools wheel build pytest ipykernel cmake \
+  Cython meson-python ninja patchelf
 
 for arg in "$@"; do
     pip download $PIP_ARGS $PY_CONSTRAINTS_ARGS $arg

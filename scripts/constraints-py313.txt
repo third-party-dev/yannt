@@ -1,0 +1,27 @@
+# Python 3.13 constraints (no stable TensorFlow yet)
+
+build<1.4.0
+chex<=0.1.9
+coremltools<9.1
+Cython<3.1
+meson-python<0.16.0
+matplotlib<3.10
+numpy<2
+onnx<1.18
+onnxruntime<1.20
+opencv_python<4.12
+opencv-python-headless<4.12
+optax<=0.2.4
+protobuf<5
+pydot<2
+pyparsing<3
+# TensorFlow ecosystem omitted because stable wheels not available
+# tensorflow>=2.20.0rc0,<2.21
+# tensorflow>=2.16.1,<2.18
+# tensorflow_cpu>=2.16.1,<2.18
+# tf_keras>=2.16,<2.18
+# tensorflowjs>=4.17,<5
+tensorflow_decision_forests<1.11  # only if not depending on TF
+tensorstore<0.1.72
+ultralytics<8.2.0
+wurlitzer<3.2

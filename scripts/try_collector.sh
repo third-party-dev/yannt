@@ -30,13 +30,14 @@ DEFAULT_PIP_ARGS="
 PIP_ARGS=${PIP_ARGS:-${DEFAULT_PIP_ARGS}}
 
 # Download CPU-only Torch and everything else
+# # python:${PY_VER}-slim
 docker run -ti --rm \
   -v ${PROJ_PATH}:/work -w /work/pip_pkgs/${PY_VER} \
   -e PIP_ARGS="$PIP_ARGS" \
   -e PY_CONSTRAINTS="${PY_CONSTRAINTS}" \
   -e HOME=/work \
   -u $(id -u):$(id -g) \
-  python:${PY_VER}-slim \
+  init-docker-local-dev:${PY_VER}-slim \
   /work/scripts/download_deps_for.sh \
     /work/yannt \
     /work/extern/thirdparty_pparse \

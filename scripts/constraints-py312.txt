@@ -1,0 +1,23 @@
+# Python 3.12 + TensorFlow (stable)
+
+build<1.4.0
+numpy<2
+protobuf<5
+tensorflow<2.18
+tensorflow_cpu<2.18
+tf_keras<2.18
+tensorflow_decision_forests<1.11
+tensorstore<0.1.72
+tensorflowjs<5
+onnx<1.18
+onnxruntime<1.20
+opencv_python<4.12
+opencv-python-headless<4.12
+matplotlib<3.10
+pydot<2
+pyparsing<3
+chex<=0.1.9
+optax<=0.2.4
+coremltools<9.1
+ultralytics<8.2.0
+wurlitzer<3.2

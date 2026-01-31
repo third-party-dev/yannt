@@ -28,7 +28,8 @@ if [ ! -e "${PROJ_PATH}/venv/${ML_VENV_NAME}" ]; then
   [ $? -ne 0 ] && { echo "Failed to create venv"; exit 1; }
   echo "--------------------- Setting Up Base Python Requirements ---------------------"
   ${PROJ_PATH}/venv/${ML_VENV_NAME}/bin/pip install --upgrade ${PIP_ARGS} ${PY_CONSTRAINTS_ARGS} \
-    pip setuptools wheel build pytest ipykernel cmake
+    pip setuptools wheel build pytest ipykernel cmake \
+    Cython meson-python ninja patchelf
 fi
 source ${PROJ_PATH}/venv/${ML_VENV_NAME}/bin/activate
 

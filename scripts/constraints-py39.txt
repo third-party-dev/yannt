@@ -23,10 +23,3 @@ tensorstore<0.1.70
 tf_keras<2.16
 ultralytics<8.1.48
 wurlitzer<3.2
-
-# ERROR: pip's dependency resolver does not currently take into account
-# all the packages that are installed. This behaviour is the source of
-# the following dependency conflicts.
-#
-# tensorflowjs 4.10.0 requires packaging~=20.9, but you have packaging
-# 26.0 which is incompatible.
