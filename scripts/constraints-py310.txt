@@ -1,0 +1,30 @@
+# Python 3.10 + TensorFlow
+
+build<1.4.0
+chex<=0.1.7
+coremltools<9.1
+ipykernel<6.30
+matplotlib<3.9
+numpy<2
+onnx<1.18
+opencv_python<4.11
+opencv-python-headless<4.11
+optax<=0.2.1
+protobuf<4.26
+pydot<2
+pyparsing<3
+tensorflow>=2.16.0,<2.17.0
+#tensorflow_cpu>=2.15,<2.17
+tensorflow_decision_forests<1.10
+tensorstore<0.1.70
+tf_keras<2.17
+tensorflowjs<5
+ultralytics<=8.0.188
+wurlitzer<3.2
+
+# ERROR: pip's dependency resolver does not currently take into account
+# all the packages that are installed. This behaviour is the source of
+# the following dependency conflicts.
+#
+# build 1.4.0 requires packaging>=24.0, but you have packaging 23.2 which
+# is incompatible.

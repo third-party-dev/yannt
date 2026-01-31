@@ -2,6 +2,7 @@
 
 PROJ_PATH=$(realpath $(dirname $0)/..)
 PY_VER=${PY_VER:-$(python3 --version | awk '{print $2}' | cut -d. -f1,2)}
+export PY_CONSTRAINTS=${PY_CONSTRAINTS:-}
 
 # Detect if we can run the collector
 # BUG: Logic should be reversed so we know _all_ URLs work.
@@ -23,8 +24,8 @@ mkdir -p ${PROJ_PATH}/pip_pkgs/${PY_VER}
 
 DEFAULT_PIP_ARGS="
   --index-url https://download.pytorch.org/whl/cpu \
-  --extra-index-url https://pypi.org/simple
-"
+  --extra-index-url https://pypi.org/simple \
+  -d /work/pip_pkgs/${PY_VER}"
 
 PIP_ARGS=${PIP_ARGS:-${DEFAULT_PIP_ARGS}}
 
@@ -32,6 +33,7 @@ PIP_ARGS=${PIP_ARGS:-${DEFAULT_PIP_ARGS}}
 docker run -ti --rm \
   -v ${PROJ_PATH}:/work -w /work/pip_pkgs/${PY_VER} \
   -e PIP_ARGS="$PIP_ARGS" \
+  -e PY_CONSTRAINTS="${PY_CONSTRAINTS}" \
   -e HOME=/work \
   -u $(id -u):$(id -g) \
   python:${PY_VER}-slim \
