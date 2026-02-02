@@ -20,9 +20,10 @@ def load_entrypoint_plugins(entrypoint_group):
     if isinstance(entry_points(), dict):
         # Python 3.9
         eps = []
-        for ep in entry_points()['yannt_command']:
-            if not ep in eps:
-                eps.append(ep)
+        if "yannt_command" in entry_points():
+            for ep in entry_points()["yannt_command"]:
+                if not ep in eps:
+                    eps.append(ep)
     else:
         # Python 3.10+
         eps = entry_points(group=entrypoint_group)

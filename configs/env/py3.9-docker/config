@@ -1,0 +1,8 @@
+# Assume defined: PROJ_PATH
+export APT_PKGS="graphviz flatbuffers-compiler protobuf-compiler cmake build-essential libopencv-dev"
+export PIP_PKGS="pip setuptools wheel build pytest ipykernel cmake Cython meson-python ninja patchelf"
+export PY_VER=${PY_VER:-3.9}
+# PY_CONTRAINTS should be relative to PROJ_PATH.
+export PY_CONSTRAINTS=${PY_CONSTRAINTS:-configs/pyver/${PY_VER}/constraints.txt}
+export ML_VENV_NAME=${ML_VENV_NAME:-ml-venv-${PY_VER}}
+export PS1_TAG=${PS1_TAG:-"(${ML_VENV_NAME}) "}

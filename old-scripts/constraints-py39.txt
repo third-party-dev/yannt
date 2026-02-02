@@ -23,3 +23,5 @@ tensorstore<0.1.70
 tf_keras<2.16
 ultralytics<8.1.48
 wurlitzer<3.2
+meson-python<0.18
+pyproject-metadata<0.10
