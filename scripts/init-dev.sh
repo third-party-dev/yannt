@@ -6,7 +6,7 @@ export PROJ_PATH=$(realpath $(dirname $0)/..)
 export CONFIG_NAME="$1"
 export CONFIG_PATH="${PROJ_PATH}/configs/env/${CONFIG_NAME}"
 
-if [ "$CONFIG_NAME" = "list" ]; then
+if [ -z "$CONFIG_NAME" -o "$CONFIG_NAME" = "list" ]; then
     ls -1 ${PROJ_PATH}/configs/env
     exit 0
 fi
