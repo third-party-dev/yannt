@@ -9,3 +9,5 @@ upstream/
 **/__pycache__/
 cache/
 **/build/
+outputs/
+models/
