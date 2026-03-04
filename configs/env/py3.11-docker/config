@@ -1,0 +1,19 @@
+# Assume defined: PROJ_PATH, CONFIG_NAME, CONFIG_PATH
+
+export APT_PKGS="graphviz flatbuffers-compiler protobuf-compiler cmake build-essential libopencv-dev"
+export PY_VER=${PY_VER:-3.11}
+
+# PY_CONSTRAINTS/PY_REQS should be relative to PROJ_PATH.
+export PY_CONSTRAINTS=${PY_CONSTRAINTS:-configs/pyver/${PY_VER}/constraints-py311.txt}
+export PY_REQS=${PY_REQS:-configs/pyver/${PY_VER}/requirements-py311.txt}
+
+export ML_VENV_NAME=${ML_VENV_NAME:-ml-cri-${PY_VER}}
+export PS1_TAG=${PS1_TAG:-"(${ML_VENV_NAME}) "}
+
+export CRI_PROJ_PATH=/work
+
+export PIP_IDX_ARGS="
+  --index-url https://download.pytorch.org/whl/cpu \
+  --extra-index-url https://pypi.org/simple"
+
+export PIP_UPSTREAM_VERIFIERS="https://download.pytorch.org/whl/cpu https://pypi.org/simple"
