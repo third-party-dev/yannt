@@ -36,8 +36,8 @@ source $(dirname $(which conda))/activate
 
 # Note: Assuming it is OK to not check if the environment exists.
 
-echo "Automatically accepting TOS."
-conda tos accept
+#echo "Automatically accepting TOS."
+#conda tos accept
 
 # Create conda environment.
 mkdir -p ${PROJ_PATH}/cache/conda/envs
@@ -117,6 +117,8 @@ for pkgpath in ${EXTERN_DIR}/*; do
 done
 
 # -------------- Dropping to shell ----------------
+if [ -z "$NO_SHELL" ]; then
+
 echo
 echo "The environment is now ready. Try 'yannt --help' for information."
 
@@ -132,3 +134,4 @@ EOF
 
 exec bash --rcfile "$TMP_RC" -i
 
+fi

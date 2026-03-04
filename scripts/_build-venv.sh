@@ -78,7 +78,9 @@ for pkgpath in ${EXTERN_DIR}/*; do
   fi
 done
 
-${CRI_PROJ_PATH}/scripts/_start-venv.sh
+if [ -z "$NO_SHELL" ]; then
+  ${CRI_PROJ_PATH}/scripts/_start-venv.sh
+fi
 
 # echo
 # echo "The environment is now ready. Try 'yannt --help' for information."

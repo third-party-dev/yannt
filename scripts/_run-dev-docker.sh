@@ -38,6 +38,7 @@ docker run -ti --rm \
     -e PY_VER="${PY_VER}" \
     -e PY_REQS="${PY_REQS}" \
     -e PY_CONSTRAINTS="${PY_CONSTRAINTS}" \
+    -e NO_SHELL="$NO_SHELL" \
     -e HOME=${CRI_PROJ_PATH}/cache/docker-home \
     -e USER="user" \
     -e ML_VENV_NAME="${ML_VENV_NAME}" \
