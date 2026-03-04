@@ -19,7 +19,8 @@ echo "The environment is now ready. Try 'yannt --help' for information."
 # Include yannt tab completion.
 TMP_RC="$(mktemp)"
 cat >> "$TMP_RC" <<'EOF'
-[ -f "~/.bashrc" ] && source ~/.bashrc
+[ -f "$HOME/.bashrc" ] && source $HOME/.bashrc
+source ${CRI_PROJ_PATH}/cache/venv/${ML_VENV_NAME}/bin/activate
 eval "$(register-python-argcomplete yannt)"
 EOF
 

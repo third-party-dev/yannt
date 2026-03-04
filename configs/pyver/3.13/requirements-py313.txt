@@ -1,0 +1,11 @@
+pip
+setuptools
+wheel
+build
+pytest
+ipykernel
+cmake
+Cython
+meson-python
+ninja
+patchelf
