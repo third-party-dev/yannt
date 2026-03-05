@@ -1,0 +1,4 @@
+# Assume defined: PROJ_PATH, CONFIG_NAME, CONFIG_PATH
+
+export ML_VENV_NAME=${ML_VENV_NAME:-"yolo-tf-conda"}
+

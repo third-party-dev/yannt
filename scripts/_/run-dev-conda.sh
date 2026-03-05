@@ -34,8 +34,8 @@ if [ -z "$(which conda)" ]; then
 fi
 source $(dirname $(which conda))/activate
 
-echo "Automatically accepting TOS."
-conda tos accept
+#echo "Automatically accepting TOS."
+#conda tos accept
 
 conda activate ${PROJ_PATH}/cache/conda/envs/${ML_VENV_NAME}
 

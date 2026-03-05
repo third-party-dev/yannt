@@ -10,5 +10,5 @@ if [ -z "${PROJ_PATH}" ]; then
 fi
 
 # Forward to generic script.
-${PROJ_PATH}/scripts/_run-dev-conda.sh $@
+${PROJ_PATH}/scripts/_/run-dev-conda.sh $@
 

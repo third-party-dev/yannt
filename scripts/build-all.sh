@@ -26,7 +26,7 @@ done
 
 # Activate each environment
 source "$(dirname $(dirname $(which conda)))/bin/activate"
-for cfg in $(ls -1 ${PROJ_PATH}/configs/env | grep -- "conda"); do
+for cfg in $(ls -1 ${PROJ_PATH}/configs/env | grep -E '^py.*conda$'); do
     echo "Fetching pip freeze for $cfg"
     (   # Run the following config in its own shell.
         source ${PROJ_PATH}/configs/env/$cfg/config \

@@ -1,0 +1,85 @@
+absl-py==2.4.0
+ai-edge-litert==2.1.2
+astunparse==1.6.3
+backports.strenum==1.2.8
+brotlicffi @ file:///home/task_176496126216915/conda-bld/brotlicffi_1764961310969/work
+certifi @ file:///home/task_176765898832781/croot/certifi_1767659141017/work/certifi
+cffi @ file:///home/task_176183215235376/conda-bld/cffi_1761832773734/work
+charset-normalizer @ file:///home/task_176174480956840/conda-bld/charset-normalizer_1761744822896/work
+colorama==0.4.6
+contourpy @ file:///home/task_176364362873675/conda-bld/contourpy_1763643921742/work
+cycler @ file:///home/task_176606789349323/croot/cycler_1766067915143/work
+filelock @ file:///home/task_176943957172477/croot/filelock_1769440496252/work
+flatbuffers==25.12.19
+fonttools @ file:///home/task_176544511140267/conda-bld/fonttools_1765445134313/work
+fsspec @ file:///home/task_176889821089028/croot/fsspec_1768898273330/work
+gast==0.7.0
+gmpy2 @ file:///home/task_176474799776688/conda-bld/gmpy2_1764748047044/work
+google-pasta==0.2.0
+grpcio==1.78.0
+h5py==3.15.1
+idna @ file:///home/task_176191178300919/conda-bld/idna_1761911982343/work
+Jinja2 @ file:///croot/jinja2_1741710844255/work
+keras==3.13.2
+kiwisolver @ file:///home/task_176415926903268/conda-bld/kiwisolver_1764159297481/work
+libclang==18.1.1
+Markdown==3.10.2
+markdown-it-py==4.0.0
+MarkupSafe @ file:///croot/markupsafe_1738584038848/work
+matplotlib==3.10.8
+mdurl==0.1.2
+ml_dtypes==0.5.4
+mpmath @ file:///croot/mpmath_1690848262763/work
+namex==0.1.0
+networkx @ file:///home/task_176537858778399/conda-bld/networkx_1765378626589/work
+numpy==2.1.3
+onnx==1.20.1
+onnx2tf==1.28.8
+onnx_graphsurgeon==0.5.8
+onnxruntime==1.24.2
+onnxslim==0.1.87
+opencv-python==4.12.0
+opencv-python-headless==4.12.0
+opt_einsum==3.4.0
+optree @ file:///home/task_176544500330461/conda-bld/optree_1765445022562/work
+packaging @ file:///home/task_176104885106445/conda-bld/packaging_1761049078006/work
+pandas @ file:///home/task_177064302115958/croot/pandas_1770643090442/work
+pillow @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_pillow_1770794002/work
+polars @ file:///home/task_176242282993003/conda-bld/polars-split_1762422845693/work
+polars-runtime-32 @ file:///home/task_176242282993003/conda-bld/polars-split_1762422845693/work/polars-runtime-32
+protobuf==5.29.6
+psutil @ file:///home/task_176189642143064/conda-bld/psutil_1761896460324/work
+py-cpuinfo @ file:///croot/py-cpuinfo_1698068081650/work
+pybind11 @ file:///croot/pybind11-split_1738944777954/work
+pybind11_global @ file:///croot/pybind11-split_1738944777954/work
+pycparser @ file:///home/task_175749606196006/conda-bld/pycparser_1757496076770/work
+Pygments==2.19.2
+pyparsing @ file:///home/task_176397386651997/conda-bld/pyparsing_1763973878368/work
+PySocks @ file:///home/task_176175228059944/conda-bld/pysocks_1761753009523/work
+python-dateutil @ file:///croot/python-dateutil_1716495738603/work
+PyYAML @ file:///home/task_176346545528585/conda-bld/pyyaml_1763465495007/work
+requests @ file:///home/task_176235919505742/conda-bld/requests_1762359593170/work
+rich==14.3.3
+scipy @ file:///home/task_176219477719838/conda-bld/scipy_1762194788951/work/dist/scipy-1.16.3-cp311-cp311-linux_x86_64.whl#sha256=04b2ce472674557a523a1efb956a3368f00804343086fe898a09cca1607a2872
+seaborn @ file:///croot/seaborn_1749110291192/work
+six @ file:///croot/six_1744271502820/work
+sng4onnx==2.0.1
+sympy @ file:///home/task_176476213407811/conda-bld/sympy_1764762918097/work
+tensorboard==2.19.0
+tensorboard-data-server==0.7.2
+tensorflow==2.19.0
+tensorflow-io-gcs-filesystem==0.37.1
+termcolor==3.3.0
+tf_keras==2.19.0
+torch @ file:///home/conda/feedstock_root/build_artifacts/libtorch_1762090669685/work
+torchaudio @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_torchaudio_1762047840/work
+torchcodec @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_torchcodec_1762022904/work
+torchvision @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_torchvision_1762096644/work
+torchvision-extra-decoders @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_torchvision-extra-decoders_1759392554/work
+tqdm==4.67.3
+typing_extensions @ file:///croot/typing_extensions_1756280817316/work
+ultralytics @ file:///home/conda/feedstock_root/build_artifacts/ultralytics_1772288247281/work
+ultralytics-thop==2.0.18
+urllib3 @ file:///home/task_176781010927466/croot/urllib3_1767810311566/work
+Werkzeug==3.1.6
+wrapt==2.1.1

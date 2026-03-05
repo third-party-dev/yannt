@@ -1,0 +1,313 @@
+python --version
+yannt transformers list | grep gpt2
+yannt transformers create --name gpt2 --type AutoModelForCausalLM --onnx_path outputs/gpt2-onnx
+yannt transformers create --model gpt2 --type AutoModelForCausalLM --onnx_path outputs/gpt2-onnx
+yannt transformers create --model gpt2 --type AutoModelForCausalLM --onnx_path outputs/gpt2-onnx
+yannt transformers create --model gpt2 --type AutoModelForCausalLM --onnx_path outputs/gpt2-onnx
+yannt transformers list | grep bert
+yannt transformers create --model bert --type AutoModel --onnx_path outputs/bert-onnx
+yannt transformers create --model bert --type AutoModelForMaskedLM --onnx_path outputs/bert-onnx
+yannt transformers create --model bert-base-uncased --type AutoModelForMaskedLM --onnx_path outputs/bert-onnx
+yannt transformers list | grep bert
+yannt transformers create --model roberta --type AutoModelForMaskedLM --onnx_path outputs/bert-onnx
+yannt transformers create --model bert --type AutoModelForMaskedLM --onnx_path outputs/bert-onnx
+yannt transformers create --model bert --type AutoModelForMaskedLM --onnx_path outputs/bert-onnx
+exit
+yannt transformers create --model bert --type AutoModelForMaskedLM --onnx_path outputs/bert-onnx
+pip freeze
+exit
+pip freeze
+exit
+pip freeze
+yannt transformers create --model bert --type AutoModelForMaskedLM --onnx_path outputs/bert-onnx
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as drawer --out output/bert-drawer/model.svg
+exit
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as drawer --out output/bert-drawer/model.svg
+rmdir output/bert-drawer/model.svg
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as drawer --out output/bert-drawer/model.svg
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as drawer --out outputs/bert-drawer/model.svg
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as graphviz | dot -Tsvg -o output/bert-drawer/my-model.svg -
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as graphviz | dot -Tsvg -o output/bert-drawer/my-model.svg
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as graphviz 
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as graphviz 2>/dev/null
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as graphviz 2>/dev/null
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as graphviz 2>/dev/null
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as graphviz 2>/dev/null
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as graphviz 2>/dev/null
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as graphviz 2>/dev/null
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as graphviz 2>/dev/null
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as graphviz 2>/dev/null
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as graphviz | grep -v "Config not found for parakeet" | dot -Tsvg -o outputs/bert-drawer/my-model.svg
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as compiler_ir
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as signature
+yannt transformers list | grep gpt2
+yannt transformers graph --model gpt2 --type AutoModelForCausalLM --as signature
+yannt transformers graph --model gpt2 --type AutoModelForCausalLM --as nodes
+yannt transformers graph --model gpt2 --type AutoModelForCausalLM --as nodes
+yannt transformers graph --model gpt2 --type AutoModelForCausalLM --as nodes
+yannt transformers graph --model gpt2 --type AutoModelForCausalLM --as nodes
+yannt transformers graph --model gpt2 --type AutoModelForCausalLM --as nodes
+yannt transformers list | grep gpt
+yannt transformers graph --model gptj --type AutoModelForCausalLM --as nodes
+yannt transformers graph --model openai-gpt --type AutoModelForCausalLM --as nodes
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as onnx --out outputs/bert-onnx/model.onnx
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as onnx --out outputs/bert-onnx/model.onnx
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as onnx --out outputs/bert-onnx/model.onnx
+yannt transformers graph --model bert --type AutoModelForMaskedLM --as nodes --out outputs/bert-onnx/model.onnx
+exit
+yann--help
+yannt --help
+yannt --help
+exit
+yannt --help
+pip install -U --no-index --find-links /work/pip_pkgs/3.9 -e /work/extern/thirdparty_yannt_yolo
+yannt --help
+pip install -U --no-index --find-links /work/pip_pkgs/3.9 -e /work/extern/thirdparty_yannt_yolo
+yannt --help
+pip install -U --no-index --find-links /work/pip_pkgs/3.9 -e /work/extern/thirdparty_yannt_yolo
+yannt --help
+yannt yolo list
+pip uninstall -y opencv-python opencv-contrib-python
+pip install opencv-python-headless
+yannt yolo list
+yolo 
+yannt yolo create --help
+yannt yolo create --help
+yannt yolo create --help
+yannt yolo create
+yannt yolo create --help
+yannt yolo list
+yannt yolo list
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v8/yolov8.yaml --as pt --path yolov8.pt
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v8/yolov8.yaml --as pt --path yolov8.pt
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v8/yolov8.yaml --as pt --path yolov8.pt
+ls
+clear
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v8/yolov8.yaml --as pt --path yolov8.pt
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v8/yolov8.yaml --as pt
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v8/yolov8.yaml --as pt
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v8/yolov8.yaml --as tflite
+exit
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v8/yolov8.yaml --as tflite
+pip freeze
+exit
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan full 
+yannt sysscan quick
+yannt sysscan quick
+pip install -U extern/thirdparty_yannt_sysscan/
+pip install -Ue extern/thirdparty_yannt_sysscan/
+pip install -U -e ./extern/thirdparty_yannt_sysscan
+#pyhton -m pip install -U -e ./extern/thirdparty_yannt_sysscan
+cd extern/thirdparty_yannt_sysscan/
+python -m pip install -U -e .
+python -m pip install -U -e .
+python -m pip install -U -e .
+python -m pip install -U -e .
+python -m pip install -U -e .
+yannt sysscan quick
+python -m pip install -U -e .
+yannt sysscan quick
+python -m pip show -f .
+python -m pip show -f thirdparty.yannt.sysscan
+python -c "import pkg_resources; print(pkg_resources.resource_listdir('thirdparty_yannt_sysscan', 'data'))"
+python -c "import pkg_resources; print(pkg_resources.resource_listdir('thirdparty.yannt.sysscan', 'data'))"
+python -m pip show -f thirdparty.yannt.sysscan
+python -m pip show -f .
+python -m pip install -U -e .
+python -m pip show -f thirdparty.yannt.sysscan
+python -c "import pkg_resources; print(pkg_resources.resource_listdir('thirdparty.yannt.sysscan', 'data'))"
+python -c "from importlib import resources; print(resources.files('thirdparty.yannt.sysscan'))"
+python -c "from importlib import resources; print(resources)"
+python -c "from importlib import resources; breakpoint()"
+python -c "from importlib import resources; print(resources.files('thirdparty.yannt.sysscan'))"
+python -c "from importlib import resources; print(resources.files('thirdparty.yannt.sysscan')).joinpath('data/misc-pci.ids)"
+python -c "from importlib import resources; print(resources.files('thirdparty.yannt.sysscan')).joinpath('data/misc-pci.ids')"
+python -c "from importlib import resources; print(resources.open_text('thirdparty.yannt.sysscan', 'data/misc-pci.ids))"
+python -c "from importlib import resources; print(resources.open_text('thirdparty.yannt.sysscan', 'data/misc-pci.ids'))"
+python -c "from importlib import resources; print(resources.open_text('thirdparty.yannt.sysscan', 'misc-pci.ids'))"
+python -c "from importlib import resources; print(resources.open_text('thirdparty.yannt.sysscan.data', 'misc-pci.ids'))"
+python -c "from importlib import resources; print(resources.open_text('thirdparty.yannt.sysscan', 'data/misc-pci.ids'))"
+python -c "from importlib import resources; print(resources.open_text('thirdparty.yannt.sysscan.data', 'misc-pci.ids'))"
+python -c "from importlib import resources; print(resources.open_text('thirdparty.yannt.sysscan.data', 'misc-pci.ids').read())"
+yannt sysscan quick
+git st
+exit
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v8/yolov8.yaml --as tflite
+pip uninstall opencv-python
+pip install opencv-python-headless
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v8/yolov8.yaml --as tflite
+ls
+pip install pip_pkgs/3.9/opencv_python_headless-4.13.0.90-cp37-abi3-manylinux_2_28_x86_64.whl 
+pip install -U pip_pkgs/3.9/opencv_python_headless-4.13.0.90-cp37-abi3-manylinux_2_28_x86_64.whl 
+pip install --force-reinstall pip_pkgs/3.9/opencv_python_headless-4.13.0.90-cp37-abi3-manylinux_2_28_x86_64.whl 
+pip freeze | grep opencv
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v8/yolov8.yaml --as tflite
+pip install packaging>=24
+pip freeze
+pip install -U packaging>=24
+clear
+ls
+exit
+pip freeze > scripts/freeze-py310.txt
+yannt --help
+exit
+exit
+exit
+exit
+exit
+exit
+exit
+ls
+pip freeze
+pip freeze > scripts/freeze-py311.txt
+exit
+pip freeze > scripts/freeze-py312.txt
+exit
+yannt --help
+yannt yolo --help
+yannt yolo list
+yannt yolo list | grep v5
+yannt yolo create --help
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v5/yolov5.yaml --as tflite
+exit
+pip freeze
+exit
+exit
+exit
+yolo --help
+yolo help
+yolo export help
+yolo cfg
+yannt yolo create --yaml_path /work/venv/ml-venv-3.9-dld/lib/python3.9/site-packages/ultralytics/cfg/models/v5/yolov5.yaml --as tflite
+yolo export model=yolov5s.pt format=tflite
+yolo export model=yolov5s.pt format=tflite weights_only=True
+#yolo export model=path/to/best.pt format=tflite
+yolo export model=yolov5su.pt format=tflite
+transformers --help
+exit
+yannt --help
+yannt --help
+yannt --help
+exit
+yannt --help
+exit
+yannt
+yannt
+exit
+exit
+exit
+exit
+echo $HOME
+ls -la ~
+cd ~
+pwd
+mktemp
+register-python-argcomplete yannt
+q
+exit
+ls -l /tmp/tmp.1SlyTj1icB
+ls -l /tmp/tmp.1SlyTj1icB/
+vi /tmp/tmp.1SlyTj1icB
+yannt --help
+yannt --help
+yannt cri --help
+python3 -m venv --help
+yannt sysscan --help
+exit
+yannt info
+yannt info
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+python3
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+yannt info yolo5
+exit
+pip freeze
+ls
+cd extern/thirdparty_pparse/tests/labs/flatbuffers/
+flatc --python schema.fbs
+chmod +x parse.py 
+./parse.py ../../data/models/yolo/yolov5su_float32.tflite 
+./parse.py ../../data/models/yolo/yolov5su_float32.tflite 
+./parse.py ../../data/models/yolo/yolov5su_float32.tflite 
+./parse.py ../../data/models/yolo/yolov5su_float32.tflite 
+./parse.py ../../data/models/yolo/yolov5su_float32.tflite 
+./parse.py ../../data/models/yolo/yolov5su_float32.tflite 
+pip freeze
+pip isntall onnx
+pip install onnx
+pip freeze
+cd ../onnx/
+./parse.py ../../data/models/yolo/yolov5su.onnx 
+./parse.py ../../data/models/yolo/yolov5su.onnx 
+./parse.py ../../data/models/yolo/yolov5su.onnx 
+./parse.py ../../data/models/yolo/yolov5su.onnx 
+ls
+cd ../../
+cd labs/safetensors/
+ls
+chmod +x *.py
+./pt_to_safetensors.py ../../data/models/yolo/yolov5su.pt ../../data/models/yolo/yolov5su.safetensors
+pip install safetensors
+./pt_to_safetensors.py ../../data/models/yolo/yolov5su.pt ../../data/models/yolo/yolov5su.safetensors
+pip install packaging
+./pt_to_safetensors.py ../../data/models/yolo/yolov5su.pt ../../data/models/yolo/yolov5su.safetensors
+./pt_to_safetensors.py ../../data/models/yolo/yolov5su.pt ../../data/models/yolo/yolov5su.safetensors
+./pt_to_safetensors.py ../../data/models/yolo/yolov5su.pt ../../data/models/yolo/yolov5su.safetensors
+./pt_to_safetensors.py ../../data/models/yolo/yolov5su.pt ../../data/models/yolo/yolov5su.safetensors
+ls
+./parse.py yolov5su.safetensors 
+cd ../mnn/
+ls
+chmod +x parse.py 
+./parse.py ../../data/models/yolo/yolov5su.mnn
+./parse.py ../../data/models/yolo/yolov5su.mnn
+./parse.py ../../data/models/yolo/yolov5su.mnn
+./parse.py ../../data/models/yolo/yolov5su.mnn
+./parse.py ../../data/models/yolo/yolov5su.mnn
+./parse.py ../../data/models/yolo/yolov5su.mnn
+pip install MNN
+./parse.py ../../data/models/yolo/yolov5su.mnn
+sudo apt install execstack
+exit

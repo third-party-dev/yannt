@@ -10,4 +10,4 @@ if [ -z "${PROJ_PATH}" ]; then
 fi
 
 # Forward to generic script.
-${PROJ_PATH}/scripts/_init-dev-docker.sh $@
+${PROJ_PATH}/scripts/_/init-dev-docker.sh $@

@@ -19,7 +19,7 @@ docker build \
   -t ml-venv-dev:${PY_VER}-slim \
   --build-arg PY_VER="${PY_VER}" \
   --build-arg APT_PKGS="${APT_PKGS}" \
-  -f ${PROJ_PATH}/scripts/init-dev.dockerfile \
+  -f ${PROJ_PATH}/scripts/_/init-dev.dockerfile \
   ${PROJ_PATH}/cache/empty-context
 
 
@@ -58,7 +58,7 @@ if [ -z "$SKIP_COLLECT" ]; then
     -e HOME=${CRI_PROJ_PATH}/cache/docker-home \
     -u $(id -u):$(id -g) \
     ml-venv-dev:${PY_VER}-slim \
-    ${CRI_PROJ_PATH}/scripts/_download-all-deps.sh
+    ${CRI_PROJ_PATH}/scripts/_/download-all-deps.sh
 
 fi
 

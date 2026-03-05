@@ -14,7 +14,7 @@ source ${CONFIG_PATH}/config
 
 if [ "${RUN_MODE}" = "build" ]; then
   echo "Building the venv."
-  CONTAINER_CMD=${CRI_PROJ_PATH}/scripts/_build-venv.sh
+  CONTAINER_CMD=${CRI_PROJ_PATH}/scripts/_/build-venv.sh
 else
   echo "Starting the venv."
   if [ ! -e "${PROJ_PATH}/cache/venv/${ML_VENV_NAME}" ]; then
@@ -23,7 +23,7 @@ else
     echo "Run: ./scripts/init-dev.sh ${CONFIG_NAME}"
     exit 1
   fi
-  CONTAINER_CMD=${CRI_PROJ_PATH}/scripts/_start-venv.sh
+  CONTAINER_CMD=${CRI_PROJ_PATH}/scripts/_/start-venv.sh
 fi
 
 
