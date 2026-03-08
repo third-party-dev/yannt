@@ -54,5 +54,5 @@ ${CRI_BIN} run -ti --rm \
     -e HOME=${CRI_PROJ_PATH}/cache/docker-home \
     -e USER="user" \
     ${CRI_RUN_ARGS} \
-    ultralytics/ultralytics:8.4.8-python-export \
+    docker.io/ultralytics/ultralytics:8.4.8-python-export \
     ${CRI_CMD}

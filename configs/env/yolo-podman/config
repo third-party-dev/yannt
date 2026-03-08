@@ -1,0 +1,7 @@
+# Assume defined: PROJ_PATH, CONFIG_NAME, CONFIG_PATH
+
+export ML_VENV_NAME=${ML_VENV_NAME:-"yolo-podman"}
+
+export CRI_PROJ_PATH=${CRI_PROJ_PATH:-"/work"}
+export CRI_BIN=${CRI_BIN:-podman}
+export CRI_RUN_ARGS=${CRI_RUN_ARGS:-"--userns keep-id"}
