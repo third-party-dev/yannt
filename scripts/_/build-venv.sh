@@ -2,10 +2,9 @@
 
 set -e
 
-PROJ_PATH=$(realpath $(dirname $0)/..)
-cd $PROJ_PATH
+# Assuming we're in top level yannt folder.
 
-EXTERN_DIR=${PROJ_PATH}/extern
+EXTERN_DIR=./extern
 
 # Allow user to assign venv name and tag shell prompt
 ML_VENV_NAME=${ML_VENV_NAME:-ml-venv}
@@ -29,7 +28,7 @@ export PS1="${PS1_TAG}${PS1:-\$ }"
 
 # Assuming we've already collected.
 
-PIP_INST_ARGS=${PIP_INST_ARGS:-"--no-index -f ${PROJ_PATH}/cache/pip_pkgs/${PY_VER}"}
+PIP_INST_ARGS=${PIP_INST_ARGS:-"--no-index -f ./cache/pip_pkgs/${PY_VER}"}
 
 # # # echo "Running pip install of config packages."
 # # # pip install -U ${PIP_INST_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
@@ -51,16 +50,16 @@ PIP_INST_ARGS=${PIP_INST_ARGS:-"--no-index -f ${PROJ_PATH}/cache/pip_pkgs/${PY_V
 # # # done
 
 
-mkdir -p ${PROJ_PATH}/cache/venv
-if [ ! -e "${PROJ_PATH}/cache/venv/${ML_VENV_NAME}" ]; then
-  python3 -m venv ${PROJ_PATH}/cache/venv/${ML_VENV_NAME}
+mkdir -p ./cache/venv
+if [ ! -e "./cache/venv/${ML_VENV_NAME}" ]; then
+  python3 -m venv ./cache/venv/${ML_VENV_NAME}
   [ $? -ne 0 ] && { echo "Failed to create venv"; exit 1; }
 
   echo "--------------------- Setting Up Base Python Requirements ---------------------"
-  ${PROJ_PATH}/cache/venv/${ML_VENV_NAME}/bin/pip install --upgrade \
+  ./cache/venv/${ML_VENV_NAME}/bin/pip install --upgrade \
     ${PIP_INST_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
 fi
-source ${PROJ_PATH}/cache/venv/${ML_VENV_NAME}/bin/activate
+source ./cache/venv/${ML_VENV_NAME}/bin/activate
 
 # TODO: These dependencies should be managed by pyproject.toml.
 echo Checking dependencies.
@@ -79,7 +78,7 @@ for pkgpath in ${EXTERN_DIR}/*; do
 done
 
 if [ -z "$NO_SHELL" ]; then
-  ${CRI_PROJ_PATH}/scripts/_/start-venv.sh
+  ./scripts/_/start-venv.sh
 fi
 
 # echo

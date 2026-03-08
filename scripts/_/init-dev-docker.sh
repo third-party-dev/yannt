@@ -15,7 +15,7 @@ source ${CONFIG_PATH}/config
 
 # Construct the base container image (venv created from container runtime)
 mkdir -p ${PROJ_PATH}/cache/empty-context
-docker build \
+${CRI_BIN} build \
   -t ml-venv-dev:${PY_VER}-slim \
   --build-arg PY_VER="${PY_VER}" \
   --build-arg APT_PKGS="${APT_PKGS}" \
@@ -47,9 +47,10 @@ if [ -z "$SKIP_COLLECT" ]; then
   mkdir -p ${PROJ_PATH}/cache/pip_pkgs/${PY_VER}
   mkdir -p ${PROJ_PATH}/cache/docker-home
 
-  docker run -ti --rm \
+  ${CRI_BIN} run -ti --rm \
     -v ${PROJ_PATH}:${CRI_PROJ_PATH} \
     -w ${CRI_PROJ_PATH} \
+    -e CRI_PROJ_PATH="${CRI_PROJ_PATH}" \
     -e PY_REQS="$PY_REQS" \
     -e PY_CONSTRAINTS="${PY_CONSTRAINTS}" \
     -e PIP_IDX_ARGS="$PIP_IDX_ARGS" \
@@ -57,6 +58,7 @@ if [ -z "$SKIP_COLLECT" ]; then
     -e USER="user" \
     -e HOME=${CRI_PROJ_PATH}/cache/docker-home \
     -u $(id -u):$(id -g) \
+    ${CRI_RUN_ARGS} \
     ml-venv-dev:${PY_VER}-slim \
     ${CRI_PROJ_PATH}/scripts/_/download-all-deps.sh
 

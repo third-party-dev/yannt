@@ -10,7 +10,8 @@ export PY_REQS=${PY_REQS:-configs/pyver/${PY_VER}/requirements-py313.txt}
 export ML_VENV_NAME=${ML_VENV_NAME:-ml-cri-${PY_VER}}
 export PS1_TAG=${PS1_TAG:-"(${ML_VENV_NAME}) "}
 
-export CRI_PROJ_PATH=/work
+export CRI_BIN=${CRI_BIN:-docker}
+export CRI_PROJ_PATH=${CRI_PROJ_PATH:-"/work"}
 
 export PIP_IDX_ARGS=${PIP_IDX_ARGS:-"
   --index-url https://download.pytorch.org/whl/cpu \

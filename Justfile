@@ -1,5 +1,5 @@
-run CONFIG="":
-    ./scripts/run-dev.sh {{CONFIG}}
+run CONFIG="" *args:
+    ./scripts/run-dev.sh {{CONFIG}} -- {{args}}
 
-init CONFIG="":
-    ./scripts/init-dev.sh {{CONFIG}}
+init CONFIG="" *args:
+    ./scripts/init-dev.sh {{CONFIG}} -- {{args}}

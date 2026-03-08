@@ -16,6 +16,7 @@ if [ ! -e "${CONFIG_PATH}/config" ]; then
     exit 1
 fi
 
-${CONFIG_PATH}/init.sh
+
+${CONFIG_PATH}/init.sh $@
 
 

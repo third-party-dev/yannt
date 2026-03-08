@@ -30,7 +30,7 @@ fi
 # Run the environment
 mkdir -p ${PROJ_PATH}/cache/docker-home
 
-docker run -ti --rm \
+${CRI_BIN} run -ti --rm \
     -u $(id -u):$(id -g) \
     -v ${PROJ_PATH}:${CRI_PROJ_PATH} \
     -w ${CRI_PROJ_PATH} \
@@ -42,5 +42,6 @@ docker run -ti --rm \
     -e HOME=${CRI_PROJ_PATH}/cache/docker-home \
     -e USER="user" \
     -e ML_VENV_NAME="${ML_VENV_NAME}" \
+    ${CRI_RUN_ARGS} \
     ml-venv-dev:${PY_VER}-slim \
     ${CONTAINER_CMD}

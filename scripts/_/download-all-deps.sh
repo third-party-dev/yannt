@@ -10,8 +10,8 @@
 # - 
 
 # Note: PROJ_PATH here should eval to the same as DOCKER_PROJ_PATH
-PROJ_PATH=$(realpath $(dirname $0)/..)
-cd $PROJ_PATH
+#PROJ_PATH=$(realpath $(dirname $0)/..)
+cd ${CRI_PROJ_PATH}
 
 PY_CONSTRAINTS=${PY_CONSTRAINTS:-}
 if [ -n "${PY_CONSTRAINTS}" ]; then
@@ -27,8 +27,8 @@ else
     PY_REQS_ARGS=
 fi
 
-PIP_DL_ARGS=${PIP_DL_ARGS:-"${PIP_IDX_ARGS} -d ${PROJ_PATH}/cache/pip_pkgs/${PY_VER}"}
-mkdir -p ${PROJ_PATH}/cache/pip_pkgs/${PY_VER}
+PIP_DL_ARGS=${PIP_DL_ARGS:-"${PIP_IDX_ARGS} -d ./cache/pip_pkgs/${PY_VER}"}
+mkdir -p ./cache/pip_pkgs/${PY_VER}
 
 echo PIP_DL_ARGS: ${PIP_DL_ARGS}
 
@@ -39,10 +39,10 @@ pip download ${PIP_DL_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
 #     pip download $PIP_ARGS $PY_CONSTRAINTS_ARGS $arg
 # done
 # Do it for yannt
-pip download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ${PROJ_PATH}/yannt
+pip download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./yannt
 
 # Do extern python packages
-for ext in `ls -1 ${PROJ_PATH}/extern`; do
-    pip download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ${PROJ_PATH}/extern/$ext
+for ext in `ls -1 ./extern`; do
+    pip download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./extern/$ext
 done
 

@@ -21,4 +21,4 @@ if [ ! -e "${CONFIG_PATH}" ]; then
     exit 1
 fi
 
-${CONFIG_PATH}/run.sh
+${CONFIG_PATH}/run.sh $@
