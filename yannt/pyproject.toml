@@ -19,3 +19,7 @@ namespaces = true
 
 [project.scripts]
 yannt = "thirdparty.yannt.cli:main"
+
+#[project.entry-points."yannt_command"]
+## yannt info plugin is currently builtin
+#yannt_info = "thirdparty.yannt.info.cli.yannt_plugin:register_yannt_info"
