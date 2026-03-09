@@ -1,0 +1,22 @@
+# Assume defined: PROJ_PATH, CONFIG_NAME, CONFIG_PATH
+
+export PY_VER=${PY_VER:-3.11}
+
+export ML_VENV_NAME=${ML_VENV_NAME:-"yannt-py${PY_VER}-podman"}
+export PS1_TAG=${PS1_TAG:-"(${ML_VENV_NAME}) "}
+
+# PY_CONSTRAINTS/PY_REQS relative to PROJ_PATH.
+export PY_CONSTRAINTS=${PY_CONSTRAINTS:-configs/pyver/${PY_VER}/constraints-py${PY_VER}.txt}
+export PY_REQS=${PY_REQS:-configs/pyver/${PY_VER}/requirements-py${PY_VER}.txt}
+
+export CRI_BIN=${CRI_BIN:-podman}
+export CRI_PROJ_PATH=${CRI_PROJ_PATH:-"/work"}
+export CRI_RUN_ARGS=${CRI_RUN_ARGS:-"--userns keep-id"}
+
+export APT_PKGS="graphviz flatbuffers-compiler protobuf-compiler cmake build-essential libopencv-dev"
+
+export PIP_IDX_ARGS=${PIP_IDX_ARGS:-"
+  --index-url https://download.pytorch.org/whl/cpu \
+  --extra-index-url https://pypi.org/simple"}
+
+export PIP_UPSTREAM_VERIFIERS=${PIP_UPSTREAM_VERIFIERS:-"https://download.pytorch.org/whl/cpu https://pypi.org/simple"}

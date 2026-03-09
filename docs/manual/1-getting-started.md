@@ -2,19 +2,9 @@
 
 ** WIP **
 
-When getting started with yannt, you need to know if you plan to interact with the code as a developer/builder or a user. If you are going to be in the developer/builder camp, you'll want to start with the "Developer Environment Setup" instructions. If you are going to be a user, please start with the instructions for Pipx Setup or Jupyter Setup.
+When getting started with yannt, you need to know if you plan to interact with the code as a developer/builder or a user. If you are going to be in the developer/builder camp, you'll want to start with the "Developer Environment Setup" instructions.
 
-There are a number of different ways to setup or use yannt. The follow sections will describe each. In summary:
-
-- Jupyter
-- Pipx
-- Offline Developer Docker Environment
-- Offline Developer Host Environment
-- Online Developer Docker Environment
-- Online Developer Host Environment
-- Offline Builder Docker Environment
-
-## Jupyter
+<!-- ## Jupyter
 
 I'm currently unsure of the user workflows within Jupyter, therefore I've constructed a minimal viable thing to test code in Jupyter. Roughly, you must start a Jupyter docker image with the `yannt` project mounted. Connect to the Jupyter instance and manually install yannt as if it was on a local host. The following example shows the scripts to run to install with pip.
 
@@ -41,31 +31,77 @@ Offline yannt pipx Install: `SKIP_COLLECT=1 ./scripts/install-host-local-pipx.sh
 
 Online yannt pipx install: `./scripts/install-host-upstream-pipx.sh`
 
-Now you should have `yannt` as a command in your normal (user) system environment.
+Now you should have `yannt` as a command in your normal (user) system environment. -->
 
 ## Developer Environment Setup
 
-To keep various capabilities independent and plugable, many components are divided up into their own repositories. Yannt is assumed to be at the top `./yannt` with all plugin source code cloned into yannt's extern folder `./yannt/extern/[plugin-pkg-name]`. The following commands should get you going (assuming bash-like shell):
+To keep various yannt components independent and plug-able, many components are divided up into their own repositories. Yannt manages the top level project folder for itself and all of its plugins. By convention, I always `git clone` yannt into a folder named `yannt`. All external plugins (i.e. not builtin plugins) are `git cloned` into `yannt/extern` with a python safe version of the package name. For example, `thirdpary.pparse` becomes `yannt/extern/thirdparty_pparse` and `thirdparty.yannt.sysscan` becomes `yannt/extern/thirdparty_yannt_sysscan`.
+
+Commands similar to the following should get you going (assuming bash-like shell):
 
 ```sh
-# ! For _reasons_:
-# ! - (atm) Assuming docker installed and current user has docker access.
-# ! - (atm) Assuming systems has Python 3.13 (I'm using debian 13)
+# Note: thirdparty-ws folder optional. Its a nice folder to open an IDE (e.g. VSCode) with.
 cd ~ ; mkdir thirdparty-ws ; cd thirdparty-ws
 ln -s yannt/extern/thirdparty_pparse pparse
 ln -s yannt/extern/thirdparty_yannt_transformers yannt_transformers
-git clone https://github.com/third-party-dev/yannt.git
+git clone https://github.com/third-party-dev/yannt.git yannt
 cd yannt ; mkdir extern ; cd extern
 git clone https://github.com/third-party-dev/pparse.git thirdparty_pparse
-git clone https://github.com/third-party-dev/yannt-transformers.git thirdparty_yannt_transformers
+git clone https://github.com/third-party-dev/yannt_sysscan.git thirdparty_yannt_sysscan
 # ... git clone any additional plugins that you want to work with, using this convention ...
-# go back to top yannt folder
+# go back to top yannt folder (not thirdparty-ws)
 cd ..
 ```
 
-Once you have the environment cloned locally into the workspace (thirdparty-ws) or project (yannt) folders, you'll want to initialize the environment for developer activities. See the following sections for the options.
+Once you have the environment cloned locally into the workspace (`thirdparty-ws`) or project (`yannt`) folders, you'll want to initialize the environment for developer activities. See the following sections for the options.
 
-### Offline **Builder** Docker Environment
+### Initializing The Environment
+
+Note: As a proposed simplification for running various build, install, or run command, I've added a Justfile and an adhoc implementation of the `just` command to the project as the `do` script. If you have the `just` command, that will work in place of `do`. I will use `do` for the rest of the documentation.
+
+Environment initialization is managed by a collection of configurations stored in the `config` folder. You can see the available configurations via `./do init` (without parameters). For example:
+
+```text
+yannt-py3.11-conda
+yannt-py3.11-docker
+yannt-py3.11-podman
+...
+```
+
+Each of the above strings is a procedure and reference to a development environment that you can build locally on your system. The configurations that start with `yannt` target environments that run the `yannt` command. The `py` part specifies the Python interpreter that will be used, and the last part of the tuple is the type of environment that will manage the isolation. At the moment, yannt supports conda (for data science setups), docker for stronger isolation w/ GPU based setups, and podman for when conda is not available or discouraged in data science setups.
+
+Note: Yannt intends to be available as a wheel that can be installed in any environment within a range of python interpreters. But this is the development environment initialization and therefore is limited to what will be supported and tested.
+
+Once you've identified a configuration to run with (e.g. `yannt-py3.11-podman`), you can run:
+
+```sh
+./do init yannt-py3.11-podman
+```
+
+The scripts will attempt to set up a new environment with Python 3.11 and all of the required Python dependencies. As part of the process, the yannt development environment will attempt to download all of the dependencies into a cache folder before performing any installs. This extra cache process is independent of pip caching and ensures that all of the python packages are available for offline usage, keeps the packages more fixed, and allows developers positive control of the packages that are being installed, regardless of the `pyproject.yaml` or requirements/constraints settings. Plus you get a built-in local repository to prevent having to redownload CUDA packages for each re-initialization of the same python version.
+
+Once the environment has been initialized, it will drop the user into a shell within the environment. If all went well you'll see something like the following:
+
+```text
+The environment is now ready. Try 'yannt --help' for information.
+(yannt-py3.11-podman) user@61cc16f975c6:/work$
+```
+
+When you are done using the development environment or want to exit the environment, simply run `exit` (i.e. do not `deactivate` when that would seem appropriate, just `exit`). By design, the development environment is always initialized in a sub-shell of the one that `./do` was executed from. This pattern prevents the development environment from polluting the original environment.
+
+### Running Already Created Environment
+
+Similar to initialization, there is a process for running an already created environment. If you created `yannt-py3.11-podman`, you can use the pre-cached environment by running:
+
+```sh
+./do run yannt-py3.11-podman
+```
+
+### Bash Tab Completion
+
+As part of the developer environment, bash tab completion is included for `yannt` command. As per the usual `argparse` enabled command, you can also run `yannt --help` to get your barrings.
+
+<!-- ### Offline **Builder** Docker Environment
 
 Environment designed to build yannt sdist and wheel packages by running within a docker environment within an offline system (i.e. no internet). The Docker container is only for managing the build environment, all modified files (with the docker `/work` mount) happen on the host system. Dependencies are expected to be pre-collected from an internet connected system and then prestaged into the same output folder (`pip_pkgs`) in the offline system. 
 
@@ -117,8 +153,6 @@ To initialize, from top level `yannt` folder: `./scripts/init-host-upstream-dev.
 
 If successful, (assuming `python3 --version` is `3.13`) this will create: `./pip_pkgs/3.13`, and `./venv/ml-venv-3.13-hud`.
 
-You're terminal should also have a prefix: `(ml-venv-3.13-hud)`
+You're terminal should also have a prefix: `(ml-venv-3.13-hud)` -->
 
-### Bash Tab Completion
 
-As part of the developer virtual environment, bash tab completion is included for `yannt` command. As per the usual `argparse` enabled command, you can also run `yannt --help` to get your barrings.

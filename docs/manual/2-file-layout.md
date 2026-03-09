@@ -13,15 +13,27 @@ When performing any virtual environment updates or resets, I always perform them
 
 ## `thirdpart-ws/yannt` Project Layout
 
-- `bundles` - Only appears when `create-bundle.sh` is run. For reasons, I've used `git bundles` to copy repo around. **Git Ignored**
-- `docs` - Documentation folder with markdown content.
-- `docs/pandoc-build` - Pandoc build source code for building the docs as a PDF. Symlinks to parent to access markdown.
-- `extern` - In-place installs of (in development) yannt plugins. **Git Ignored**
-- `pip_pkgs` - Downloaded pip dependency location (from running `./download.sh` in docker folder). **Git Ignored**
-- `scripts` - Location of all initialization, collection, build, and install scripts.
-- `upstream` - Folder for holding upstream source code (e.g. pytorch source code). **Git Ignored**
-- `venv` - Location of all Python virtual environments. Note: Must be recreated if moved. **Git Ignored**
-- `yannt` - The top folder for the yannt python package distribution.
+
+- **bundles** - Ephemeral folder for holding git bundles, used for transferring backups to offline systems.
+- **cache** - Ephemeral folder for holding virtual development environments (conda, venv, docker home folders).
+  - **conda** - Project local storage for conda environments.
+  - **docker-home** - A home directory for container users to save bash history and other caches.
+  - **empty-context** - An always empty folder that can be used for empty docker contexts.
+  - **pip_pkgs** - Project local pip package cache built with `pip download`.
+  - **venv** - Project local storage for python virtual environments.
+- **configs** - Directory of used (supported?) virtual development environment configurations.
+- **docs** - Documentation
+  - **manual** - Proper "manual" for rendering to HTML and PDF.
+  - **notes** - Chicken scratch notes that I'm not ready to delete.
+- **extern** - Ephemeral folder for holding references to other yannt plugins (often git repos themselves). All folders in extern are assumed to be python packages and are installed in place when building a standard yannt development environment with `init-dev.sh`.
+- **models** - Ephemeral folder for holding various models on the system for testing and development.
+- **outputs** - Ephemeral yannt output folder.
+- **scripts** - Scripts for building development environments, testing, and building of yannt package suites.
+- **upstream** - Ephemeral folder for holding clones of upstream git repos used for developing and testing yannt.
+- **yannt** - The yannt python package distribution. (This is the top of the python package.)
+- **do** - (Janky) self contained version of `just` for use with the adjacent `Justfile`.
+- **Justfile** - Modern-ish version of Makefile with design principles for project management.
+- **create-bundle.sh** - A convenience script for creating git bundles.
 
 ## `thirdpart-ws/yannt/yannt` Package Distribution
 

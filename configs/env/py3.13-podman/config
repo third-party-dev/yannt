@@ -1,6 +1,0 @@
-# Assume defined: PROJ_PATH, CONFIG_NAME, CONFIG_PATH
-
-source ${PROJ_PATH}/configs/env/py3.13-docker/config
-
-export CRI_BIN=podman
-export CRI_RUN_ARGS="--userns keep-id"
