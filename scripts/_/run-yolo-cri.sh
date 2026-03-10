@@ -20,27 +20,22 @@ fi
 source ${CONFIG_PATH}/config
 
 # Attempt to activate conda
-if [ -z "$(which ${CRI_BIN})" ]; then
-  echo "Could not locate ${CRI_BIN} (CRI_BIN). Please add ${CRI_BIN} to PATH."
+CRI_BIN_ONLY=$(echo "${CRI_BIN}" | cut -d ' ' -f 1)
+if [ -z "$(which ${CRI_BIN_ONLY})" ]; then
+  echo "Could not locate ${CRI_BIN_ONLY} (CRI_BIN). Please add ${CRI_BIN_ONLY} to PATH."
   echo 
-  echo "  Example: export PATH=\$PATH:/opt/${CRI_BIN}/bin"
+  echo "  Example: export PATH=\$PATH:/opt/${CRI_BIN_ONLY}/bin"
   echo
   exit 1
 fi
 
 # Note: Assuming it is OK to not check if the environment exists.
 
-# Get all arguments after --
-while [[ "$1" != "--" && "$#" -gt 0 ]]; do
-    shift
-done
-shift
-
-if [ -z "${NO_SHELL}" ]; then
+if [ -n "${NO_SHELL}" ]; then
+  CRI_CMD="bash -c 'exit'"
+else
   CRI_CMD=${CRI_CMD:-"$@"}
   echo CRI_CMD ${CRI_CMD}
-else
-  CRI_CMD="bash -c 'exit'"
 fi
 
 # Run the environment

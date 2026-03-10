@@ -12,6 +12,12 @@ export PS1="${PS1_TAG}${PS1:-\$ }"
 
 source ./cache/venv/${ML_VENV_NAME}/bin/activate
 
+if [ $# -gt 0 ]; then
+
+$@
+
+else
+
 echo
 echo "The environment is now ready. Try 'yannt --help' for information."
 
@@ -24,3 +30,5 @@ eval "$(register-python-argcomplete yannt)"
 EOF
 
 exec bash --rcfile "$TMP_RC" -i
+
+fi

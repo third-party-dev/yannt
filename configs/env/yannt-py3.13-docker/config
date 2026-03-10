@@ -14,8 +14,10 @@ export CRI_PROJ_PATH=${CRI_PROJ_PATH:-"/work"}
 
 export APT_PKGS="graphviz flatbuffers-compiler protobuf-compiler cmake build-essential libopencv-dev"
 
-export PIP_IDX_ARGS=${PIP_IDX_ARGS:-"
-  --index-url https://download.pytorch.org/whl/cpu \
-  --extra-index-url https://pypi.org/simple"}
+if [ -z "$PIP_IDX_ARGS" ]; then
+  PIP_IDX_ARGS="--index-url https://download.pytorch.org/whl/cpu"
+  PIP_IDX_ARGS="$PIP_IDX_ARGS --extra-index-url https://pypi.org/simple"
+  export PIP_IDX_ARGS
+fi
 
 export PIP_UPSTREAM_VERIFIERS=${PIP_UPSTREAM_VERIFIERS:-"https://download.pytorch.org/whl/cpu https://pypi.org/simple"}

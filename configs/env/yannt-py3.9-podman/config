@@ -9,14 +9,16 @@ export PS1_TAG=${PS1_TAG:-"(${ML_VENV_NAME}) "}
 export PY_CONSTRAINTS=${PY_CONSTRAINTS:-configs/pyver/${PY_VER}/constraints-py${PY_VER}.txt}
 export PY_REQS=${PY_REQS:-configs/pyver/${PY_VER}/requirements-py${PY_VER}.txt}
 
-export CRI_BIN=${CRI_BIN:-podman}
+export CRI_BIN=${CRI_BIN:-"podman --root ${PROJ_PATH}/cache/podman-runroot"}
 export CRI_PROJ_PATH=${CRI_PROJ_PATH:-"/work"}
 export CRI_RUN_ARGS=${CRI_RUN_ARGS:-"--userns keep-id"}
 
 export APT_PKGS="graphviz flatbuffers-compiler protobuf-compiler cmake build-essential libopencv-dev"
 
-export PIP_IDX_ARGS=${PIP_IDX_ARGS:-"
-  --index-url https://download.pytorch.org/whl/cpu \
-  --extra-index-url https://pypi.org/simple"}
+if [ -z "$PIP_IDX_ARGS" ]; then
+  PIP_IDX_ARGS="--index-url https://download.pytorch.org/whl/cpu"
+  PIP_IDX_ARGS="$PIP_IDX_ARGS --extra-index-url https://pypi.org/simple"
+  export PIP_IDX_ARGS
+fi
 
 export PIP_UPSTREAM_VERIFIERS=${PIP_UPSTREAM_VERIFIERS:-"https://download.pytorch.org/whl/cpu https://pypi.org/simple"}

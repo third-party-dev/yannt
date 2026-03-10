@@ -12,9 +12,9 @@ set -e
 source ${CONFIG_PATH}/config
 
 
-if [ "${RUN_MODE}" = "build" ]; then
+if [ -n "${BUILD_MODE}" ]; then
   echo "Building the venv."
-  CONTAINER_CMD=${CRI_PROJ_PATH}/scripts/_/build-venv.sh
+  CONTAINER_CMD=${CRI_PROJ_PATH}/scripts/_/build-venv.sh $@
 else
   echo "Starting the venv."
   if [ ! -e "${PROJ_PATH}/cache/venv/${ML_VENV_NAME}" ]; then
@@ -23,7 +23,7 @@ else
     echo "Run: ./scripts/init-dev.sh ${CONFIG_NAME}"
     exit 1
   fi
-  CONTAINER_CMD=${CRI_PROJ_PATH}/scripts/_/start-venv.sh
+  CONTAINER_CMD="${CRI_PROJ_PATH}/scripts/_/start-venv.sh $@"
 fi
 
 
@@ -43,5 +43,5 @@ ${CRI_BIN} run -ti --rm \
     -e USER="user" \
     -e ML_VENV_NAME="${ML_VENV_NAME}" \
     ${CRI_RUN_ARGS} \
-    ml-venv-dev:${PY_VER}-slim \
+    localhost/${ML_VENV_NAME} \
     ${CONTAINER_CMD}

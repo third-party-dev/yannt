@@ -78,7 +78,7 @@ for pkgpath in ${EXTERN_DIR}/*; do
 done
 
 if [ -z "$NO_SHELL" ]; then
-  ./scripts/_/start-venv.sh
+  ./scripts/_/start-venv.sh $@
 fi
 
 # echo
