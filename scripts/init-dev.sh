@@ -10,7 +10,7 @@ export CONFIG_PATH="${PROJ_PATH}/configs/env/${CONFIG_NAME}"
 while [[ "$1" != "--" && "$#" -gt 0 ]]; do
     shift
 done
-shift
+[ "$#" -gt 0 ] && shift
 
 if [ -z "$CONFIG_NAME" -o "$CONFIG_NAME" = "list" ]; then
     ls -1 ${PROJ_PATH}/configs/env

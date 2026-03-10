@@ -9,9 +9,7 @@
 # - PY_VER
 # - 
 
-# Note: PROJ_PATH here should eval to the same as DOCKER_PROJ_PATH
-#PROJ_PATH=$(realpath $(dirname $0)/..)
-cd ${CRI_PROJ_PATH}
+# Assuming we're in the top level yannt folder regardless of CRI or host.
 
 PY_CONSTRAINTS=${PY_CONSTRAINTS:-}
 if [ -n "${PY_CONSTRAINTS}" ]; then
@@ -28,21 +26,37 @@ else
 fi
 
 PIP_DL_ARGS=${PIP_DL_ARGS:-"${PIP_IDX_ARGS} -d ./cache/pip_pkgs/${PY_VER}"}
+PYTHON=${PYTHON:-"python"}
+PIP=${PIP:-"${PYTHON} -m pip"}
+
+# $(${PIP} 2>/dev/null)
+# if [ $? -ne 0 ]; then
+#   echo "ERROR: It appears that pip is not installed for ${PYTHON}"
+#   echo
+#   echo "If you are running on an apt based system, this can usually"
+#   echo "be fixed with:"
+#   echo
+#   echo "  apt-get install python3-pip"
+#   echo
+#   echo "Note: Your environment's python version is $(python3 --version)"
+#   exit 1
+# fi
+
 mkdir -p ./cache/pip_pkgs/${PY_VER}
 
 echo PIP_DL_ARGS: ${PIP_DL_ARGS}
 
-pip download ${PIP_DL_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
+${PIP} download ${PIP_DL_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
 
 # # Do given python packages
 # for arg in "$@"; do
 #     pip download $PIP_ARGS $PY_CONSTRAINTS_ARGS $arg
 # done
 # Do it for yannt
-pip download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./yannt
+${PIP} download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./yannt
 
 # Do extern python packages
 for ext in `ls -1 ./extern`; do
-    pip download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./extern/$ext
+    ${PIP} download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./extern/$ext
 done
 
