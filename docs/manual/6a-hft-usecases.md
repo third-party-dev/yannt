@@ -1,0 +1,258 @@
+# Huggingface Transformers Use Cases
+
+## List available transformer models
+
+```sh
+hft list
+```
+
+Example Output:
+
+```text
+Indexing all of the transformer types available. (Takes a moment.)
+Index Complete.
+model: EvollaModel type: AutoModel
+model: EvollaModel type: AutoModelForImageTextToText
+model: EvollaModel type: AutoModelForMultimodalLM
+model: EvollaModel type: AutoModelForPreTraining
+model: afmoe type: AutoModel
+model: afmoe type: AutoModelForCausalLM
+model: aimv2 type: AutoModel
+
+... ~1400 more lines ...
+
+model: youtu type: AutoModelForCausalLM
+model: zamba type: AutoModel
+model: zamba type: AutoModelForCausalLM
+model: zamba type: AutoModelForSequenceClassification
+model: zamba2 type: AutoModel
+model: zamba2 type: AutoModelForCausalLM
+model: zamba2 type: AutoModelForSequenceClassification
+model: zoedepth type: AutoModelForDepthEstimation
+```
+
+Look for something specific (e.g. bert) with grep:
+
+```text
+$ hft list | grep "model: bert"
+Loading PyTorch and Transformers.
+model: bert type: AutoModel
+model: bert type: AutoModelForCausalLM
+model: bert type: AutoModelForMaskedLM
+model: bert type: AutoModelForMultipleChoice
+model: bert type: AutoModelForNextSentencePrediction
+model: bert type: AutoModelForPreTraining
+model: bert type: AutoModelForQuestionAnswering
+model: bert type: AutoModelForSequenceClassification
+model: bert type: AutoModelForTextEncoding
+model: bert type: AutoModelForTokenClassification
+model: bert-generation type: AutoModel
+model: bert-generation type: AutoModelForCausalLM
+```
+
+## Generate _untrained_ models
+
+Generate (weights only) PyTorch file:
+
+```sh
+hft create --type AutoModel --model bert --pytorch_params_path ./yannt/models/bert/pt
+```
+
+Generate PyTorch file with architecture:
+
+```sh
+hft create --type AutoModel --model bert --pytorch_path ./yannt/models/bert/pt
+```
+
+Generate Safetensors (with config.json):
+
+```sh
+hft create --type AutoModel --model bert --safetensors_path ./yannt/models/bert/safetensors
+```
+
+Generate ONNX:
+
+```sh
+hft create --type AutoModel --model bert --onnx_path ./yannt/models/bert/onnx
+```
+
+Generate an Export IR (intermediate representation):
+
+```sh
+hft create --type AutoModel --model bert --export_path ./yannt/models/bert/ir
+```
+
+## Generate graph outputs of transformers models
+
+In general, we're using `exported = torch.export.export(model, input_args)`, and then:
+
+- **human_ir** - `exported.graph_module.print_readable()`
+- **compiler_ir** - `exported.graph_module.graph.print_tabular()`
+- **schema** - `exported.graph_signature`
+- **nodes** - `exported.graph_module.graph.nodes` with meta in a list format
+- **graphviz** - `exported.graph_module.graph.nodes` in dot notation.
+- **drawer** - FxGraphDrawer SVG of Graph
+
+  ```python
+  from torch.fx.passes.graph_drawer import FxGraphDrawer
+  drawer = FxGraphDrawer(exported.graph_module, "exported_model")
+  drawer.get_dot_graph().write_svg('path/to/my.svg')
+  ```
+
+- **coverage** - Python line use coverage of the (auto detected) python model files used in export. In other words, its a code coverage report. Code coverage could be useful in understanding what was actually exported when using different input arguments.
+
+Note: These actions can be performed on any fully parsed/unpickled PyTorch file. Considering adding
+a "input torch" argument as a replacement for "--model" and "--type" as an option. TBD.
+
+### Generate graph graphviz output
+
+```sh
+hft graph --type AutoModel --model bert --as graphviz --input ones
+```
+
+Example Output:
+
+```text
+digraph G {
+  "p_embeddings_word_embeddings_weight" [label="placeholder\np_embeddings_word_embeddings_weight"];
+  "p_embeddings_position_embeddings_weight" [label="placeholder\np_embeddings_position_embeddings_weight"];
+  "p_embeddings_token_type_embeddings_weight" [label="placeholder\np_embeddings_token_type_embeddings_weight"];
+  "p_embeddings_layernorm_weight" [label="placeholder\np_embeddings_layernorm_weight"];
+  "p_embeddings_layernorm_bias" [label="placeholder\np_embeddings_layernorm_bias"];
+
+  ... ~1080 more lines ...
+  
+  "linear_72" -> "tanh";
+  "output" [label="output\noutput"];
+  "layer_norm_24" -> "output";
+  "tanh" -> "output";
+}
+```
+
+Generate graphviz output and pipe to dot for rendering:
+
+```sh
+hft graph --type AutoModel --model bert --as graphviz --input ones \
+  | dot -Tpng -o ../yannt/models/bert/graphviz.png
+```
+
+### Dump `exported.graph_module.print_readable()`
+
+```sh
+hft graph --type AutoModel --model bert --as human_ir
+```
+
+Example Output:
+
+```python
+class GraphModule(torch.nn.Module):
+    def forward(self, p_embeddings_word_embeddings_weight: "f32[30522, 768]", p_embeddings_position_embeddings_weight: "f32[512, 768]", p_embeddings_token_type_embeddings_weight: "f32[2, 768]",
+
+    # ... A WHOLE LOT MORE parameters here ...
+
+    p_encoder_layer_11_output_layernorm_bias: "f32[768]", p_pooler_dense_weight: "f32[768, 768]", p_pooler_dense_bias: "f32[768]", b_embeddings_position_ids: "i64[1, 512]", b_embeddings_token_type_ids: "i64[1, 512]", input_ids: "i64[1, 16]", attention_mask: "i64[1, 16]"):
+
+    # ...  A WHOLE LOT MORE CODE HERE (~1545 more lines) ...
+```
+
+### Dump `exported.graph_module.graph.print_tabular()`
+
+```sh
+hft graph --type AutoModel --model bert --as compiler_ir --input ones 
+```
+
+Output is a table with: opcode, name, target, args, and kwargs as columns.
+
+### Dump `exported.graph_module.graph.nodes` with meta in a list format
+
+```sh
+hft graph --type AutoModel --model bert --as nodes --input ones 
+```
+
+Output Snippet:
+
+```text
+---------------------------------------------------------------------------
+arange_3 (call_function)
+  Inputs: []
+  Target: aten.arange.default
+  Args: (1,) {'device': device(type='cpu'), 'pin_memory': False}
+---------------------------------------------------------------------------
+arange_4 (call_function)
+  Inputs: []
+  Target: aten.arange.default
+  Args: (16,) {'device': device(type='cpu'), 'pin_memory': False}
+---------------------------------------------------------------------------
+add_2 (call_function)
+  Inputs: [arange_4]
+  Target: aten.add.Tensor
+  Args: (arange_4, 0) {}
+---------------------------------------------------------------------------
+unsqueeze (call_function)
+  Inputs: [arange_2]
+  Target: aten.unsqueeze.default
+  Args: (arange_2, 1) {}
+---------------------------------------------------------------------------
+```
+
+### Dump FxGraphDrawer SVG of Graph
+
+```sh
+hft graph --type AutoModel --model bert --as drawer --input ones \
+  --out ../yannt/models/bert/drawer.svg
+```
+
+### Dump `exported.graph_signature`
+
+```sh
+hft graph --type AutoModel --model bert --as schema --input ones
+```
+
+Output Snippets:
+
+```text
+# inputs
+p_embeddings_word_embeddings_weight: PARAMETER target='embeddings.word_embeddings.weight'
+p_embeddings_position_embeddings_weight: PARAMETER target='embeddings.position_embeddings.weight'
+p_embeddings_token_type_embeddings_weight: PARAMETER target='embeddings.token_type_embeddings.weight'
+p_embeddings_layernorm_weight: PARAMETER target='embeddings.LayerNorm.weight'
+p_embeddings_layernorm_bias: PARAMETER target='embeddings.LayerNorm.bias'
+```
+
+```text
+p_encoder_layer_11_output_dense_bias: PARAMETER target='encoder.layer.11.output.dense.bias'
+p_encoder_layer_11_output_layernorm_weight: PARAMETER target='encoder.layer.11.output.LayerNorm.weight'
+p_encoder_layer_11_output_layernorm_bias: PARAMETER target='encoder.layer.11.output.LayerNorm.bias'
+p_pooler_dense_weight: PARAMETER target='pooler.dense.weight'
+p_pooler_dense_bias: PARAMETER target='pooler.dense.bias'
+b_embeddings_position_ids: BUFFER target='embeddings.position_ids' persistent=False
+b_embeddings_token_type_ids: BUFFER target='embeddings.token_type_ids' persistent=False
+input_ids: USER_INPUT
+attention_mask: USER_INPUT
+
+# outputs
+layer_norm_24: USER_OUTPUT
+tanh: USER_OUTPUT
+```
+
+### Dump code coverage report of exported graph
+
+```sh
+hft graph --type AutoModel --model bert --as coverage --input ones 
+```
+
+Example Output:
+
+```text
+File: /opt/data/thirdparty-ws/yannt_transformers/cache/venv/hft/lib/python3.13/site-packages/transformers/models/bert/modeling_bert.py
+  Executed lines: ['80-81', '85', '87-88', '93-94', '96-98', '102-105', '107-108', '110-112', '176-177', '180-182', '184', '198-199', '202-210', '212-213', '301-304', '325-332', '334-335', '348-350', '361-364', '397-402', '404', '406', '423-424', '426', '429-431', '451-459', '462-464', '477-480', '654', '657', '659', '666', '669-671', '676-678', '680-685', '688-694', '697-706', '708-709', '711-714', '726', '735-738', '741', '749']
+Name                                                                                               Stmts   Miss  Cover
+----------------------------------------------------------------------------------------------------------------------
+cache/venv/hft/lib/python3.13/site-packages/transformers/models/bert/__init__.py                       6      6     0%
+cache/venv/hft/lib/python3.13/site-packages/transformers/models/bert/configuration_bert.py            28     28     0%
+cache/venv/hft/lib/python3.13/site-packages/transformers/models/bert/modeling_bert.py                559    480    14%
+cache/venv/hft/lib/python3.13/site-packages/transformers/models/bert/tokenization_bert.py             36     36     0%
+cache/venv/hft/lib/python3.13/site-packages/transformers/models/bert/tokenization_bert_legacy.py     197    197     0%
+----------------------------------------------------------------------------------------------------------------------
+TOTAL       
+```

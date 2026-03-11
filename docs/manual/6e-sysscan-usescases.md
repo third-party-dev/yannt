@@ -1,0 +1,87 @@
+# System Scan Use Cases
+
+## Quick Scan (grab things with points, no needle/haystack searching)
+
+Example Run:
+
+```text
+$ yannt sysscan quick
+Found 2 GPU(s):
+
+PCI Address : 0000:c3:00.0
+Vendor      : Advanced Micro Devices, Inc. [AMD/ATI] (1002)
+Device      : Navi 33 [Radeon RX 7600/7600 XT/7600M XT/7600S/7700S / PRO W7600] (7480)
+Class       : 0x030000
+Driver      : amdgpu
+------------------------------------------------------------
+PCI Address : 0000:c4:00.0
+Vendor      : Advanced Micro Devices, Inc. [AMD/ATI] (1002)
+Device      : Strix [Radeon 880M / 890M] (150e)
+Class       : 0x038000
+Driver      : amdgpu
+------------------------------------------------------------
+Found 1 GPU (or VM) Drivers(s):
+
+Name  : amdgpu
+Size  : 20406272
+Refs  : 129
+Deps  : []
+State : Live
+------------------------------------------------------------
+Kernel taint flags: none
+Done quick scan.
+```
+
+## Full Scan (quick scan + needle/haystack searching)
+
+Example Run:
+
+```text
+$ yannt sysscan full
+Sus Command: /work/cache/conda/envs/yolo-conda/bin/benchmark_app
+Sus Command: /work/cache/conda/envs/yolo-conda/bin/torchrun
+Sus Command: /work/cache/conda/envs/yolo-conda/bin/paddle
+Sus Command: /work/cache/conda/envs/yolo-conda/bin/ovc
+Sus Command: /work/cache/conda/envs/yolo-conda/bin/x2paddle
+Sus Library: /work/cache/conda/envs/yolo-conda/lib/libcusolver.so.11
+Sus Library: /work/cache/conda/envs/yolo-conda/lib/libnvrtc.so.11.2
+Sus Library: /work/cache/conda/envs/yolo-conda/lib/python3.1/site-packages/openvino/libs/libtbb.so.12
+Sus Library: /work/cache/conda/envs/yolo-conda/lib/python3.1/site-packages/paddle/libs/libtbb.so.12
+Sus Library: /work/cache/conda/envs/yolo-conda/lib/libcufft.so.10
+Sus Library: /work/cache/conda/envs/yolo-conda/lib/libcublas.so.11
+Sus Library: /work/cache/conda/envs/yolo-conda/lib/libcurand.so.10.3.0.86
+Sus Library: /work/cache/conda/envs/yolo-conda/lib/libcusparse.so.11
+Sus Library: /work/cache/conda/envs/yolo-conda/lib/libnvToolsExt.so
+Sus Library: /work/cache/conda/envs/yolo-conda/lib/libcudart.so.11.8.89
+Sus Command: /work/cache/conda/envs/yolo-tf-conda/bin/saved_model_cli
+Sus Command: /work/cache/conda/envs/yolo-tf-conda/bin/torchrun
+Sus Command: /work/cache/conda/envs/yolo-tf-conda/bin/tflite_convert
+Sus Library: /work/cache/conda/envs/yolo-tf-conda/lib/libtbb.so.12
+Sus Library: /work/cache/conda/envs/yolo-tf-conda/lib/libze_loader.so.1
+Sus Library: /work/cache/conda/envs/yolo-tf-conda/lib/libOpenCL.so.1
+Sus Command: /work/cache/podman-runroot/overlay/8c74aac4287ee60ca4abfa19dd0b25ecad5fa5cb9f9d70d6eb4d0731d6b86f5b/diff/usr/local/bin/benchmark_app
+Sus Command: /work/cache/podman-runroot/overlay/8c74aac4287ee60ca4abfa19dd0b25ecad5fa5cb9f9d70d6eb4d0731d6b86f5b/diff/usr/local/bin/saved_model_cli
+Sus Command: /work/cache/podman-runroot/overlay/8c74aac4287ee60ca4abfa19dd0b25ecad5fa5cb9f9d70d6eb4d0731d6b86f5b/diff/usr/local/bin/paddle
+Sus Command: /work/cache/podman-runroot/overlay/8c74aac4287ee60ca4abfa19dd0b25ecad5fa5cb9f9d70d6eb4d0731d6b86f5b/diff/usr/local/bin/ovc
+Sus Command: /work/cache/podman-runroot/overlay/8c74aac4287ee60ca4abfa19dd0b25ecad5fa5cb9f9d70d6eb4d0731d6b86f5b/diff/usr/local/bin/x2paddle
+Sus Command: /work/cache/podman-runroot/overlay/8c74aac4287ee60ca4abfa19dd0b25ecad5fa5cb9f9d70d6eb4d0731d6b86f5b/diff/usr/local/bin/tflite_convert
+Sus Library: /work/cache/podman-runroot/overlay/8c74aac4287ee60ca4abfa19dd0b25ecad5fa5cb9f9d70d6eb4d0731d6b86f5b/diff/usr/local/lib/python3.11/site-packages/openvino/libs/libtbb.so.12
+Sus Library: /work/cache/podman-runroot/overlay/8c74aac4287ee60ca4abfa19dd0b25ecad5fa5cb9f9d70d6eb4d0731d6b86f5b/diff/usr/local/lib/python3.11/site-packages/paddle/libs/libtbb.so.12
+Sus Relpath: /work/cache/podman-runroot/overlay/8c74aac4287ee60ca4abfa19dd0b25ecad5fa5cb9f9d70d6eb4d0731d6b86f5b/diff/root/.keras
+Sus Command: /work/cache/podman-runroot/overlay/1dc8417e97dd1938c55d1b421fbf13912b1c39c3359020991b743924ed9d9c6b/diff/usr/local/bin/torchrun
+Sus Command: /work/cache/venv/yannt-py3.13-venv/bin/torchrun
+Sus Command: /work/cache/venv/yannt-py3.11-docker/bin/torchrun
+Sus Library: /work/upstream/cuda/lib64/python3.13/site-packages/nvidia/cusparse/lib/libcusparse.so.12
+Sus Library: /work/upstream/cuda/lib64/python3.13/site-packages/nvidia/cufft/lib/libcufft.so.11
+Sus Library: /work/upstream/cuda/lib64/python3.13/site-packages/nvidia/cusolver/lib/libcusolver.so.11
+Sus Library: /work/upstream/cuda/lib64/python3.13/site-packages/nvidia/nccl/lib/libnccl.so.2
+Sus Library: /work/upstream/cuda/lib64/python3.13/site-packages/nvidia/cudnn/lib/libcudnn.so.9
+Sus Library: /work/upstream/cuda/lib64/python3.13/site-packages/nvidia/nvtx/lib/libnvToolsExt.so.1
+Sus Library: /work/upstream/cuda/lib64/python3.13/site-packages/nvidia/cuda_runtime/lib/libcudart.so.12
+Sus Library: /work/upstream/cuda/lib64/python3.13/site-packages/nvidia/cuda_nvrtc/lib/libnvrtc.so.12
+Sus Library: /work/upstream/cuda/lib64/python3.13/site-packages/nvidia/cublas/lib/libcublas.so.12
+Sus Library: /work/upstream/cuda/lib64/python3.13/site-packages/nvidia/curand/lib/libcurand.so.10
+Sus Command: /work/upstream/cuda/bin/torchrun
+Done full scan.
+```
+

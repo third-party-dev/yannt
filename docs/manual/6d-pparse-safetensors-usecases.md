@@ -1,0 +1,98 @@
+# Safetensors Use Cases
+
+## Extract and pretty print (for humans) safetensors JSON header
+
+Generate test data:
+
+```sh
+hft create --type AutoModel --model bert \
+  --safetensors_path ../yannt/models/bert/safetensors
+
+```
+
+```sh
+yannt pparse safetensors header /work/models/bert/safetensors/model.safetensors
+```
+
+Example Output:
+
+```json
+Parsing header from: /work/models/bert/safetensors/model.safetensors
+{
+    "__metadata__": {
+        "format": "pt"
+    },
+    "embeddings.LayerNorm.bias": {
+        "dtype": "F32",
+        "shape": [
+            768
+        ],
+        "data_offsets": [
+            0,
+            3072
+        ]
+    },
+
+# ... ~2050 more lines ...
+
+    "pooler.dense.weight": {
+        "dtype": "F32",
+        "shape": [
+            768,
+            768
+        ],
+        "data_offsets": [
+            435569664,
+            437928960
+        ]
+    }
+}
+```
+
+Do it in python:
+
+```python
+import json
+import struct
+
+filepath = '/work/models/bert/safetensors/model.safetensors'
+with open(filepath, "rb") as fobj:
+    header_length = struct.unpack("<Q", fobj.read(8))[0]
+    hdr_json = json.dumps(json.loads(fobj.read(header_length).decode()), indent=4)
+    print(hdr_json)
+```
+
+## Extract and parse into a node tree (for non-humans) safetensors JSON header
+
+Parse and inspect from CLI:
+
+```sh
+yannt pparse --breakpoint safetensors pheader /work/models/bert/safetensors/model.safetensors
+```
+
+Parse in python:
+
+```python
+from thirdparty.pparse.view import SafeTensors
+
+node_tree = SafeTensors().open_fpath(args.path)
+```
+
+## Compute the arc hash of a safetensors
+
+Example Run:
+
+```text
+$ yannt pparse safetensors hash /work/models/bert/safetensors/model.safetensors
+Hashing safetensors from: /work/models/bert/safetensors/model.safetensors with: arc
+1add2c275863ff5d8f35f2e77739895b2073c1390f6040f653260c127d1fdcc7
+```
+
+Do it in python:
+
+```python
+from thirdparty.pparse.view import SafeTensors
+
+obj = SafeTensors().open_fpath(args.path)
+obj.as_arc_hash(hashed_data_path=args.hashed_data_path)
+```
