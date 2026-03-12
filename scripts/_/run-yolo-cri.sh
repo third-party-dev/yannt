@@ -39,14 +39,14 @@ else
 fi
 
 # Run the environment
-mkdir -p ${PROJ_PATH}/cache/docker-home
+mkdir -p ${PROJ_PATH}/${CRI_HOME}
 
 ${CRI_BIN} run -ti --rm \
     -u $(id -u):$(id -g) \
     -v ${PROJ_PATH}:${CRI_PROJ_PATH} \
     -w ${CRI_PROJ_PATH} \
     -e CRI_PROJ_PATH="${CRI_PROJ_PATH}" \
-    -e HOME=${CRI_PROJ_PATH}/cache/docker-home \
+    -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \
     -e USER="user" \
     ${CRI_RUN_ARGS} \
     docker.io/ultralytics/ultralytics:8.4.8-python-export \

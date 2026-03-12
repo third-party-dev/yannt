@@ -3,5 +3,7 @@
 export ML_VENV_NAME=${ML_VENV_NAME:-"yolo-podman"}
 
 export CRI_PROJ_PATH=${CRI_PROJ_PATH:-"/work"}
-export CRI_BIN=${CRI_BIN:-"podman --root ${PROJ_PATH}/cache/podman-runroot"}
+export CRI_BIN=${CRI_BIN:-"podman --root ${PROJ_PATH}/cache/podman/runroot"}
 export CRI_RUN_ARGS=${CRI_RUN_ARGS:-"--userns keep-id"}
+# Allow users to override home folder for container (relative to PROJ_PATH)
+export CRI_HOME=${CRI_HOME:-"cache/podman/home"}

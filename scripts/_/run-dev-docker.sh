@@ -28,7 +28,7 @@ fi
 
 
 # Run the environment
-mkdir -p ${PROJ_PATH}/cache/docker-home
+mkdir -p ${PROJ_PATH}/${CRI_HOME}
 
 ${CRI_BIN} run -ti --rm \
     -u $(id -u):$(id -g) \
@@ -39,7 +39,7 @@ ${CRI_BIN} run -ti --rm \
     -e PY_REQS="${PY_REQS}" \
     -e PY_CONSTRAINTS="${PY_CONSTRAINTS}" \
     -e NO_SHELL="$NO_SHELL" \
-    -e HOME=${CRI_PROJ_PATH}/cache/docker-home \
+    -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \
     -e USER="user" \
     -e ML_VENV_NAME="${ML_VENV_NAME}" \
     ${CRI_RUN_ARGS} \

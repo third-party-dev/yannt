@@ -11,6 +11,8 @@ export PY_REQS=${PY_REQS:-configs/pyver/${PY_VER}/requirements-py${PY_VER}.txt}
 
 export CRI_BIN=${CRI_BIN:-docker}
 export CRI_PROJ_PATH=${CRI_PROJ_PATH:-"/work"}
+# Allow users to override home folder for container (relative to PROJ_PATH)
+export CRI_HOME=${CRI_HOME:-"cache/docker/home"}
 
 export APT_PKGS="graphviz flatbuffers-compiler protobuf-compiler cmake build-essential libopencv-dev"
 

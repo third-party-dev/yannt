@@ -9,7 +9,5 @@ if [ -z "${PROJ_PATH}" ]; then
   exit 1
 fi
 
-mkdir -p ${PROJ_PATH}/cache/podman-runroot
-
 # Forward to generic script.
-${PROJ_PATH}/scripts/_/init-dev-docker.sh $@
+${PROJ_PATH}/scripts/_/init-dev-podman.sh $@

@@ -45,7 +45,7 @@ if [ -z "$SKIP_COLLECT" ]; then
   fi
 
   mkdir -p ${PROJ_PATH}/cache/pip_pkgs/${PY_VER}
-  mkdir -p ${PROJ_PATH}/cache/docker-home
+  mkdir -p ${PROJ_PATH}/${CRI_HOME}
 
   ${CRI_BIN} run -ti --rm \
     -v ${PROJ_PATH}:${CRI_PROJ_PATH} \
@@ -56,7 +56,7 @@ if [ -z "$SKIP_COLLECT" ]; then
     -e PIP_IDX_ARGS="${PIP_IDX_ARGS}" \
     -e PY_VER="$PY_VER" \
     -e USER="user" \
-    -e HOME=${CRI_PROJ_PATH}/cache/docker-home \
+    -e HOME=${CRI_PROJ_PATH}${CRI_HOME} \
     -u $(id -u):$(id -g) \
     ${CRI_RUN_ARGS} \
     localhost/${ML_VENV_NAME} \

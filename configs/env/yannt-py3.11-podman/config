@@ -9,9 +9,18 @@ export PS1_TAG=${PS1_TAG:-"(${ML_VENV_NAME}) "}
 export PY_CONSTRAINTS=${PY_CONSTRAINTS:-configs/pyver/${PY_VER}/constraints-py${PY_VER}.txt}
 export PY_REQS=${PY_REQS:-configs/pyver/${PY_VER}/requirements-py${PY_VER}.txt}
 
-export CRI_BIN=${CRI_BIN:-"podman --root ${PROJ_PATH}/cache/podman-runroot"}
+# Allow users to override podman runRoot, esp when project is on NFS mount.
+export CRI_ROOT=${CRI_ROOT:-"${PROJ_PATH}/cache/podman/runroot"}
+# Allow users to specify container manager binary to use (e.g. docker/podman)
+export CRI_BIN=${CRI_BIN:-"podman --root ${CRI_ROOT}"}
+# Allow users to specify where the project is mounted in the container.
 export CRI_PROJ_PATH=${CRI_PROJ_PATH:-"/work"}
+# Allow users to specify what is a "RUN" command when doing a "podman run" build.
+export CRI_RUN=${CRI_RUN:-"${CRI_BIN} exec ${ML_VENV_NAME}"}
+# Allow users to specify "podman run" arguments (after build phase).
 export CRI_RUN_ARGS=${CRI_RUN_ARGS:-"--userns keep-id"}
+# Allow users to override home folder for container (relative to PROJ_PATH)
+export CRI_HOME=${CRI_HOME:-"cache/podman/home"}
 
 export APT_PKGS="graphviz flatbuffers-compiler protobuf-compiler cmake build-essential libopencv-dev"
 
