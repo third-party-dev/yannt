@@ -27,7 +27,7 @@ ${CRI_BIN} build \
 
 if [ -z "$SKIP_COLLECT" ]; then
 
-  if [ -n "$PIP_UPSTREAM_VERIFIERS" ]; then
+  if [ -n "$(echo ${PIP_UPSTREAM_VERIFIERS} | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')" ]; then
     # Detect if we can run the collector
     # BUG: Logic should be reversed so we know _all_ URLs work.
     CAN_ACCESS_UPSTREAM=${CAN_ACCESS_UPSTREAM:-false}
