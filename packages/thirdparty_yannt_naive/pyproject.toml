@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "thirdparty-yannt-naive"
+version = "0.0.1"
+description = "Naive Model Parsing"
+# Note: No idea the real version required at this time.
+requires-python = ">=3.9"
+
+dependencies = ["safetensors", "numpy"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = true
+
+[project.scripts]
+naive = "thirdparty.yannt.naive.cli:main"
+
+[project.entry-points."yannt_command"]
+# Register pparse as a yannt subcommand
+naive = "thirdparty.yannt.naive.cli.yannt_plugin:register_naive"
+
+[project.entry-points."naive_command"]
+
+# Register safetensors as a pparse subcommand
+safetensors = "thirdparty.yannt.naive.cli.naive_safetensors:register_naive_safetensors"
+
+## Register pytorch as a pparse subcommand
+#pytorch = "thirdparty.pparse.cli.pparse_pytorch:register_pparse_pytorch"
+
