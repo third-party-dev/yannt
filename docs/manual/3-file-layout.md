@@ -9,10 +9,9 @@
 
 When working on the individual plugins, I treat them as their own independent projects and _then_ test them with `yannt` integration.
 
-When performing any virtual environment updates or resets, I always perform them from the `thirdparty-ws/yannt` folder so I can make assumptions like: "all in-place installs will exist in `extern` relative to `yannt` top folder.". 
+When performing any virtual environment updates or resets, I always perform them from the `thirdparty-ws/yannt` folder so I can make assumptions like: "all in-place installs will exist in `extern` relative to `yannt` top folder.".
 
 ## `thirdpart-ws/yannt` Project Layout
-
 
 - **bundles** - Ephemeral folder for holding git bundles, used for transferring backups to offline systems.
 - **cache** - Ephemeral folder for holding virtual development environments (conda, venv, docker home folders).

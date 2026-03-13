@@ -25,12 +25,3 @@ When installing `thirdparty.pparse` into a python environment, it enables:
 - `pparse [pparse-command] [options] [args]` - For systems that are confident they only need pparse, you can install pparse by itself, without yannt. This was an easy addition based on how the argparse component was integrated so its nice to be able to quickly and independently test pparse commands.
 
 Note: A primary reason for keeping yannt separate from pparse is because pparse is a more generic parsing philosophy that can be used well beyond the scope of ML artifact parsing. In contrast, yannt keeps the focus to AI/ML related artifacts.
-
-
-
-
-
-
-
-
-

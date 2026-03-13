@@ -1,6 +1,6 @@
 # Getting Started
 
-** WIP **
+Note: **WIP**
 
 When getting started with yannt, you need to know if you plan to interact with the code as a developer/builder or a user. If you are going to be in the developer/builder camp, you'll want to start with the "Developer Environment Setup" instructions.
 
@@ -68,7 +68,7 @@ yannt-py3.11-podman
 ...
 ```
 
-Each of the above strings is a procedure and reference to a development environment that you can build locally on your system. The configurations that start with `yannt` target environments that run the `yannt` command. The `py` part specifies the Python interpreter that will be used, and the last part of the tuple is the type of environment that will manage the isolation. At the moment, yannt supports conda (for data science setups), docker for stronger isolation w/ GPU based setups, and podman for when conda is not available or discouraged in data science setups.
+Each of the above strings is a procedure and reference to a development environment that you can build locally on your system. The configurations that start with `yannt` target environments that run the `yannt` command. The `py` part specifies the Python interpreter version that will be used, and the last part of the tuple is the type of environment that will manage the isolation. At the moment, yannt supports conda (for data science setups), docker for stronger isolation w/ GPU based setups, and podman for when conda is not available or discouraged in data science setups.
 
 Note: Yannt intends to be available as a wheel that can be installed in any environment within a range of python interpreters. But this is the development environment initialization and therefore is limited to what will be supported and tested.
 
@@ -87,72 +87,22 @@ The environment is now ready. Try 'yannt --help' for information.
 (yannt-py3.11-podman) user@61cc16f975c6:/work$
 ```
 
-When you are done using the development environment or want to exit the environment, simply run `exit` (i.e. do not `deactivate` when that would seem appropriate, just `exit`). By design, the development environment is always initialized in a sub-shell of the one that `./do` was executed from. This pattern prevents the development environment from polluting the original environment.
+When you are done using the development environment or want to exit the environment, simply run `exit` (i.e. do not `deactivate` when that would seem appropriate, just `exit`). By design, the development environment is always initialized in a sub-shell of the one that `./do` was executed from. **This pattern prevents the development environment from polluting the original environment.**
 
 ### Running Already Created Environment
 
-Similar to initialization, there is a process for running an already created environment. If you created `yannt-py3.11-podman`, you can use the pre-cached environment by running:
+Similar to initialization, there is a process for running an already created (or initialized) environment. If you created `yannt-py3.11-podman`, you can use the pre-cached environment by running:
 
 ```sh
 ./do run yannt-py3.11-podman
 ```
 
+Optionally, you don't need to run everything from a shell in the container. You can often accomplish single runs by providing `--` and the command you want to run. For example:
+
+```sh
+./do run yannt-py3.11-podman -- yannt --help
+```
+
 ### Bash Tab Completion
 
 As part of the developer environment, bash tab completion is included for `yannt` command. As per the usual `argparse` enabled command, you can also run `yannt --help` to get your barrings.
-
-<!-- ### Offline **Builder** Docker Environment
-
-Environment designed to build yannt sdist and wheel packages by running within a docker environment within an offline system (i.e. no internet). The Docker container is only for managing the build environment, all modified files (with the docker `/work` mount) happen on the host system. Dependencies are expected to be pre-collected from an internet connected system and then prestaged into the same output folder (`pip_pkgs`) in the offline system. 
-
-To initialize, from top level `yannt` folder: `./scripts/build-docker-local-prod.sh`
-
-Optionally, select a specific python version: `PY_VER=3.9 ./scripts/build-docker-local-prod.sh`
-
-If successful, (assuming `python3 --version` is `3.13`) this will create: `./pip_pkgs/yannt/3.13` where all output ends up.
-
-### Offline Developer Docker Environment
-
-Environment designed to run within a docker environment within an offline system (i.e. no internet). The Docker container is only for managing the runtime environment, all modified files (with the docker `/work` mount) happen on the host system. Dependencies are expected to be precollected from an internet connected system and then prestaged into the same output folder (`pip_pkgs`) in the offline system. Docker environments are good for testing and developing with Python versions that are not available on the host system.
-
-To initialize, from top level `yannt` folder: `./scripts/init-docker-local-dev.sh`
-
-Optionally, select a specific python version: `PY_VER=3.9 ./scripts/init-docker-local-dev.sh`
-
-If successful, (assuming `python3 --version` is `3.13`) this will create: `./pip_pkgs/3.13`, and `./venv/ml-venv-3.13-dld`.
-
-You're terminal should also have a prefix: `(ml-venv-3.13-dld)`
-
-### Online Developer Docker Environment
-
-Environment designed to run within a docker environment within an online system (i.e. internet connected). The Docker container is only for managing the runtime environment, all modified files (with the docker `/work` mount) happen on the host system. In contrast to the Offline version, this environment will always attempt to initialize with the newest upstream packages allowed by the package dependency definitions. Docker environments are good for testing and developing with Python versions that are not available on the host system.
-
-To initialize, from top level `yannt` folder: `./scripts/init-docker-upstream-dev.sh`
-
-Optionally, select a specific python version: `PY_VER=3.9 ./scripts/init-docker-upstream-dev.sh`
-
-If successful, (assuming `python3 --version` is `3.13`) this will create: `./pip_pkgs/3.13`, and `./venv/ml-venv-3.13-dud`.
-
-You're terminal should also have a prefix: `(ml-venv-3.13-dud)`
-
-### Offline Developer Host Environment
-
-Environment designed to run directly on the current host environment, utilizing a system installed python environment. This host environment is offline compatible (i.e. no internet). Dependencies are expected to be precollected from an internet connected system and then prestaged into the same output folder (`pip_pkgs`) in the offline system.
-
-To initialize, from top level `yannt` folder: `./scripts/init-host-local-dev.sh`
-
-If successful, (assuming `python3 --version` is `3.13`) this will create: `./pip_pkgs/3.13`, and `./venv/ml-venv-3.13-hld`.
-
-You're terminal should also have a prefix: `(ml-venv-3.13-hld)`
-
-### Online Developer Host Environment
-
-Environment designed to run directly on the current host environment, utilizing a system installed python environment. This host environment is expected to be online (i.e. internet connectivity). In contrast to the Offline version, this environment will always attempt to initialize with the newest upstream packages allowed by the package dependency definitions.
-
-To initialize, from top level `yannt` folder: `./scripts/init-host-upstream-dev.sh`
-
-If successful, (assuming `python3 --version` is `3.13`) this will create: `./pip_pkgs/3.13`, and `./venv/ml-venv-3.13-hud`.
-
-You're terminal should also have a prefix: `(ml-venv-3.13-hud)` -->
-
-
