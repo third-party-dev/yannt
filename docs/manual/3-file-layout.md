@@ -2,31 +2,30 @@
 
 ## Workspace Layout
 
-- `thirdparty-ws` - The name of this folder can be anything, but I will normally name _workspace_ folders after the larger effort or epic that it is contributing too. Sometimes it becomes the forge organization.
-- `thirdparty-ws/yannt` - Top level git repo folder for yannt.
-- `thirdparty-ws/pparse` - A symlink to the yannt `enabled/thirdparty_pparse`. Avoids having multiple checkouts that could get out of sync.
-- `thirdparty-ws/yannt_transformers` - A symlink to the yannt `enabled/thirdparty_yannt_transformers`. Avoids having multiple checkouts that could get out of sync.
+- **thirdparty-ws** - The name of this folder can be anything, but I will normally name _workspace_ folders after the larger effort or epic that it is contributing too. Sometimes it becomes the forge organization.
+- **thirdparty-ws/yannt** - Top level git repo folder for yannt.
 
-When working on the individual plugins, I treat them as their own independent projects and _then_ test them with `yannt` integration.
+Note: When performing any virtual environment updates or resets, I always perform them from the `thirdparty-ws/yannt` folder so I can make assumptions like: "all in-place installs will exist in `enabled` relative to `yannt` top folder.".
 
-When performing any virtual environment updates or resets, I always perform them from the `thirdparty-ws/yannt` folder so I can make assumptions like: "all in-place installs will exist in `enabled` relative to `yannt` top folder.".
+## **thirdpart-ws/yannt** Project Layout
 
-## `thirdpart-ws/yannt` Project Layout
-
-- **bundles** - Ephemeral folder for holding git bundles, used for transferring backups to offline systems.
-- **cache** - Ephemeral folder for holding virtual development environments (conda, venv, docker home folders).
+- **bundles** - Ephemeral folder for holding git bundles, used for transferring backups to other systems.
+- **cache** - Ephemeral folder for holding virtual development environment state (conda, venv, docker home folders).
   - **conda** - Project local storage for conda environments.
-  - **docker-home** - A home directory for container users to save bash history and other caches.
+  - **docker/home** - A home directory for container users to save bash history and other caches.
   - **empty-context** - An always empty folder that can be used for empty docker contexts.
   - **pip_pkgs** - Project local pip package cache built with `pip download`.
   - **venv** - Project local storage for python virtual environments.
-- **configs** - Directory of used (supported?) virtual development environment configurations.
+  - **podman/home** - A home directory for container users to save bash history and other caches.
+  - **podman/runroot** - Project specific image cache and state database for podman.
+- **configs** - Directory of virtual development environment configurations.
 - **docs** - Documentation
   - **manual** - Proper "manual" for rendering to HTML and PDF.
   - **notes** - Chicken scratch notes that I'm not ready to delete.
-- **enabled** - Ephemeral folder for holding references to other yannt plugins (often git repos themselves). All folders in enabled are assumed to be python packages and are installed in place when building a standard yannt development environment with `init-dev.sh`.
+- **enabled** - Ephemeral folder for holding references to yannt plugins that will be automatically installed in place when initializing a development environment.
 - **models** - Ephemeral folder for holding various models on the system for testing and development.
 - **outputs** - Ephemeral yannt output folder.
+- **plugins** - Folder for storage of all plugin code (regardless of whether its in use).
 - **scripts** - Scripts for building development environments, testing, and building of yannt package suites.
 - **upstream** - Ephemeral folder for holding clones of upstream git repos used for developing and testing yannt.
 - **yannt** - The yannt python package distribution. (This is the top of the python package.)

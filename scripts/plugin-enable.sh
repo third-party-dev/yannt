@@ -13,4 +13,5 @@ if [ -z "$PLUGIN" ]; then
     ls -1 plugins
 fi
 
+mkdir -p ./enabled
 ln -s ../plugins/$PLUGIN ./enabled/$PLUGIN

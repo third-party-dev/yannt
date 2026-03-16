@@ -15,22 +15,28 @@ Pparse is its own python package and has its own documentation, but its worth no
 ## Project Layout
 
 - **yannt** - Top project directory (not the python package top)
-  - **bundles** - Ephemeral folder for holding git bundles, used for transferring backups to offline systems.
-  - **cache** - Ephemeral folder for holding virtual development environments (conda, venv, docker home folders).
-  - **configs** - Directory of used (supported?) virtual development environment configurations.
+  - **bundles** - Ephemeral folder for holding git bundles, used for transferring backups to other systems.
+  - **cache** - Ephemeral folder for holding virtual development environment state (conda, venv, docker home folders).
+    - **conda** - Project local storage for conda environments.
+    - **docker/home** - A home directory for container users to save bash history and other caches.
+    - **empty-context** - An always empty folder that can be used for empty docker contexts.
+    - **pip_pkgs** - Project local pip package cache built with `pip download`.
+    - **venv** - Project local storage for python virtual environments.
+    - **podman/home** - A home directory for container users to save bash history and other caches.
+    - **podman/runroot** - Project specific image cache and state database for podman.
+  - **configs** - Directory of virtual development environment configurations.
   - **docs** - Documentation
     - **manual** - Proper "manual" for rendering to HTML and PDF.
     - **notes** - Chicken scratch notes that I'm not ready to delete.
-  - **enabled** - Ephemeral folder for holding references to other yannt plugins (often git repos themselves). All folders in enabled are assumed to be python packages and are installed in place when building a standard yannt development environment with `init-dev.sh`.
-    - 
+  - **enabled** - Ephemeral folder for holding references to yannt plugins that will be automatically installed in place when initializing a development environment.
   - **models** - Ephemeral folder for holding various models on the system for testing and development.
   - **outputs** - Ephemeral yannt output folder.
+  - **plugins** - Folder for storage of all plugin code (regardless of whether its in use).
   - **scripts** - Scripts for building development environments, testing, and building of yannt package suites.
   - **upstream** - Ephemeral folder for holding clones of upstream git repos used for developing and testing yannt.
   - **yannt** - The yannt python package distribution. (This is the top of the python package.)
   - **do** - (Janky) self contained version of `just` for use with the adjacent `Justfile`.
   - **Justfile** - Modern-ish version of Makefile with design principles for project management.
-  - **create-bundle.sh** - A convenience script for creating git bundles.
 
 ## Build Conda Environment
 

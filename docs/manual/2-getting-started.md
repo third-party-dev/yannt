@@ -4,19 +4,7 @@ Note: **WIP**
 
 When getting started with yannt, you need to know if you plan to interact with the code as a developer/builder or a user. If you are going to be in the developer/builder camp, you'll want to start with the "Developer Environment Setup" instructions.
 
-<!-- ## Jupyter
-
-I'm currently unsure of the user workflows within Jupyter, therefore I've constructed a minimal viable thing to test code in Jupyter. Roughly, you must start a Jupyter docker image with the `yannt` project mounted. Connect to the Jupyter instance and manually install yannt as if it was on a local host. The following example shows the scripts to run to install with pip.
-
-Build yannt Project for version in Jupyter: `PY_VER=3.9 ./scripts/build-docker-local-prod.sh`
-
-Start the Jupyter docker container: ./scripts/start-docker-local-jupyter.sh
-
-Inspect the Jupyter logs to get the token to access the localhost instance. Once connected, open a terminal and change directory (`cd`) into yannt folder. Then install with pip by running: `SKIP_COLLECT=1 ./scripts/install-host-local-pip.sh`.
-
-Optionally, enable tab completion in the temrinal with: `source ./scripts/bash-tab-complete.sh`.
-
-## Pipx
+<!-- ## Pipx
 
 Before using `pipx`, please ensure its installed and within your path:
 
@@ -35,22 +23,17 @@ Now you should have `yannt` as a command in your normal (user) system environmen
 
 ## Developer Environment Setup
 
-To keep various yannt components independent and plug-able, many components are divided up into their own repositories. Yannt manages the top level project folder for itself and all of its plugins. By convention, I always `git clone` yannt into a folder named `yannt`. All plugins (i.e. not builtin plugins) are `git cloned` into `yannt/enabled` with a python safe version of the package name. For example, `thirdpary.pparse` becomes `yannt/enabled/thirdparty_pparse` and `thirdparty.yannt.sysscan` becomes `yannt/enabled/thirdparty_yannt_sysscan`.
+To keep various yannt components independent and plug-able, many components are divided up into their own plugins. Yannt manages the top level project folder as a lobby for itself and all of its plugins. By convention, I always `git clone` the yannt repo into a folder structure like: `thirdparty-ws/yannt`. All plugin code lives in `yannt/plugins` and active or _enabled_ plugins have a relative symlink from `yannt/enabled` to its code folder. Plugin folder names always are named for their namespace, but expressed with a python safe version of the string. For example, `thirdpary.pparse` becomes `yannt/enabled/thirdparty_pparse` and `thirdparty.yannt.sysscan` becomes `yannt/enabled/thirdparty_yannt_sysscan`.
 
 Commands similar to the following should get you going (assuming bash-like shell):
 
 ```sh
-# Note: thirdparty-ws folder optional. Its a nice folder to open an IDE (e.g. VSCode) with.
+# Create workspace folder
 cd ~ ; mkdir thirdparty-ws ; cd thirdparty-ws
-ln -s yannt/enabled/thirdparty_pparse pparse
-ln -s yannt/enabled/thirdparty_yannt_transformers yannt_transformers
-git clone https://github.com/third-party-dev/yannt.git yannt
-cd yannt ; mkdir enabled ; cd enabled
-git clone https://github.com/third-party-dev/pparse.git thirdparty_pparse
-git clone https://github.com/third-party-dev/yannt_sysscan.git thirdparty_yannt_sysscan
-# ... git clone any additional plugins that you want to work with, using this convention ...
-# go back to top yannt folder (not thirdparty-ws)
-cd ..
+git clone https://github.com/third-party-dev/yannt.git yannt ; cd yannt
+# Clone the external plugin pparse and enable it.
+git clone https://github.com/third-party-dev/pparse.git plugins/thirdparty_pparse
+./do enable thirdparty_pparse
 ```
 
 Once you have the environment cloned locally into the workspace (`thirdparty-ws`) or project (`yannt`) folders, you'll want to initialize the environment for developer activities. See the following sections for the options.

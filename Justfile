@@ -12,3 +12,6 @@ disable PLUGIN="":
 
 podman CONFIG="" *args:
     ./scripts/podman.sh {{CONFIG}} -- {{args}}
+
+bundle:
+    ./scripts/create-bundle.sh
