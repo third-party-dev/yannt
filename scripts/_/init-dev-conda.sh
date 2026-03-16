@@ -53,7 +53,7 @@ conda activate ${PROJ_PATH}/cache/conda/envs/${ML_VENV_NAME}
 
 # There are some assumptions that current folder is ${PROJ_PATH}
 cd ${PROJ_PATH}
-EXTERN_DIR=${PROJ_PATH}/extern
+EXTERN_DIR=./enabled
 
 PY_CONSTRAINTS=${PY_CONSTRAINTS:-}
 if [ -n "${PY_CONSTRAINTS}" ]; then
@@ -86,9 +86,9 @@ if [ -z "$SKIP_COLLECT" ]; then
   # Do for yannt
   pip download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ${PROJ_PATH}/yannt
 
-  # Do extern python packages
-  for ext in `ls -1 ${PROJ_PATH}/extern`; do
-      pip download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ${PROJ_PATH}/extern/$ext
+  # Do enabled python packages
+  for ext in `ls -1 ${EXTERN_DIR}`; do
+      pip download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ${EXTERN_DIR}/$ext
   done
 
 fi
@@ -106,8 +106,8 @@ echo Checking dependencies.
 echo "Installing base yannt package in place (ie for development)."
 pip show thirdparty_yannt &>/dev/null || pip install -U ${PIP_INST_ARGS} -e yannt
 
-echo "Installing each package from ./extern in place (ie for development)."
-# pip install for each extern
+echo "Installing each package from ./enabled in place (ie for development)."
+# pip install for each enabled
 mkdir -p ${EXTERN_DIR}
 for pkgpath in ${EXTERN_DIR}/*; do
   if [ -d "$pkgpath" ]; then

@@ -35,17 +35,17 @@ Now you should have `yannt` as a command in your normal (user) system environmen
 
 ## Developer Environment Setup
 
-To keep various yannt components independent and plug-able, many components are divided up into their own repositories. Yannt manages the top level project folder for itself and all of its plugins. By convention, I always `git clone` yannt into a folder named `yannt`. All external plugins (i.e. not builtin plugins) are `git cloned` into `yannt/extern` with a python safe version of the package name. For example, `thirdpary.pparse` becomes `yannt/extern/thirdparty_pparse` and `thirdparty.yannt.sysscan` becomes `yannt/extern/thirdparty_yannt_sysscan`.
+To keep various yannt components independent and plug-able, many components are divided up into their own repositories. Yannt manages the top level project folder for itself and all of its plugins. By convention, I always `git clone` yannt into a folder named `yannt`. All plugins (i.e. not builtin plugins) are `git cloned` into `yannt/enabled` with a python safe version of the package name. For example, `thirdpary.pparse` becomes `yannt/enabled/thirdparty_pparse` and `thirdparty.yannt.sysscan` becomes `yannt/enabled/thirdparty_yannt_sysscan`.
 
 Commands similar to the following should get you going (assuming bash-like shell):
 
 ```sh
 # Note: thirdparty-ws folder optional. Its a nice folder to open an IDE (e.g. VSCode) with.
 cd ~ ; mkdir thirdparty-ws ; cd thirdparty-ws
-ln -s yannt/extern/thirdparty_pparse pparse
-ln -s yannt/extern/thirdparty_yannt_transformers yannt_transformers
+ln -s yannt/enabled/thirdparty_pparse pparse
+ln -s yannt/enabled/thirdparty_yannt_transformers yannt_transformers
 git clone https://github.com/third-party-dev/yannt.git yannt
-cd yannt ; mkdir extern ; cd extern
+cd yannt ; mkdir enabled ; cd enabled
 git clone https://github.com/third-party-dev/pparse.git thirdparty_pparse
 git clone https://github.com/third-party-dev/yannt_sysscan.git thirdparty_yannt_sysscan
 # ... git clone any additional plugins that you want to work with, using this convention ...

@@ -6,14 +6,14 @@
 
 - User Install: (`pip install thirdparty_yannt thirdparty_pparse thirdparty_sysscan`)
   - Implicitly assumes online and grabs dependencies from upstream pip via `pyproject.toml`.
-  - Does not implicitly install `extern` plugins.
+  - Does not implicitly install `enabled` plugins.
   - Should not have constraints requirements.
   - transformers/yolo not intended for users.
 
 - ~~Dev Install: (`./scripts/init-dev.sh 3.9-docker` or `./scripts/run-dev.sh 3.9-docker`)~~
   - ~~Implicitly assumes docker used for pre-download pip dependencies (`pip_pkgs`).~~
   - ~~Implicitly assumes docker for all venv things.~~
-  - ~~Implicitly installs `extern` plugins in place.~~
+  - ~~Implicitly installs `enabled` plugins in place.~~
   - ~~May explicitly provide config name (`configs/yannt/[config-name]/.env`)~~
 
 - Add configs/ ... TBD

@@ -21,7 +21,8 @@ Pparse is its own python package and has its own documentation, but its worth no
   - **docs** - Documentation
     - **manual** - Proper "manual" for rendering to HTML and PDF.
     - **notes** - Chicken scratch notes that I'm not ready to delete.
-  - **extern** - Ephemeral folder for holding references to other yannt plugins (often git repos themselves). All folders in extern are assumed to be python packages and are installed in place when building a standard yannt development environment with `init-dev.sh`.
+  - **enabled** - Ephemeral folder for holding references to other yannt plugins (often git repos themselves). All folders in enabled are assumed to be python packages and are installed in place when building a standard yannt development environment with `init-dev.sh`.
+    - 
   - **models** - Ephemeral folder for holding various models on the system for testing and development.
   - **outputs** - Ephemeral yannt output folder.
   - **scripts** - Scripts for building development environments, testing, and building of yannt package suites.

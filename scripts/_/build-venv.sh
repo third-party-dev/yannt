@@ -4,7 +4,7 @@ set -e
 
 # Assuming we're in top level yannt folder.
 
-EXTERN_DIR=./extern
+EXTERN_DIR=./enabled
 
 # Allow user to assign venv name and tag shell prompt
 ML_VENV_NAME=${ML_VENV_NAME:-ml-venv}
@@ -38,8 +38,8 @@ PYTHON=${PYTHON:-python}
 # # # echo "Installing base yannt package in place (ie for development)."
 # # # pip show thirdparty_yannt &>/dev/null || pip install -U ${PIP_INST_ARGS} -e yannt
 
-# # # echo "Installing each package from ./extern in place (ie for development)."
-# # # # pip install for each extern
+# # # echo "Installing each package from ./enabled in place (ie for development)."
+# # # # pip install for each enabled
 # # # mkdir -p ${EXTERN_DIR}
 # # # for pkgpath in ${EXTERN_DIR}/*; do
 # # #   if [ -d "$pkgpath" ]; then
@@ -66,7 +66,7 @@ echo Checking dependencies.
 pip show thirdparty_yannt &>/dev/null || pip install ${PIP_INST_ARGS} \
   ${PY_CONSTRAINTS_ARGS} -e yannt
 
-# pip install for each extern
+# pip install for each enabled
 mkdir -p ${EXTERN_DIR}
 for pkgpath in ${EXTERN_DIR}/*; do
   if [ -d "$pkgpath" ]; then

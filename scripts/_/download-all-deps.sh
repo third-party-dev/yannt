@@ -55,8 +55,8 @@ ${PIP} download ${PIP_DL_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
 # Do it for yannt
 ${PIP} download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./yannt
 
-# Do extern python packages
-for ext in `ls -1 ./extern`; do
-    ${PIP} download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./extern/$ext
+# Do enabled python packages
+for ext in `ls -1 ./enabled`; do
+    ${PIP} download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./enabled/$ext
 done
 

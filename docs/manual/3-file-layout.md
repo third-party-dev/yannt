@@ -4,12 +4,12 @@
 
 - `thirdparty-ws` - The name of this folder can be anything, but I will normally name _workspace_ folders after the larger effort or epic that it is contributing too. Sometimes it becomes the forge organization.
 - `thirdparty-ws/yannt` - Top level git repo folder for yannt.
-- `thirdparty-ws/pparse` - A symlink to the yannt extern/thirdparty_pparse. Avoids having multiple checkouts that could get out of sync.
-- `thirdparty-ws/yannt_transformers` - A symlink to the yannt extern/thirdparty_yannt_transformers. Avoids having multiple checkouts that could get out of sync.
+- `thirdparty-ws/pparse` - A symlink to the yannt `enabled/thirdparty_pparse`. Avoids having multiple checkouts that could get out of sync.
+- `thirdparty-ws/yannt_transformers` - A symlink to the yannt `enabled/thirdparty_yannt_transformers`. Avoids having multiple checkouts that could get out of sync.
 
 When working on the individual plugins, I treat them as their own independent projects and _then_ test them with `yannt` integration.
 
-When performing any virtual environment updates or resets, I always perform them from the `thirdparty-ws/yannt` folder so I can make assumptions like: "all in-place installs will exist in `extern` relative to `yannt` top folder.".
+When performing any virtual environment updates or resets, I always perform them from the `thirdparty-ws/yannt` folder so I can make assumptions like: "all in-place installs will exist in `enabled` relative to `yannt` top folder.".
 
 ## `thirdpart-ws/yannt` Project Layout
 
@@ -24,7 +24,7 @@ When performing any virtual environment updates or resets, I always perform them
 - **docs** - Documentation
   - **manual** - Proper "manual" for rendering to HTML and PDF.
   - **notes** - Chicken scratch notes that I'm not ready to delete.
-- **extern** - Ephemeral folder for holding references to other yannt plugins (often git repos themselves). All folders in extern are assumed to be python packages and are installed in place when building a standard yannt development environment with `init-dev.sh`.
+- **enabled** - Ephemeral folder for holding references to other yannt plugins (often git repos themselves). All folders in enabled are assumed to be python packages and are installed in place when building a standard yannt development environment with `init-dev.sh`.
 - **models** - Ephemeral folder for holding various models on the system for testing and development.
 - **outputs** - Ephemeral yannt output folder.
 - **scripts** - Scripts for building development environments, testing, and building of yannt package suites.
