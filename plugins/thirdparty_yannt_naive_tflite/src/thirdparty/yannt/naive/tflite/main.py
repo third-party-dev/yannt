@@ -13,22 +13,22 @@ def register_naive_tflite(subparsers):
     tflite_load_parser.set_defaults(func=tflite_load)
 
 
-# TODO: Can we auto-detect missing modules after unpickle fails?
-# pip install ultralytics
-# apt-get install libgl1
 # yannt naive --breakpoint tflite load ./models/yolo/yolov5su.pt
 def tflite_load(args):
     import tflite
+    import flatbuffers
 
-    model = tflite.load(args.path)
+    with open(args.path, "rb") as f:
+        buf = f.read()
+
+    model = tflite.Model.GetRootAsModel(buf, 0)
 
     if args.breakpoint:
         print(f"Locals: {list(locals().keys())}")
-        print(f"Example: model.graph")
-        print(f"Example: model.graph.input[0].type.tensor_type.shape.dim")
-        print(f"Example: model.graph.initializer[0]")
-        print(f"Example: tflite.checker.check_model(model)")
-        print(f"Example: print(tflite.helper.printable_graph(model.graph))")
+        print(f"Example: model.Version()")
+        print(f"Example: model.Subgraphs(0)")
+        print(f"Example: model.Subgraphs(0).TensorsLength()")
+        print(f"Example: model.Subgraphs(0).OperatorsLength()")
         breakpoint()
 
 

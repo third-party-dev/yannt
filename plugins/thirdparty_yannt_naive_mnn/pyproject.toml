@@ -3,13 +3,13 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "thirdparty-yannt-naive-tflite"
+name = "thirdparty-yannt-naive-mnn"
 version = "0.0.1"
-description = "Yannt Naive TFlite Parsing"
+description = "Yannt Naive MNN Parsing"
 # Note: No idea the real version required at this time.
 requires-python = ">=3.9"
 
-dependencies = ["tflite", "flatbuffers"]
+dependencies = ["MNN"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -18,5 +18,5 @@ namespaces = true
 [project.entry-points."naive_command"]
 
 # Register onnx as a pparse subcommand
-tflite = "thirdparty.yannt.naive.tflite.main:register_naive_tflite"
+mnn = "thirdparty.yannt.naive.mnn.main:register_naive_mnn"
 

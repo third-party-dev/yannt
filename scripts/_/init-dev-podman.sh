@@ -31,8 +31,9 @@ RUN() {
 }
 
 BUILD_CONTAINER() {
-    PODMAN stop $ML_VENV_NAME
-    PODMAN rm $ML_VENV_NAME
+    # Initial stop and rm allowed to fail.
+    ${CRI_BIN} stop $ML_VENV_NAME
+    ${CRI_BIN} rm $ML_VENV_NAME
 
     echo "Creating container ${ML_VENV_NAME}"
     CONTAINER=$(\
