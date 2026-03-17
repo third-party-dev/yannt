@@ -24,6 +24,9 @@ podman CONFIG="" *args:
 bundle:
     ./scripts/create-bundle.sh
 
+bundle-full:
+    ./scripts/create-bundle-full.sh
+
 buildpkgs TAG="":
     ./scripts/build-pkgs.sh {{TAG}}
 
