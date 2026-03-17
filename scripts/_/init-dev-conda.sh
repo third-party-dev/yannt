@@ -79,13 +79,6 @@ if [ -z "$SKIP_COLLECT" ]; then
   # Note: Only works when we assume python is version $PY_VER
   pip download ${PIP_DL_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
 
-  # # Do given python packages
-  # for arg in "$@"; do
-  #     
-  # done
-  # Do for yannt
-  pip download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ${PROJ_PATH}/yannt
-
   # Do enabled python packages
   for ext in `ls -1 ${EXTERN_DIR}`; do
       pip download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ${EXTERN_DIR}/$ext
@@ -102,9 +95,6 @@ pip install -U ${PIP_INST_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
 
 # Note: These dependencies _should_ be managed by pyproject.toml.
 echo Checking dependencies.
-
-echo "Installing base yannt package in place (ie for development)."
-pip show thirdparty_yannt &>/dev/null || pip install -U ${PIP_INST_ARGS} -e yannt
 
 echo "Installing each package from ./configs/auto_install in place (ie for development)."
 # pip install for each enabled

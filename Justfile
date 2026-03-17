@@ -21,11 +21,8 @@ podman CONFIG="" *args:
 
 # Source Maintenance Targets
 
-bundle:
-    ./scripts/create-bundle.sh
-
-bundle-full:
-    ./scripts/create-bundle-full.sh
+bundle DURATION="":
+    ./scripts/create-bundle.sh {{DURATION}}
 
 buildpkgs TAG="":
     ./scripts/build-pkgs.sh {{TAG}}
