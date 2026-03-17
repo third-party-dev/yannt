@@ -29,24 +29,6 @@ export PS1="${PS1_TAG}${PS1:-\$ }"
 # Assuming we've already collected.
 PIP_INST_ARGS=${PIP_INST_ARGS:-"--no-index -f ./cache/pip_pkgs/${PY_VER}"}
 PYTHON=${PYTHON:-python}
-# # # echo "Running pip install of config packages."
-# # # pip install -U ${PIP_INST_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
-
-# # # # Note: These dependencies _should_ be managed by pyproject.toml.
-# # # echo Checking dependencies.
-
-# # # echo "Installing base yannt package in place (ie for development)."
-# # # pip show thirdparty_yannt &>/dev/null || pip install -U ${PIP_INST_ARGS} -e yannt
-
-# # # echo "Installing each package from ./enabled in place (ie for development)."
-# # # # pip install for each enabled
-# # # mkdir -p ${EXTERN_DIR}
-# # # for pkgpath in ${EXTERN_DIR}/*; do
-# # #   if [ -d "$pkgpath" ]; then
-# # #     echo pip install -U ${PIP_INST_ARGS} -e $pkgpath ${PY_CONSTRAINTS_ARGS}
-# # #     pip show $(basename "$pkgpath") &>/dev/null || pip install -U ${PIP_INST_ARGS} -e $pkgpath
-# # #   fi
-# # # done
 
 mkdir -p ./cache/venv
 if [ ! -e "./cache/venv/${ML_VENV_NAME}" ]; then
@@ -63,9 +45,6 @@ echo HERE4
 # TODO: These dependencies should be managed by pyproject.toml.
 echo Checking dependencies.
 
-pip show thirdparty_yannt &>/dev/null || pip install ${PIP_INST_ARGS} \
-  ${PY_CONSTRAINTS_ARGS} -e yannt
-
 # pip install for each enabled
 mkdir -p ${EXTERN_DIR}
 for pkgpath in ${EXTERN_DIR}/*; do
@@ -80,15 +59,4 @@ if [ -z "$NO_SHELL" ]; then
   ./scripts/_/start-venv.sh $@
 fi
 
-# echo
-# echo "The environment is now ready. Try 'yannt --help' for information."
 
-# # Include yannt tab completion.
-# TMP_RC="$(mktemp)"
-# cat >> "$TMP_RC" <<'EOF'
-# [ -f "~/.bashrc" ] && source ~/.bashrc
-# source ${CRI_PROJ_PATH}/cache/venv/${ML_VENV_NAME}/bin/activate
-# eval "$(register-python-argcomplete yannt)"
-# EOF
-
-# exec bash --rcfile "$TMP_RC" -i

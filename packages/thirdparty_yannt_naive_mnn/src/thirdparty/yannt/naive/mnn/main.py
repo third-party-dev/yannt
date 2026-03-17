@@ -19,18 +19,23 @@ def mnn_load(args):
     '''
     When importing MNN, you may receive an exception like the following:
 
+      ```text
       ImportError: /work/cache/venv/yannt-py3.9-podman/lib/python3.9/site-packages/_mn
       ncengine.cpython-39-x86_64-linux-gnu.so: cannot enable executable stack as share
       d object requires: Invalid argument
+      ```
 
     On newer kernels, executable stacks are strictly forbidden. To test MNN,
     which requires an executable stack, you need to test in a VM with its
     own kernel when you use a modern kernel.
 
-    Its also worth mentioning that because this is coming from the kernel and
-    possibly a container runtime, it is not something that can be overridden inside
-    a container or libc. We could _maybe_ do a KVM config? Need a baseline image 
-    source before I can consider going down the adhoc VM path.
+    Because this executable stack exception is coming from the kernel and
+    possibly a container runtime, it is not something that can be overridden
+    inside a container or libc fix.
+    
+    We could _maybe_ do a yannt KVM config? But to continue with this, I would 
+    need to know of a "upstream" VM image source to baseline any VMs on. yannt
+    is not in the business of generating OS installs from scratch.
     '''
 
     import MNN

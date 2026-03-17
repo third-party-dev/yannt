@@ -23,20 +23,25 @@ Now you should have `yannt` as a command in your normal (user) system environmen
 
 ## Developer Environment Setup
 
-To keep various yannt components independent and plug-able, many components are divided up into their own plugins. Yannt manages the top level project folder as a lobby for itself and all of its plugins. By convention, I always `git clone` the yannt repo into a folder structure like: `thirdparty-ws/yannt`. All plugin code lives in `yannt/plugins` and active or _enabled_ plugins have a relative symlink from `yannt/auto_install` to its code folder. Plugin folder names always are named for their namespace, but expressed with a python safe version of the string. For example, `thirdpary.pparse` becomes `yannt/enabled/thirdparty_pparse` and `thirdparty.yannt.sysscan` becomes `yannt/enabled/thirdparty_yannt_sysscan`.
+To keep various yannt components independent and plug-able, many components are divided up into their own plugins. Yannt manages the top level project folder as a lobby for itself and all of its plugins. By convention, I always `git clone` the yannt repo into a folder structure like: `thirdparty-ws/yannt`. All plugin code lives in `yannt/packages` and active or _enabled_ plugins have a relative symlink from `configs/auto_install` to its code folder. Plugin folder names always are named for their namespace, but expressed with a python safe version of the string. For example:
+
+- `thirdpary.pparse` becomes `thirdparty_pparse`
+- `thirdparty.yannt.sysscan` becomes `thirdparty_yannt_sysscan`.
 
 Commands similar to the following should get you going (assuming bash-like shell):
 
 ```sh
-# Create workspace folder
-cd ~ ; mkdir thirdparty-ws ; cd thirdparty-ws
-git clone https://github.com/third-party-dev/yannt.git yannt ; cd yannt
-# Clone the external plugin pparse and enable it.
-git clone https://github.com/third-party-dev/pparse.git plugins/thirdparty_pparse
-./do enable thirdparty_pparse
+mkdir thirdparty-ws
+cd thirdparty-ws
+git clone https://github.com/third-party-dev/yannt.git yannt
+cd yannt
+git clone https://github.com/third-party-dev/pparse.git packages/thirdparty_pparse
+./do enable-all
 ```
 
 Once you have the environment cloned locally into the workspace (`thirdparty-ws`) or project (`yannt`) folders, you'll want to initialize the environment for developer activities. See the following sections for the options.
+
+<!-- TODO: Talk about enabling and disabling packages. -->
 
 ### Initializing The Environment
 
