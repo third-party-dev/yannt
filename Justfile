@@ -19,5 +19,13 @@ disable-all:
 podman CONFIG="" *args:
     ./scripts/podman.sh {{CONFIG}} -- {{args}}
 
+# Source Maintenance Targets
+
 bundle:
     ./scripts/create-bundle.sh
+
+buildpkgs TAG="":
+    ./scripts/build-pkgs.sh {{TAG}}
+
+buildenvs:
+    ./scripts/build-all-envs.sh
