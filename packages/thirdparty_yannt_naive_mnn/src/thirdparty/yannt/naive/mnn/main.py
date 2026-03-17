@@ -16,29 +16,35 @@ def register_naive_mnn(subparsers):
 # ! untested
 # yannt naive --breakpoint mnn load ./models/yolo/yolov5su.mnn
 def mnn_load(args):
-    '''
-    When importing MNN, you may receive an exception like the following:
 
-      ```text
-      ImportError: /work/cache/venv/yannt-py3.9-podman/lib/python3.9/site-packages/_mn
-      ncengine.cpython-39-x86_64-linux-gnu.so: cannot enable executable stack as share
-      d object requires: Invalid argument
-      ```
+    try:
+        import MNN
+    except ImportError as e:
+        if 'stack' in str(e):
+            print('''
+------------------------------------------------------------------------------
+When importing MNN, you may receive an exception like the following:
 
-    On newer kernels, executable stacks are strictly forbidden. To test MNN,
-    which requires an executable stack, you need to test in a VM with its
-    own kernel when you use a modern kernel.
+```text
+ImportError: /work/cache/venv/yannt-py3.9-podman/lib/python3.9/site-packages/
+_mnncengine.cpython-39-x86_64-linux-gnu.so: cannot enable executable stack as
+ shared object requires: Invalid argument
+```
 
-    Because this executable stack exception is coming from the kernel and
-    possibly a container runtime, it is not something that can be overridden
-    inside a container or libc fix.
-    
-    We could _maybe_ do a yannt KVM config? But to continue with this, I would 
-    need to know of a "upstream" VM image source to baseline any VMs on. yannt
-    is not in the business of generating OS installs from scratch.
-    '''
+On newer kernels, executable stacks are strictly forbidden. To test MNN,
+which requires an executable stack, you need to test in a VM with its
+own (older) kernel when you use a modern kernel on the host.
 
-    import MNN
+Because this executable stack exception is coming from the kernel and
+possibly a container runtime, it is not something that can be overridden
+inside a container or libc fix.
+
+We could _maybe_ do a yannt KVM config? But to continue with this, I would 
+need to know of a "upstream" VM image source to baseline any VMs on. yannt
+is not in the business of generating OS installs from scratch.
+------------------------------------------------------------------------------
+            ''')
+        raise
 
     obj = MNN.Interpreter(args.path)
     sess = interpreter.createSession()
