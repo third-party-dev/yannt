@@ -9,7 +9,5 @@ if [ -z "${PROJ_PATH}" ]; then
   exit 1
 fi
 
-mkdir -p ${CRI_ROOT}
-
 # Forward to generic script.
 ${PROJ_PATH}/scripts/_/init-dev-venv.sh $@
