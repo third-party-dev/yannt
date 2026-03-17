@@ -4,7 +4,7 @@ set -e
 
 # Assuming we're in top level yannt folder.
 
-EXTERN_DIR=./enabled
+EXTERN_DIR=./configs/auto_install
 
 # Allow user to assign venv name and tag shell prompt
 ML_VENV_NAME=${ML_VENV_NAME:-ml-venv}

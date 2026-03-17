@@ -56,7 +56,7 @@ ${PIP} download ${PIP_DL_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
 ${PIP} download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./yannt
 
 # Do enabled python packages
-for ext in `ls -1 ./enabled`; do
-    ${PIP} download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./enabled/$ext
+for ext in `ls -1 ./configs/auto_install`; do
+    ${PIP} download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./configs/auto_install/$ext
 done
 

@@ -53,7 +53,7 @@ conda activate ${PROJ_PATH}/cache/conda/envs/${ML_VENV_NAME}
 
 # There are some assumptions that current folder is ${PROJ_PATH}
 cd ${PROJ_PATH}
-EXTERN_DIR=./enabled
+EXTERN_DIR=./configs/auto_install
 
 PY_CONSTRAINTS=${PY_CONSTRAINTS:-}
 if [ -n "${PY_CONSTRAINTS}" ]; then
@@ -106,7 +106,7 @@ echo Checking dependencies.
 echo "Installing base yannt package in place (ie for development)."
 pip show thirdparty_yannt &>/dev/null || pip install -U ${PIP_INST_ARGS} -e yannt
 
-echo "Installing each package from ./enabled in place (ie for development)."
+echo "Installing each package from ./configs/auto_install in place (ie for development)."
 # pip install for each enabled
 mkdir -p ${EXTERN_DIR}
 for pkgpath in ${EXTERN_DIR}/*; do

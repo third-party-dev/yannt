@@ -5,10 +5,16 @@ init CONFIG="" *args:
     ./scripts/init-dev.sh {{CONFIG}} -- {{args}}
 
 enable PLUGIN="":
-    ./scripts/plugin-enable.sh {{PLUGIN}}
+    ./scripts/auto-package.sh enable {{PLUGIN}}
 
 disable PLUGIN="":
-    ./scripts/plugin-disable.sh {{PLUGIN}}
+    ./scripts/auto-package.sh disable {{PLUGIN}}
+
+enable-all:
+    ./scripts/auto-package.sh enable-all
+
+disable-all:
+    ./scripts/auto-package.sh disable-all
 
 podman CONFIG="" *args:
     ./scripts/podman.sh {{CONFIG}} -- {{args}}

@@ -1,8 +1,7 @@
 clutter/
 dist/
 bundles/
-enabled/
-plugins/thirdparty_pparse
+plugins/
 upstream/
 **.whl
 **.tar.gz
