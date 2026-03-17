@@ -10,7 +10,7 @@ There is a lot of cross over between different components of yannt and therefore
 
 ## Table of Contents
 
-- **4.1** - Use cases for generating test data.
-- **4.2** - Use cases for parsing model files the _pparse_ way.
-- **4.3** - Use cases for other yannt sub-commands.
-- **4.4** - Use cases for parsing model files the _naive_ way.
+- **4.1** - [Use cases for generating test data.](./4.1-test-usecases.md)
+- **4.2** - [Use cases for parsing model files the _pparse_ way.](./4.2-pparse-usecases.md)
+- **4.3** - [Use cases for other yannt sub-commands.](./4.3-misc-usecases.md)
+- **4.4** - [Use cases for parsing model files the _naive_ way.](./4.4-naive-usecases.md)
