@@ -10,7 +10,7 @@ This fractured design was a deliberate decision to allow a minimal viable instal
 
 ## PParse (as in "partial parser")
 
-From strictly a user perspective, yannt is a single point of entry for discovering and using the plugins installed into the python environment. The most important of these plugins is the `pparse` plugin. Pparse is its own python package and has its own dependencies, plugins, and documentation, but its worth noting here that pparse is the heart of a lot of yannt's functionality. `pparse` aims to:
+From strictly a user perspective, yannt is a single point of entry for discovering and using the plugins installed into the python environment. The most important of these plugins is the `pparse` plugin. Pparse is its own python package and has its own dependencies, plugins, and documentation, but its worth noting here that pparse is the heart of a lot of yannt's unique functionality. `pparse` aims to:
 
 - Enable parsing of very large files (model files) that do not fit on a single machine's memory.
 - Parse model files independent of the upstream frameworks. For example, not executing pickle when parsing a PyTorch file.
