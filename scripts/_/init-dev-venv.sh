@@ -8,6 +8,28 @@
 # Load environment configuration
 source ${CONFIG_PATH}/config
 
+# Check if given python is in path.
+PYTHON=${PYTHON:-python}
+if [ -z "$(which ${PYTHON})" ]; then
+  echo "Could not locate ${PYTHON}. Please add ${PYTHON} to PATH."
+  echo 
+  echo "  Example: export PATH=\$PATH:/opt/${PYTHON}/bin"
+  echo
+  echo "To install from upstream you can try to find a package from:"
+  echo
+  echo "  https://github.com/astral-sh/python-build-standalone/releases"
+  echo
+  echo " or"
+  echo
+  echo "  apt-get install pipx        # Ensure pipx is installed."
+  echo "  pipx install pystand        # Ensure pystand is installed"
+  echo "  pystand show                # Show architecture matching versions"
+  echo "  pystand install ${PY_VER}   # Install python version"
+  echo "  export PATH=\$PATH:$(pystand path)/${PY_VER}/bin"
+  echo
+  exit 1
+fi
+
 # Construct the base container image (venv created from container runtime)
 mkdir -p ${PROJ_PATH}/cache/venv
 
