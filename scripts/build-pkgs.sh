@@ -11,8 +11,8 @@ else
 fi
 
 for pkg in packages/*; do
-  if [ "$pkg" == "thirdparty_pparse" ]; then
-    # pparse is versioned independently
+  if [ -e "packages/$pkg/.yannt-ignore" ]; then
+    # package wants to be ignored by yannt processing
     continue
   fi
   echo "$VERSION" > "$pkg/VERSION"
@@ -21,7 +21,9 @@ done
 # Rebuild all packages
 mkdir -p outputs/dist
 for pkg in packages/*; do
-  (cd "$pkg" && python -m build --outdir ${PROJ_PATH}/outputs/dist)
+  (cd "$pkg" \
+    && python -m build --outdir ${PROJ_PATH}/outputs/dist \
+    && python -m build --sdist --outdir ${PROJ_PATH}/outputs/dist)
 done
 
 echo "!! Ensure clean repo before tagging. !!"
