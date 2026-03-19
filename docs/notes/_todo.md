@@ -8,3 +8,11 @@
   - uv, pyenv, (we already support conda)
 
 - Re-integrate transformers
+
+## Pparse
+
+- Refactor protobuf generator code.
+- Need a common way to dump node trees!
+- Need to normaize node API across all parsers.
+- Need to setup minimal test rigs for protobuf, flatbuffers, json, and pickle.
+- 

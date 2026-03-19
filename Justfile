@@ -27,5 +27,8 @@ bundle DURATION="":
 buildpkgs TAG="":
     ./scripts/build-pkgs.sh {{TAG}}
 
+buildpparse TAG="":
+    cd packages/thirdparty_pparse && ./scripts/build-pkgs.sh {{TAG}}
+
 buildenvs:
     ./scripts/build-all-envs.sh
