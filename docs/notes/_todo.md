@@ -7,12 +7,12 @@
 - Consider alternative python virtual environments that control interpreters:
   - uv, pyenv, (we already support conda)
 
-- Re-integrate transformers
+- Re-integrate `hft` as its own environment config.
+  - Note: `hft` _does_ now get auto installed as a package via `./do enable-all`
 
 ## Pparse
 
-- Refactor protobuf generator code.
 - Need a common way to dump node trees!
 - Need to normaize node API across all parsers.
 - Need to setup minimal test rigs for protobuf, flatbuffers, json, and pickle.
-- 
+- Standardize the "make_*_parser" decorator pattern for all lazy parsers.
