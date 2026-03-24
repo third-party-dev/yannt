@@ -32,3 +32,6 @@ buildpparse TAG="":
 
 buildenvs:
     ./scripts/build-all-envs.sh
+
+fulltest:
+    ./scripts/fulltest.sh
