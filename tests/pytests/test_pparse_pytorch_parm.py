@@ -16,6 +16,7 @@ def generated_data_dir():
     # TODO: Verify we have hft.
     # TODO: On error: pytest.fail(f"Test data generation failed: {e}")
     # TODO: Generate the test data here.
+    # deferred
     return None
 
 
