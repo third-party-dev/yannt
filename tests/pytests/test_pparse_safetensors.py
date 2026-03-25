@@ -4,9 +4,6 @@ import pytest
 import logging
 
 log = logging.getLogger(__name__)
-from thirdparty.pparse.view import SafeTensors
-import safetensors
-import safetensors.numpy
 
 # #### Snippet For Development Only ####
 # import sys
@@ -17,6 +14,9 @@ import safetensors.numpy
 
 log.info("\n## Loading imports.")
 import numpy
+from thirdparty.pparse.view import SafeTensors
+import safetensors
+import safetensors.numpy
 
 
 @pytest.fixture(scope="session")

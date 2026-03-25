@@ -2,20 +2,21 @@
 
 ## Coverage Synopsis
 
-| format      | model               | NTL | NTD | PTL | PTD |
-|-------------|---------------------|-----|-----|-----|-----|
-| pytorch     | bert (weights-only) | XXX | XXX | XXX | XXX |
-| pytorch     | bert (architecture) | XXX | XXX | XXX | XXX |
-| safetensors | bert                | XXX | XXX | XXX | XXX |
-| zip         |                     |     |     |     |     |
-| json        |                     |     |     |     |     |
-| protobuf    |                     |     |     |     |     |
-| flatbuffers |                     |     |     |     |     |
-| pickle      |                     |     |     |     |     |
-| onnx        | yolo                |     |     |     |     |
-| mnn         | yolo                |     |     |     |     |
-| om          | yolo                |     |     |     |     |
-| tflite      | yolo (float32)      |     |     |     |     |
+| format      | model               | NTL | NTD | PTL | PTD | DONE |
+|-------------|---------------------|-----|-----|-----|-----|------|
+| pytorch     | bert (weights-only) | XXX | XXX | XXX | XXX | XXXX |
+| pytorch     | bert (architecture) | XXX | XXX | XXX | XXX | XXXX |
+| safetensors | bert                | XXX | XXX | XXX | XXX | XXXX |
+| onnx        | yolo                | XXX | XXX | XXX | XXX | XXXX |
+| mnn         | yolo                |     |     |     |     |      |
+| om          | yolo                |     |     |     |     |      |
+| tflite      | yolo (float32)      |     |     |     |     | BAD  |
+| zip         | NA                  | NA  | NA  | NA  | NA  | BAD  |
+| json        | NA                  | NA  | NA  | NA  | NA  | XXXX |
+| protobuf    | NA                  | NA  | NA  | NA  | NA  |      |
+| flatbuffers | NA                  | NA  | NA  | NA  | NA  |      |
+| pickle      | NA                  | NA  | NA  | NA  | NA  | XXXX |
+
 
 ## No Plan To Test
 
