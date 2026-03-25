@@ -17,7 +17,6 @@
 | flatbuffers | NA                  | NA  | NA  | NA  | NA  |      |
 | pickle      | NA                  | NA  | NA  | NA  | NA  | XXXX |
 
-
 ## No Plan To Test
 
 - pparse ident
@@ -30,18 +29,18 @@
 
 ## Planned To Test
 
+- (BROKE) pparse tflite == naive tflite, tensor data
 - (DONE) pparse pytorch == naive pytorch, weights_only tensor data
 - (DONE) pparse pytorch == naive pytorch, architecture tensor data
-- pparse safetensors == naive safetensors, tensor data
-- pparse zip == naive zip, files
-- pparse json == naive json, canonical-data
+- (DONE) pparse safetensors == naive safetensors, tensor data
+- (DONE) pparse zip == naive zip, files
+- (DONE) pparse json == naive json, canonical-data
+- (DONE) pparse pickle == expected data
+- (DONE) pparse onnx == naive onnx, tensor data
 - pparse protobuf == expected data
 - pparse flatbuffers == expected data
-- pparse pickle == expected data
-- pparse onnx == naive onnx, tensor data
 - pparse mnn == naive mnn, tensor data
 - pparse om == expected data, tensor data
-- pparse tflite == naive tflite, tensor data
 
 Notes:
 
