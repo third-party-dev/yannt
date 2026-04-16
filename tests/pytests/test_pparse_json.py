@@ -2,23 +2,16 @@
 
 import pytest
 import logging
-
 log = logging.getLogger(__name__)
-from thirdparty.pparse.view import SafeTensors
-import safetensors
-import safetensors.numpy
 
-# #### Snippet For Development Only ####
-# import sys
-# handler = logging.StreamHandler(sys.stdout)
-# fmt = "%(asctime)s [%(levelname)s] %(message)s"
-# logging.basicConfig(level=logging.INFO, format=fmt, handlers=[handler])
-# #### Snippet For Development Only ####
 
-log.info("\n## Loading imports.")
 import io
 import hashlib
 import json
+from thirdparty.pparse.utils import run_test_independently
+
+
+log.info("\n## Loading imports under test.")
 from thirdparty.pparse.view.json import Json
 
 
@@ -30,19 +23,9 @@ def generated_data_dir():
     return None
 
 
-def build_pyobj(zip_buffer):
-    pyobj = {}
-    # Open the ZIP in memory
-    with zipfile.ZipFile(zip_buffer, 'r') as zf:
-        for file_name in zf.namelist():
-            data = zf.read(file_name)
-            pyobj[file_name] = hashlib.md5(data).hexdigest()
-    return pyobj
-
-
 def test_data(generated_data_dir):
     json_string = b'''
-    {"key1": "value1", "key2": ["value2"], "key3": {"key4": "value4"}, "key5": 5 }
+        {"key1": "value1", "key2": ["value2"], "key3": {"key4": "value4"}, "key5": 5 }
     '''
     json_buffer = io.BytesIO()
     json_buffer.write(json_string)
@@ -63,9 +46,6 @@ def test_data(generated_data_dir):
     assert ppjson['key3'].value['key4'] == pyobj['key3']['key4']
     assert ppjson['key5'] == pyobj['key5']
 
-    # #### Snippet For Development Only ####
-    # print(f"Locals: {list(locals().keys())}")
-    # breakpoint()
-    # #### Snippet For Development Only ####
 
-#test_data(None)
+if __name__ == "__main__":
+    run_test_independently(log, [[test_data, [None], None]])

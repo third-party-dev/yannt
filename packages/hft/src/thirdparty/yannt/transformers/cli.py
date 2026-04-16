@@ -31,7 +31,7 @@ def main():
     transformers_create_parser.add_argument("--onnx_path", dest="onnx_path", default="")
     transformers_create_parser.add_argument("--export_path", dest="export_path", default="")
     transformers_create_parser.add_argument(
-        "--max_shard", dest="max_shard", default="2147483648"
+        "--max_shard", dest="max_shard", default="2147483648", help="max shard size in bytes",
     )
     transformers_create_parser.set_defaults(func=transformers_create)
 

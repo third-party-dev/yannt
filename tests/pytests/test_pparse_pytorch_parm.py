@@ -2,13 +2,16 @@
 
 import pytest
 import logging
-
 log = logging.getLogger(__name__)
+
+
+import numpy
+from thirdparty.pparse.utils import run_test_independently
+
 
 log.info("\n## Loading imports.")
 from thirdparty.pparse.view.pytorch import PyTorch
 import torch
-import numpy
 
 
 @pytest.fixture(scope="session")
@@ -40,9 +43,7 @@ def test_data(generated_data_dir):
         ppnumpy = ppobj.tensor(ppkeys[i]).as_numpy()
         assert numpy.array_equal(ptnumpy, ppnumpy)
 
-    # #### Snippet For Development Only ####
-    # print(f"Locals: {list(locals().keys())}")
-    # breakpoint()
-    # #### Snippet For Development Only ####
 
+if __name__ == "__main__":
+    run_test_independently(log, [[test_data, [None], None]])
 

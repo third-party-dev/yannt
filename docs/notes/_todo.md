@@ -21,6 +21,19 @@
 - Need to setup minimal test rigs for protobuf, flatbuffers, json, and pickle.
 - Standardize the "make_*_parser" decorator pattern for all lazy parsers.
 
+- Consider allowing file offsets in CLI/view objects for analysis work.
+  - For now, we can recreate the file with `dd`. Ideally, we should be able to point FileData to an offset.
+
+- Consider a breadth first (per node) flatbuffers parser for pparse.
+  - When given a vector, pre-generate the uninitialized element node object for all elements in the vector. THEN go through each and parse. Note: Flatbuffers is ideal for deferred parsing (when not doing discovery)!
+- RKNN
+  - Grab a clean graph and calculate hash.
+  - Grab clean tensor data from pt or onnx file.
+  - Investigate tensor data with a known good graph.
+  - Investigate parsing rknn via rknntoolkit shared object.
+
 ## Naive
 
 - Consider using our own MNN and TFlite flatbuffers bindings for naive interface.
+- For proprietary formats (OM, MNN, RKNN), we should consider comparing pre-conversion to parsed for testing. Naive at that point becomes loading the open version (onnx) and then possible transform/conversion to the unparsable via "naive".
+  - In summary, have naive: parsing, transforms, and IR dumps.

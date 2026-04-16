@@ -1,0 +1,20 @@
+onnx - good
+json - good
+pickle - good
+safetensors - good
+zip - good
+pytorch_arch - good
+pytorch_parm - good
+
+
+sharded_safetensors
+flatbuffers
+onnx
+protobuf
+tflite
+
+
+
+mnn
+rknn
+om

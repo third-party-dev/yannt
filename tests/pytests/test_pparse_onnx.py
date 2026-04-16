@@ -2,20 +2,15 @@
 
 import pytest
 import logging
-
 log = logging.getLogger(__name__)
+from thirdparty.pparse.utils import run_test_independently
 
-# #### Snippet For Development Only ####
-# import sys
-# handler = logging.StreamHandler(sys.stdout)
-# fmt = "%(asctime)s [%(levelname)s] %(message)s"
-# logging.basicConfig(level=logging.INFO, format=fmt, handlers=[handler])
-# #### Snippet For Development Only ####
 
-log.info("\n## Loading imports.")
+log.info("\n## Loading imports under test.")
 import numpy
-from thirdparty.pparse.view.onnx import Onnx
 import onnx
+from thirdparty.pparse.view.onnx import Onnx
+
 
 @pytest.fixture(scope="session")
 def generated_data_dir():
@@ -49,10 +44,8 @@ def test_data(generated_data_dir):
         msnumpy = onnx.numpy_helper.to_array(msmap[mskeys[i]])
         assert numpy.array_equal(msnumpy, ppnumpy)
 
-#     #### Snippet For Development Only ####
-#     log.info(f"Locals: {list(locals().keys())}")
-#     breakpoint()
-#     #### Snippet For Development Only ####
 
-# test_data(None)
+if __name__ == "__main__":
+    run_test_independently(log, [[test_data, [None], None]])
+
 

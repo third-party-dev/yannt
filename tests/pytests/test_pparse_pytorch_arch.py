@@ -2,20 +2,16 @@
 
 import pytest
 import logging
-
 log = logging.getLogger(__name__)
 
-# #### Snippet For Development Only ####
-# import sys
-# handler = logging.StreamHandler(sys.stdout)
-# fmt = "%(asctime)s [%(levelname)s] %(message)s"
-# logging.basicConfig(level=logging.INFO, format=fmt, handlers=[handler])
-# #### Snippet For Development Only ####
+
+import numpy
+from thirdparty.pparse.utils import run_test_independently
+
 
 log.info("\n## Loading imports.")
 from thirdparty.pparse.view.pytorch import PyTorch
 import torch
-import numpy
 
 
 @pytest.fixture(scope="session")
@@ -47,9 +43,6 @@ def test_data(generated_data_dir):
         ppnumpy = ppobj.tensor(ppkeys[i]).as_numpy()
         assert numpy.array_equal(ptnumpy, ppnumpy)
 
-    # #### Snippet For Development Only ####
-    # print(f"Locals: {list(locals().keys())}")
-    # breakpoint()
-    # #### Snippet For Development Only ####
 
-# test_data(None)
+if __name__ == "__main__":
+    run_test_independently(log, [[test_data, [None], None]])

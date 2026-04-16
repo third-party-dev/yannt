@@ -2,23 +2,19 @@
 
 import pytest
 import logging
-
 log = logging.getLogger(__name__)
-from thirdparty.pparse.view import SafeTensors
-import safetensors
-import safetensors.numpy
 
-# #### Snippet For Development Only ####
-# import sys
-# handler = logging.StreamHandler(sys.stdout)
-# fmt = "%(asctime)s [%(levelname)s] %(message)s"
-# logging.basicConfig(level=logging.INFO, format=fmt, handlers=[handler])
-# #### Snippet For Development Only ####
 
-log.info("\n## Loading imports.")
 import io
 import hashlib
 import zipfile
+import safetensors
+import safetensors.numpy
+from thirdparty.pparse.utils import run_test_independently
+
+
+log.info("\n## Loading imports.")
+from thirdparty.pparse.view.safetensors import SafeTensors
 from thirdparty.pparse.view.zip import Zip
 
 
@@ -38,6 +34,7 @@ def test_data(generated_data_dir):
     zip_buffer = io.BytesIO()
 
     # TODO: Add support for BZIP, LZMA, and other compression formats. (ZSTD?)
+    # TODO: Add checks for FOOTER META and FOOTER CRC32.
     with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
         zf.writestr("file1.txt", "Hello World")
         zf.writestr("file2.txt", "Another file")
@@ -68,9 +65,6 @@ def test_data(generated_data_dir):
         # Check the file content (via MD5)
         assert pymap[pyfiles[i]] == ppmap[ppfiles[i]]
 
-#     #### Snippet For Development Only ####
-#     print(f"Locals: {list(locals().keys())}")
-#     breakpoint()
-#     #### Snippet For Development Only ####
 
-# test_data(None)
+if __name__ == "__main__":
+    run_test_independently(log, [[test_data, [None], None]])

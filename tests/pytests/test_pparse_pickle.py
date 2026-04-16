@@ -2,21 +2,17 @@
 
 import pytest
 import logging
-
 log = logging.getLogger(__name__)
 
-# #### Snippet For Development Only ####
-# import sys
-# handler = logging.StreamHandler(sys.stdout)
-# fmt = "%(asctime)s [%(levelname)s] %(message)s"
-# logging.basicConfig(level=logging.DEBUG, format=fmt, handlers=[handler])
-# #### Snippet For Development Only ####
 
-log.info("\n## Loading imports.")
-from thirdparty.pparse.view.pickle import Pickle
 import io
 import pickle
 from collections import OrderedDict
+from thirdparty.pparse.utils import run_test_independently
+
+
+log.info("\n## Loading imports.")
+from thirdparty.pparse.view.pickle import Pickle
 
 @pytest.fixture(scope="session")
 def generated_data_dir():
@@ -60,9 +56,6 @@ def test_data(generated_data_dir):
     # Now check they are equal (python implicitly does a deep compare)
     assert pyod == ppod
 
-#     #### Snippet For Development Only ####
-#     log.info(f"Locals: {list(locals().keys())}")
-#     breakpoint()
-#     #### Snippet For Development Only ####
 
-# test_data(None)
+if __name__ == "__main__":
+    run_test_independently(log, [[test_data, [None], None]])
