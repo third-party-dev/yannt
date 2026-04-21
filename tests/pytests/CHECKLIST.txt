@@ -5,15 +5,13 @@ safetensors - good
 zip - good
 pytorch_arch - good
 pytorch_parm - good
+tflite - good
+sharded_safetensors - good
 
 
-sharded_safetensors
+
 flatbuffers
-onnx
 protobuf
-tflite
-
-
 
 mnn
 rknn
