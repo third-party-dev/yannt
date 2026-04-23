@@ -64,7 +64,10 @@ def transformers_list(args):
             long_list.append(f"model: {model_name} type: {model_type}")
 
     for entry in sorted(long_list):
-        print(entry)
+        try:
+            print(entry)
+        except BrokenPipeError:
+            pass
 
     if hasattr(args, "breakpoint") and args.breakpoint:
         print(f"Locals: {list(locals().keys())}")
