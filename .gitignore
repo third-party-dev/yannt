@@ -13,3 +13,4 @@ models/
 
 configs/auto_install
 packages/thirdparty_pparse
+packages/thirdparty_pparse_rust
