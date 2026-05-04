@@ -23,6 +23,13 @@ def generated_data_dir():
 
 
 def test_data(generated_data_dir):
+
+    # FOR DEVELOPMENT ONLY
+    # _ppobj = Pickle().open_fpath('./models/bert/pt/data.pkl')
+    # _ppobj.root_node().dump()
+    # return
+
+
     buf = io.BytesIO()
     obj = OrderedDict([
         ("key1", "value1"),
@@ -38,6 +45,7 @@ def test_data(generated_data_dir):
 
     log.info("\n## Parsing with pparse")
     _ppobj = Pickle().from_bytesio(buf)
+
     # TODO: A view object should abstract this.
     ppobj = _ppobj._extraction._result["pkl"].value[0].value[0]
 
@@ -55,6 +63,7 @@ def test_data(generated_data_dir):
 
     # Now check they are equal (python implicitly does a deep compare)
     assert pyod == ppod
+    
 
 
 if __name__ == "__main__":
