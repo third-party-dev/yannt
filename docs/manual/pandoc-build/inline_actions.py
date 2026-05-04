@@ -41,8 +41,32 @@ class InlineAction(Part):
         self.end_obj = end_obj
         self.res_str = res_str
 
+
+    '''
+      workdir only reverted after all commands
+
+      shell + cmd([]) => '\n'.join(cmd)
+      shell + cmd("") => cmd
+      cmd([]) => cmd
+      cmd("") => shlex.split(cmd)
+
+      output = false - removes all output on success (for side effects)
+      header/footer - only applied on success and newline not included
+
+      Consider:
+        show_user_cmd - add command to header with $
+        show_root_cmd - add command to header with #
+        timeout - kill process after X seconds (useful for user input demos?)
+          - can we expect or something with pdb?
+    '''
+
     def update(self):
         import hashlib
+        import shlex
+        from collections.abc import Iterable
+
+        # cmd = "python3 -c 'import sys; print(sys.version)'"
+        # args = shlex.split(cmd)
 
         res_parts = []
 
@@ -60,22 +84,56 @@ class InlineAction(Part):
             
             # Run command
             if "cmd" in self.act_obj:
+                cmd = self.act_obj["cmd"]
+
+                result = None
                 if "shell" in self.act_obj:
-                    result = subprocess.run(self.act_obj["cmd"], shell=True, executable=self.act_obj["shell"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-                    # ! Only allow successful commands to overwrite res_str.
-                    if result.returncode == 0:
-                        res_parts.append(result.stdout)
-                    else:
-                        res_parts = [self.res_str]
-                        break
+                    if isinstance(cmd, Iterable) and not isinstance(cmd, str):
+                        # treat as array of multiple commands
+                        cmd = '\n'.join(cmd)
+                    print(f"Running with shell:\n{cmd}")
+                    result = subprocess.run(cmd, shell=True, executable=self.act_obj["shell"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
                 else:
-                    result = subprocess.run(self.act_obj["cmd"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-                    # ! Only allow successful commands to overwrite res_str.
-                    if result.returncode == 0:
-                        res_parts.append(result.stdout)
+                    if isinstance(cmd, str):
+                        # treat as command to be split into args
+                        cmd = shlex.split(cmd)
+                    print(f"Running:\n{cmd}")
+                    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+                
+                if result.returncode == 0 and "output" in self.act_obj and self.act_obj["output"] == False:
+                    # No output will wipe everything (if command succeeds).
+                    res_parts = []
+                    break
+                elif result.returncode == 0:
+                    # Only allow successful commands to overwrite res_str.
+
+                    if "head_snip" in self.act_obj or "tail_snip" in self.act_obj:
+                        lines = result.stdout.splitlines()
+                        head_snip = 0
+                        tail_snip = 0
+
+                        if "head_snip" in self.act_obj:
+                            head_snip = self.act_obj["head_snip"]
+                        if "tail_snip" in self.act_obj:
+                            tail_snip = self.act_obj["tail_snip"]
+                        
+                        if "head_snip" in self.act_obj:
+                            res_parts.append('\n'.join(lines[:head_snip]))
+                        res_parts.append(f'\n\n... ~{len(lines)-head_snip-tail_snip} more lines ...\n\n')
+                        if "tail_snip" in self.act_obj:
+                            res_parts.append('\n'.join(lines[-tail_snip:]))
+
                     else:
-                        res_parts = [self.res_str]
-                        break
+                        res_parts.append(result.stdout)
+
+
+
+
+                else:
+                    # Keep original
+                    res_parts = [self.res_str]
+                    break
 
             # Apply footer
             if "footer" in self.act_obj:
