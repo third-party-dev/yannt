@@ -28,7 +28,7 @@ export CRI_RUN_ARGS=${CRI_RUN_ARGS:-"--userns=keep-id:uid=0,gid=0 -u 0:0"}
 # Allow users to override home folder for container (relative to PROJ_PATH)
 export CRI_HOME=${CRI_HOME:-"cache/podman/home"}
 
-export APT_PKGS="graphviz flatbuffers-compiler protobuf-compiler cmake build-essential"
+export APT_PKGS="graphviz flatbuffers-compiler protobuf-compiler cmake build-essential git"
 
 if [ -z "$PIP_IDX_ARGS" ]; then
   PIP_IDX_ARGS="--index-url https://download.pytorch.org/whl/cpu"

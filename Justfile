@@ -24,6 +24,12 @@ podman CONFIG="" *args:
 bundle DURATION="":
     ./scripts/create-bundle.sh {{DURATION}}
 
+builddevpkgs TAG="":
+    ./scripts/build-dev-pkgs.sh {{TAG}}
+
+builddevpparse TAG="":
+    cd packages/thirdparty_pparse && ./scripts/build-dev-pkgs.sh {{TAG}}
+
 buildpkgs TAG="":
     ./scripts/build-pkgs.sh {{TAG}}
 
