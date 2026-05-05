@@ -19,7 +19,7 @@ ADD https://github.com/ultralytics/assets/releases/download/v0.0.0/Arial.ttf \
 
 # Install linux packages and conda packages
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libgl1 libegl1 && \
+    apt-get install -y --no-install-recommends libgl1 libegl1 git && \
     apt-get clean
 
 # Install conda packages
