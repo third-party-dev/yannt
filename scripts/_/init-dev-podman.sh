@@ -56,7 +56,7 @@ BUILD_CONTAINER() {
 
     RUN apt-get -o APT::Sandbox::User=root update
     # Note: `openssh-client`` post-install script fails on NFS: Ignoring errors for now.
-    ${CRI_RUN} apt-get -o APT::Sandbox::User=root install -y vim unzip git ${APT_PKGS}
+    ${CRI_RUN} apt-get -o APT::Sandbox::User=root install -y vim unzip git wget curl ${APT_PKGS}
     RUN useradd -m user
 
     echo "Saving container as localhost/${ML_VENV_NAME}"

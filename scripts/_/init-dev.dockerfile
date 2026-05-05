@@ -8,5 +8,5 @@ RUN chown root /var/lib/apt/lists/partial \
     && chown root /var/cache/apt/archives/partial \
     && chown root /var/log/apt
 
-RUN apt-get update && apt-get install -y vim unzip git $APT_PKGS
+RUN apt-get update && apt-get install -y vim unzip git wget curl $APT_PKGS
 RUN useradd -m user
