@@ -1,0 +1,101 @@
+
+<job version="1.0">
+    <!-- root extraction doesn't have to be in extractions element. -->
+    <extraction name="onnx-bundle.zip">
+
+        <datasource type="FileData">
+            <!-- Data digested can be shorter than total datasource length. -->
+            <digest type="sha1" length="123">sha1_here</digest>
+
+            <!-- datasource type specific values (as a map)-->
+            <extra>
+                <entry type="int" name="offset">0</entry>
+                <entry type="int" name="length">104857600</entry>
+                <entry type="str" name="posix_path">/path/to/onnx-bundle.zip</entry>
+            </extra>
+        </datasource>
+    
+        <parsers>
+
+          <!-- type points to the class, name is the str class id -->
+          <parser type="zip" name="zip">
+            <configs />
+
+            <result>
+              <Node />
+            </result>
+          </parser>
+
+        </parsers>
+
+        <child_extractions>
+          <extraction name="model.onnx">
+            
+            <datasource type="BytesIoData">
+              <!-- Data digested can be shorter than total datasource length. -->
+              <digest type="sha1" length="123">sha1_here</digest>
+
+              <!-- derived-from points to parent parser to replay for datasource -->
+              <derived_from parser="zip">
+                <!-- TODO: This is probably a bad use case for result_xpath. We'll  -->
+                <!-- TODO: likely only read derived_from and grab BytesIO from -->
+                <!-- TODO: runtime with "zip_path" in extra. -->
+                <result_xpath>//Node/value/Node</result_xpath>
+              </derived_from>
+              
+              <!-- datasource type specific values (as a map) -->
+              <extra>
+                <entry type="int" name="offset">0</entry>
+                <entry type="int" name="length">104857600</entry>
+                <entry type="str" name="zip_path">model.onnx</entry>
+              </extra>
+            </datasource>
+            
+            <parsers>
+
+              <parser type="protobuf" name="onnx">
+                <configs>
+                  <entry type="list" name="extensions">
+                    <entry type="str">.onnx</entry>
+                  </entry>
+                  <entry type="str" name="init_msgtype">.onnx.ModelProto</entry>
+                  <entry type="map" name="schema">
+                    <entry type="str" name="namespace">thirdparty.pparse.data</entry>
+                    <entry type="str" name="path">proto/onnx.pb</entry>
+                  </entry>
+                </configs>
+                <result>
+                  <Node>
+                    <reader type="cursor|range">
+                        <!-- this reader should never change! -->
+                        <offset>0</offset>
+                        <length>124124</length>
+                        <!-- datasource is closest datasource ancestor-->
+                    </reader>
+                    <context>
+                        <reader type="cursor|range">
+                            <offset>0</offset>
+                            <length>124124</length>
+                            <!-- datasource is closest datasource ancestor-->
+                        </reader>
+                        <state>fully qualified state name (for replay!)</state>
+                        <start></start>
+                        <end></end>
+
+                    </context>
+                    <value type="node|map|list">
+                        <Node />
+                    </value>
+                  </Node>
+                </result>
+              </parser>
+
+            </parsers>
+
+            <child_extractions />
+          </extraction>
+        </child_extractions>
+
+    </extraction>
+
+</job>
