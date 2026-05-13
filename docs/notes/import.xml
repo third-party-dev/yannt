@@ -1,7 +1,7 @@
 
 <job version="1.0">
     <!-- root extraction doesn't have to be in extractions element. -->
-    <extraction name="onnx-bundle.zip">
+    <extraction type="BytesExtraction" name="onnx-bundle.zip">
 
         <datasource type="FileData">
             <!-- Data digested can be shorter than total datasource length. -->
@@ -10,8 +10,8 @@
             <!-- datasource type specific values (as a map)-->
             <extra>
                 <entry type="int" name="offset">0</entry>
-                <entry type="int" name="length">104857600</entry>
-                <entry type="str" name="posix_path">/path/to/onnx-bundle.zip</entry>
+                <entry type="int" name="length">36906988</entry>
+                <entry type="str" name="posix_path">/work/models/yolo/yolov5su.onnx</entry>
             </extra>
         </datasource>
     
@@ -21,6 +21,8 @@
           <parser type="zip" name="zip">
             <configs />
 
+            <!-- ! what do we do when nodes use a different parser? -->
+            <!-- ! likely need to list parsers via associated root node and create refs, ugh -->
             <result>
               <Node />
             </result>
@@ -60,6 +62,7 @@
                   </entry>
                   <entry type="str" name="init_msgtype">.onnx.ModelProto</entry>
                   <entry type="map" name="schema">
+                    <!-- TODO: Schema should also be able to be directly embedded. -->
                     <entry type="str" name="namespace">thirdparty.pparse.data</entry>
                     <entry type="str" name="path">proto/onnx.pb</entry>
                   </entry>

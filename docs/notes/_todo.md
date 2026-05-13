@@ -57,6 +57,7 @@
 - SafeTensors + Graph
   - Convert NodeTree to "GiSt".
   - (Some) Analyzers should read GiSt.
+  - **BLOCKER**: SafeTensors `__metadata__` only allows Dict[str, str]. `:(`
 
 - Serialize
   - Fresh (hard)
