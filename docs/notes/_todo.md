@@ -45,14 +45,25 @@
   - Layer Count, Activation ID
 
 - Test on Windows
+  - PLAN: Use wine to test yannt/pparse via python.exe in linux (new env).
 
 - Export / Import State
   - DataSource
+    - ~~FileData~~
+    - HttpCachedData
+    - (derived) BytesIoData
   - Extractions
+    - ~~BytesExtraction~~
     - IDed by sha1sum + length
-  - Parser Options
-  - NodeTree Nodes
-  - Optionally NodeTree Contexts
+  - ~~Parser Options~~
+  - ~~NodeTree Nodes~~
+  - ~~Optionally NodeTree Contexts~~
+
+- Output Formats
+  - Importable/Reusable pparse XML - (intended to be) fully replayable
+  - Node Only XML - throws away "replay-ability"
+  - pparse XML as JSON (lossless) - uses `@` convention for attributes
+  - pparse XML as JSON (lossy) - throws away attributes
 
 - SafeTensors + Graph
   - Convert NodeTree to "GiSt".

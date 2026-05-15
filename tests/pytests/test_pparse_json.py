@@ -27,11 +27,13 @@ def test_data(generated_data_dir):
     json_string = b'''
         {"key1": "value1", "key2": ["value2"], "key3": {"key4": "value4"}, "key5": 5 }
     '''
+    #json_string = b'{"key1":"value1","key2":["value2"],"key3":{"key4":"value4"},"key5":5}'
     json_buffer = io.BytesIO()
     json_buffer.write(json_string)
 
     log.info("\n## Parsing with pparse")
     ppobj = Json().from_bytesio(json_buffer, fname="test.json")
+
     ppjson = ppobj._extraction._result['json'].value.value
 
     log.info("\n## Parsing with naive")
