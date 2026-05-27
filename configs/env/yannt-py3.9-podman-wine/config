@@ -1,0 +1,78 @@
+# Assume defined: PROJ_PATH, CONFIG_NAME, CONFIG_PATH
+
+export PY_VER=${PY_VER:-3.9}
+
+export ML_VENV_NAME=${ML_VENV_NAME:-"yannt-py${PY_VER}-podman-wine"}
+export PS1_TAG=${PS1_TAG:-"(${ML_VENV_NAME}) "}
+
+# PY_CONSTRAINTS/PY_REQS relative to PROJ_PATH.
+export PY_CONSTRAINTS=${PY_CONSTRAINTS:-configs/pyver/${PY_VER}/constraints-py${PY_VER}.txt}
+export PY_REQS=${PY_REQS:-configs/pyver/${PY_VER}/requirements-py${PY_VER}.txt}
+
+# Allow users to override podman runRoot, esp when project is on NFS mount.
+export CRI_ROOT=${CRI_ROOT:-"${PROJ_PATH}/cache/podman/runroot-vfs"}
+# Build our baseline podman command.
+_CRI_BIN="podman --root ${CRI_ROOT}"
+# Permit usage of podman without /etc/subuid or /etc/subgid
+#_CRI_BIN="${_CRI_BIN} --storage-opt overlay.ignore_chown_errors=true"
+_CRI_BIN="${_CRI_BIN} --storage-driver vfs"
+# Suppress annoying warnings.
+_CRI_BIN="${_CRI_BIN} --cgroup-manager=cgroupfs"
+# Allow users to specify container manager binary to use (e.g. docker/podman)
+export CRI_BIN=${CRI_BIN:-"${_CRI_BIN}"}
+# Allow users to specify where the project is mounted in the container.
+export CRI_PROJ_PATH=${CRI_PROJ_PATH:-"/work"}
+# Allow users to specify what is a "RUN" command when doing a "podman run" build.
+export CRI_RUN=${CRI_RUN:-"${CRI_BIN} exec ${ML_VENV_NAME}"}
+# Allow users to specify "podman run" arguments (after build phase).
+# Note: WINEPREFIX must start with what ever $HOME will be.
+export CRI_RUN_ARGS=${CRI_RUN_ARGS:-"--userns=keep-id:uid=0,gid=0 -u 0:0 -e XDG_RUNTIME_DIR=/tmp/runtime -e WINEPREFIX=/work/.wine -e WINEDEBUG=-all"}
+# Allow users to override home folder for container (relative to PROJ_PATH)
+export CRI_HOME=${CRI_HOME:-"cache/podman/home"}
+
+export EXTRA_PODMAN_PREAPT_COMMANDS="RUN dpkg --add-architecture i386"
+
+export APT_PKGS="graphviz flatbuffers-compiler protobuf-compiler cmake build-essential wine wine32 wine64 wget ca-certificates"
+
+export EXTRA_PODMAN_RUN_COMMANDS="RUN wineboot --init"
+
+if [ -z "$PIP_IDX_ARGS" ]; then
+  PIP_IDX_ARGS="--index-url https://download.pytorch.org/whl/cpu"
+  PIP_IDX_ARGS="$PIP_IDX_ARGS --extra-index-url https://pypi.org/simple"
+  export PIP_IDX_ARGS
+fi
+
+export PIP_UPSTREAM_VERIFIERS=${PIP_UPSTREAM_VERIFIERS:-"https://download.pytorch.org/whl/cpu https://pypi.org/simple"}
+
+
+# -- Set XDG_RUNTIME_DIR or wine will complain.
+# export XDG_RUNTIME_DIR=/tmp/runtime
+# -- For troubleshooting, use WINEDEBUG+err-all to show errors.
+# WINEDEBUG=+err-all wineboot --init 2>&1 | head -50
+# -- Troubleshoot from classic windows command prompt.
+# wine cmd.exe
+
+# -- Embedded python 3.9 (64bit) distribution (because .exe installer doesn't work with headless wine)
+# wget https://www.python.org/ftp/python/3.9.13/python-3.9.13-embed-amd64.zip
+
+# -- Use get-pip.py to install/bootstrap pip (Official and maintained by PyPa.)
+# -- Note: DEFAULT is only for 3.10+: wget https://bootstrap.pypa.io/get-pip.py
+# wget https://bootstrap.pypa.io/pip/3.9/get-pip.py
+
+# -- AFTER winboot --init (usually run during container creation).
+# unzip python-3.9.13-embed-amd64.zip -d /work/.wine/drive_c/Python39/
+# -- OPTIONAL Add C:\Python39\Scripts To Path: wine reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_EXPAND_SZ /d "C:\Python39;C:\Python39\Scripts" /f
+# -- Do the pip install/bootstrap
+# wine /work/.wine/drive_c/Python39/python.exe get-pip.py
+# -- Required with embedded python distribution
+# sed -i 's/#import site/import site/' /work/.wine/drive_c/Python39/python39._pth
+
+# ---- Does not work ----
+# -- Exe Installer Instructions (BROKEN)
+# -- wget https://www.python.org/ftp/python/3.9.13/python-3.9.13-amd64.exe
+# -- WILL NOT INSTALL wine python-3.9.13-amd64.exe /quiet InstallAllUsers=1 PrependPath=1
+# -- wineserver --wait
+# -- wine "C:/Python39/python.exe" --version
+# ----------------------
+
+

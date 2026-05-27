@@ -54,10 +54,14 @@ BUILD_CONTAINER() {
     RUN chown root /var/cache/apt/archives/partial
     RUN chown root /var/log/apt
 
+    ${EXTRA_PODMAN_PREAPT_COMMANDS}
+
     RUN apt-get -o APT::Sandbox::User=root update
     # Note: `openssh-client`` post-install script fails on NFS: Ignoring errors for now.
     ${CRI_RUN} apt-get -o APT::Sandbox::User=root install -y vim unzip git wget curl ${APT_PKGS}
     RUN useradd -m user
+
+    ${EXTRA_PODMAN_RUN_COMMANDS}
 
     echo "Saving container as localhost/${ML_VENV_NAME}"
     PODMAN commit ${ML_VENV_NAME} localhost/${ML_VENV_NAME}
