@@ -2,6 +2,7 @@
 
 # Load environment configuration
 #source ${CONFIG_PATH}/config
+
 PROJ_PATH="{{proj_path}}"
 CONFIG_NAME="{{config_name}}"
 CONFIG_PATH="{{config_path}}"
@@ -29,7 +30,7 @@ mkdir -p ${CRI_ROOT}
 # ------------- Podman Hackery ------------
 
 PODMAN() {
-    ${CRI_BIN} $@
+    ${CRI_BIN} "$@"
     if [ $? -ne 0 ]; then
         echo "Failed to run: $@"
         echo "Cancelling."
@@ -38,7 +39,7 @@ PODMAN() {
 }
 
 RUN() {
-    ${CRI_RUN} $@
+    ${CRI_RUN} "$@"
     if [ $? -ne 0 ]; then
         echo "Failed to run: $@"
         echo "Cancelling."
@@ -113,6 +114,12 @@ else
     echo "Existing container not found. Building now."
     BUILD_CONTAINER
 fi
+
+
+# --------------------------------------------------------------------------------------
+# TODO: We should create minimal venv, THEN download all the dependencies from the venv!
+# --------------------------------------------------------------------------------------
+
 
 # ----- Fetch and cache python deps ----
 

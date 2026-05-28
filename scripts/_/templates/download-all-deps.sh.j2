@@ -2,6 +2,11 @@
 
 # !! Note: This script is intended to be run from inside a docker container.
 
+# TODO: Things not windows friendly:
+# TODO: - "./cache/pip_pkgs/${PY_VER}"
+# TODO: - "./configs/auto_install"
+# TODO: - "./configs/auto_install/$ext"
+
 PY_VER=${PY_VER:-"{{py_ver}}"}
 
 # Assuming we're in the top level yannt folder regardless of CRI or host.
@@ -24,19 +29,6 @@ PIP_IDX_ARGS="{{pip_idx_args}}"
 PIP_DL_ARGS=${PIP_DL_ARGS:-"${PIP_IDX_ARGS} -d ./cache/pip_pkgs/${PY_VER}"}
 PYTHON=${PYTHON:-"{{python}}"}
 PIP=${PIP:-"${PYTHON} -m pip"}
-
-# $(${PIP} 2>/dev/null)
-# if [ $? -ne 0 ]; then
-#   echo "ERROR: It appears that pip is not installed for ${PYTHON}"
-#   echo
-#   echo "If you are running on an apt based system, this can usually"
-#   echo "be fixed with:"
-#   echo
-#   echo "  apt-get install python3-pip"
-#   echo
-#   echo "Note: Your environment's python version is $(python3 --version)"
-#   exit 1
-# fi
 
 mkdir -p ./cache/pip_pkgs/${PY_VER}
 

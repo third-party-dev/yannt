@@ -13,6 +13,8 @@ config_root:
     alias: podman
     runtime: podman
     platform: linux
+
+    # unused
     image: ubuntu:22.04
 
     extra_preapt_commands:
@@ -32,7 +34,13 @@ config_root:
 
     extra_podman_run_commands:
     - RUN wineboot --init
-    - RUN wine reg add "HKEY_LOCAL_MACHINE\\\\System\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\Environment" /v Path /t REG_EXPAND_SZ /d "C:\\Python39;C:\\Python39\\Scripts" /f
+    - '[ ! -e "${PROJ_PATH}/${CRI_HOME}/python-3.9.13-embed-amd64.zip" ] && wget -O "${PROJ_PATH}/${CRI_HOME}/python-3.9.13-embed-amd64.zip" https://www.python.org/ftp/python/3.9.13/python-3.9.13-embed-amd64.zip'
+    - '[ ! -e "${PROJ_PATH}/${CRI_HOME}/get-pip.py" ] && wget -O "${PROJ_PATH}/${CRI_HOME}/get-pip.py" https://bootstrap.pypa.io/pip/3.9/get-pip.py'
+    - unzip -o "${PROJ_PATH}/${CRI_HOME}/python-3.9.13-embed-amd64.zip" -d "${PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python39/"
+    - RUN wine ${CRI_PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python39/python.exe ${CRI_PROJ_PATH}/${CRI_HOME}/get-pip.py
+    - echo sed -i 's/#import site/import site/' ${PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python39/python39._pth
+    - sed -i 's/#import site/import site/' ${PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python39/python39._pth
+    - RUN wine reg add 'HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' /v Path /t REG_EXPAND_SZ /d 'C:\Python39;C:\Python39\Scripts' /f    
     - RUN wineserver --wait
 
     ps1_tag: { from: env, name: PS1_TAG }
@@ -42,6 +50,11 @@ config_root:
     cri_run: { from: env, name: CRI_RUN }
     cri_run_args: { from: env, name: CRI_RUN_ARGS }
     cri_proj_path: { from: env, name: CRI_PROJ_PATH }
+
+    # TODO: Rethink how to push venv initialization into venv runtime.
+    # TODO: Re-do download-all-deps so its coming from wine python.
+    # TODO: Re-do build-venv so its using wine python.
+    # TODO: Re-do start-venv so its using cmd.exe or something.
 
     python: { from: env, name: PYTHON }
     pip_idx_args: { from: env, name: PIP_IDX_ARGS }
