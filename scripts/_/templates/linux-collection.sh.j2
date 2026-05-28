@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+PROJ_PATH="{{proj_path}}"
+CONFIG_NAME="{{config_name}}"
+CRI_BIN="{{cri_bin}}"
+CRI_HOME="{{cri_home}}"
+CRI_PROJ_PATH="{{cri_proj_path}}"
+ML_VENV_NAME="{{env_name}}"
+PY_VER="{{py_ver}}"
+CRI_RUN_ARGS="{{cri_run_args}}"
+
+PIP_UPSTREAM_VERIFIERS="{{pip_upstream_verifiers}}"
+
+# ----- Fetch and cache python deps ----
+
+if [ -z "$SKIP_COLLECT" ]; then
+
+  if [ -n "$(echo ${PIP_UPSTREAM_VERIFIERS} | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')" ]; then
+    # Detect if we can run the collector
+    # BUG: Logic should be reversed so we know _all_ URLs work.
+    CAN_ACCESS_UPSTREAM=${CAN_ACCESS_UPSTREAM:-false}
+    for url in ${PIP_UPSTREAM_VERIFIERS}; do
+        if curl -fsI "$url" >/dev/null 2>&1; then
+            CAN_ACCESS_UPSTREAM=true
+            break
+        fi
+    done
+    if [ "$CAN_ACCESS_UPSTREAM" = false ]; then
+        echo "No internet detected."
+        echo "Assuming deps in: ${PROJ_PATH}/pip_pkgs/${PY_VER}"
+        exit 0
+    fi
+  fi
+
+  mkdir -p ${PROJ_PATH}/cache/pip_pkgs/${PY_VER}
+  mkdir -p ${PROJ_PATH}/${CRI_HOME}
+
+  ${CRI_BIN} run -ti --rm \
+    -v ${PROJ_PATH}:${CRI_PROJ_PATH} \
+    -w ${CRI_PROJ_PATH} \
+    -e USER="user" \
+    -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \
+    -u $(id -u):$(id -g) \
+    ${CRI_RUN_ARGS} \
+    localhost/${ML_VENV_NAME} \
+    ${CRI_PROJ_PATH}/{{layer_dir}}/download-all-deps.sh
+
+fi
+
+echo RUNNING: BUILD_MODE="build" ${PROJ_PATH}/scripts/run-dev.sh ${CONFIG_NAME}
+BUILD_MODE="build" ${PROJ_PATH}/scripts/run-dev.sh ${CONFIG_NAME}

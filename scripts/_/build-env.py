@@ -154,11 +154,13 @@ class PodmanBuilder(Builder):
             'download-all-deps.sh': Path("scripts") / "_" / "templates" / "download-all-deps.sh.j2",
             'run-dev-docker.sh': Path("scripts") / "_" / "templates" / "run-dev-docker.sh.j2",
             'build-venv.sh': Path("scripts") / "_" / "templates" / "build-venv.sh.j2",
+            'linux-collection.sh': Path("scripts") / "_" / "templates" / "linux-collection.sh.j2",
         }
         tmpl_data = {
             'download-all-deps.sh': open(tmpl_path['download-all-deps.sh']).read(),
             'run-dev-docker.sh': open(tmpl_path['run-dev-docker.sh']).read(),
             'build-venv.sh': open(tmpl_path['build-venv.sh']).read(),
+            'linux-collection.sh': open(tmpl_path['linux-collection.sh']).read(),
         }
 
         self.config['layer_path'] = layer_dir
