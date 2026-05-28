@@ -21,9 +21,8 @@ if [ -z "$CONFIG_NAME" -o "$CONFIG_NAME" = "list" ]; then
     exit 0
 fi
 
-if [ ! -e "${CONFIG_PATH}" ]; then
+if [ ! -e "${CONFIG_PATH}/config" -a ! -e "${CONFIG_PATH}/config.env" ]; then
     echo "Could not find config file for ${CONFIG_NAME}"
-    echo $CONFIG_PATH
     exit 1
 fi
 

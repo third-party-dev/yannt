@@ -37,6 +37,9 @@ ${CRI_BIN} run -ti --rm \
     -e CRI_PROJ_PATH="${CRI_PROJ_PATH}" \
     -e PY_VER="${PY_VER}" \
     -e PY_REQS="${PY_REQS}" \
+    -e PYTHON="${PYTHON}" \
+    -e VENV_PYTHON="${VENV_PYTHON:-./cache/venv/${ML_VENV_NAME}/bin/python}" \
+    -e PKG_SKIP_LIST="${PKG_SKIP_LIST}" \
     -e PY_CONSTRAINTS="${PY_CONSTRAINTS}" \
     -e NO_SHELL="$NO_SHELL" \
     -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \

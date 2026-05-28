@@ -9,6 +9,6 @@ if [ -z "${PROJ_PATH}" ]; then
   exit 1
 fi
 
-source ${CONFIG_PATH}/config.env
+# Forward to generic script.
+${PROJ_PATH}/scripts/_/run-dev-docker.sh $@
 
-${PROJ_PATH}/cache/builder/${CONFIG_NAME}/host/podman/run-dev-docker.sh $@

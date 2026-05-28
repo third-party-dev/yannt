@@ -1,12 +1,28 @@
 #!/usr/bin/env bash
 
-# The following should be set:
-# PROJ_PATH - Full path to yannt
-# CONFIG_NAME - Name of config folder
-# CONFIG_PATH - Full path to config folder
-
 # Load environment configuration
-source ${CONFIG_PATH}/config
+#source ${CONFIG_PATH}/config
+PROJ_PATH="{{proj_path}}"
+CONFIG_NAME="{{config_name}}"
+CONFIG_PATH="{{config_path}}"
+CRI_ROOT="{{cri_root}}"
+CRI_BIN="{{cri_bin}}"
+CRI_RUN="{{cri_run}}"
+CRI_HOME="{{cri_home}}"
+CRI_PROJ_PATH="{{cri_proj_path}}"
+ML_VENV_NAME="{{env_name}}"
+PY_VER="{{py_ver}}"
+CRI_RUN_ARGS="{{cri_run_args}}"
+APT_PKGS="{{apt_packages}}"
+
+PIP_UPSTREAM_VERIFIERS="{{pip_upstream_verifiers}}"
+
+PY_REQS="{{py_reqs}}"
+PY_CONSTRAINTS="{{py_constraints}}"
+PIP_IDX_ARGS="{{pip_idx_args}}"
+PYTHON="{{python}}"
+VENV_PYTHON="{{venv_python}}"
+PKG_SKIP_LIST="{{pkg_skip_list}}"
 
 mkdir -p ${CRI_ROOT}
 
@@ -38,8 +54,8 @@ BUILD_CONTAINER() {
     echo "Creating container ${ML_VENV_NAME}"
     CONTAINER=$(\
     ${CRI_BIN} create --name $ML_VENV_NAME \
-        -v $(pwd):/work/cache/docker-home -w /work \
-        -e PY_VER=${PY_VER} -e HOME=/work \
+        -v ${PROJ_PATH}:${CRI_PROJ_PATH} -w ${CRI_PROJ_PATH} \
+        -e PY_VER=${PY_VER} -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \
         ${CRI_RUN_ARGS} \
         docker.io/library/python:${PY_VER}-slim \
         tail -f /dev/null
@@ -54,14 +70,16 @@ BUILD_CONTAINER() {
     RUN chown root /var/cache/apt/archives/partial
     RUN chown root /var/log/apt
 
-    ${EXTRA_PODMAN_PREAPT_COMMANDS}
+    {{extra_preapt_commands}}
 
-    RUN apt-get -o APT::Sandbox::User=root update
+    RUN mkdir -p ${CRI_PROJ_PATH}/${CRI_HOME}/.cache/apt/partial
+    RUN echo APT_PATH: ${CRI_PROJ_PATH}/${CRI_HOME}/.cache/apt/partial
+    RUN apt-get -o Dir::Cache::archives=${CRI_PROJ_PATH}/${CRI_HOME}/.cache/apt -o APT::Sandbox::User=root update
     # Note: `openssh-client`` post-install script fails on NFS: Ignoring errors for now.
-    ${CRI_RUN} apt-get -o APT::Sandbox::User=root install -y vim unzip git wget curl ${APT_PKGS}
+    ${CRI_RUN} apt-get -o Dir::Cache::archives=${CRI_PROJ_PATH}/${CRI_HOME}/.cache/apt -o APT::Sandbox::User=root install -y vim unzip git wget curl ${APT_PKGS}
     RUN useradd -m user
 
-    ${EXTRA_PODMAN_RUN_COMMANDS}
+    {{extra_podman_run_commands}}
 
     echo "Saving container as localhost/${ML_VENV_NAME}"
     PODMAN commit ${ML_VENV_NAME} localhost/${ML_VENV_NAME}
@@ -72,7 +90,7 @@ BUILD_CONTAINER() {
 }
 
 # Check if container already exists and ensure user is ok with restarting.
-RESULT=$(${CRI_BIN} ps -a --filter "name=${ML_VENV_NAME}" --format "{{.Names}} 2>/dev/null")
+RESULT=$(${CRI_BIN} ps -a --filter "name=${ML_VENV_NAME}" --format "{% raw %}{{.Names}}{% endraw %} 2>/dev/null")
 if [ -n "${RESULT}" ]; then
     echo "Container ${ML_VENV_NAME} exists."
     echo
@@ -123,21 +141,14 @@ if [ -z "$SKIP_COLLECT" ]; then
   ${CRI_BIN} run -ti --rm \
     -v ${PROJ_PATH}:${CRI_PROJ_PATH} \
     -w ${CRI_PROJ_PATH} \
-    -e CRI_PROJ_PATH="${CRI_PROJ_PATH}" \
-    -e PY_REQS="$PY_REQS" \
-    -e PY_CONSTRAINTS="${PY_CONSTRAINTS}" \
-    -e PIP_IDX_ARGS="${PIP_IDX_ARGS}" \
-    -e PY_VER="$PY_VER" \
-    -e PYTHON="${PYTHON:-python}" \
-    -e VENV_PYTHON="${VENV_PYTHON:-./cache/venv/${ML_VENV_NAME}/bin/python}" \
-    -e PKG_SKIP_LIST="${PKG_SKIP_LIST}" \
     -e USER="user" \
     -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \
     -u $(id -u):$(id -g) \
     ${CRI_RUN_ARGS} \
     localhost/${ML_VENV_NAME} \
-    ${CRI_PROJ_PATH}/scripts/_/download-all-deps.sh
+    ${CRI_PROJ_PATH}/{{layer_dir}}/download-all-deps.sh
 
 fi
 
+echo RUNNING: BUILD_MODE="build" ${PROJ_PATH}/scripts/run-dev.sh ${CONFIG_NAME}
 BUILD_MODE="build" ${PROJ_PATH}/scripts/run-dev.sh ${CONFIG_NAME}
