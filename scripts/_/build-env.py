@@ -5,41 +5,7 @@ from pathlib import Path
 import os
 import shlex
 
-import yaml
 
-class Executor:
-    def emit(self, scripts: list[Script], ctx: BuildContext) -> BuildContext:
-        raise NotImplementedError("abstract Executor.emit() not implemented")
-    
-    def _resolve_order(self, scripts: list[Script]) -> list[Script]:
-        by_name = {s.name: s for s in scripts}
-        visited = set()
-        in_progress = set()
-        ordered = []
-
-        def visit(name: str):
-            if name in visited:
-                return
-            if name in in_progress:
-                raise ValueError(f"Circular dependency: {name}")
-            
-            in_progress.add(name)
-
-            script = by_name.get(name)
-            if script is None:
-                raise ValueError(f"Script {name} not defined")
-            
-            for dep in script.depends_on:
-                visit(dep)
-            
-            in_progress.discard(name)
-            visited.add(name)
-            ordered.append(script)
-        
-        for script in scripts:
-            visit(script.name)
-        
-        return ordered
 
 
 class Script:
@@ -50,22 +16,21 @@ class Script:
         self.env = env
         self.depends_on = depends_on
 
-class BuildContext:
-    def __init__(self, executor: Executor, config: dict): #, cache_dir: Path)
-        self.executor = executor
-        self.config = config
 
 class Builder:
-    def __init__(self, config: dict, child: Optional['Builder']):
+    def __init__(self, config: dict, inner_cfg): #child: Optional['Builder']):
         self.config = config
-        self.child = child
+        self.child = parse_config(inner_cfg, inherited_attrs=self.override_inheritance(config)) if inner_cfg else None
 
-    def emit_start(self, parent_cfg) -> Script:
-        raise NotImplementedError("abstract Builder.emit_start() not implemented")
+
+    def override_inheritance(self, config):
+        return config
+
 
     def emit_scripts(self) -> list[Script]:
         raise NotImplementedError("abstract Builder.emit_scripts() not implemented")
-    
+
+
     def get_name(self):
         layer_name = self.__class__.__name__
         if 'alias' in self.config:
@@ -73,56 +38,53 @@ class Builder:
         return layer_name
 
 
-    def build(self, ctx: BuildContext):
-        scripts = self.emit_scripts(ctx)
-        inner_ctx = ctx.executor.stage_and_run(scripts, ctx)
-
-        if self.child:
-            self.child.build(inner_ctx)
-
-class PodmanExecutor(Executor):
-    def stage_and_run(self, scripts, ctx):
-        ordered = self._resolve_order(scripts)
-        for script in ordered:
-            tmp = Path(f'/tmp/{script.name}')
-            tmp.write_text(script.body)
-            #subprocess.run(f'podman cp {tmp} {self.container_id}:/scripts/{script.name}.sh')
-            #subprocess.run(f'podman exec ...',
-            #env={**os.environ, **script.env})
-        return ctx
-
-
 class LinuxHostBuilder(Builder):
-    def emit_start(self, parent_cfg, layer_dir) -> Script:
-        # Emit scripts used to stage and run ourselves.
-        raise NotImplementedError("LinuxHostBuilder.emit_start() not implemented")
+    def emit_scripts(self, builder_path) -> list[Script]:
+        from jinja2 import Template, StrictUndefined
 
-    def emit_scripts(self, layer_dir) -> list[Script]:
-        # Emit scripts used to setup this layer.
+        tmpl_paths = {
+            'init-host.sh': Path("scripts") / "_" / "templates" / "init-host.sh.linux.j2",
+        }
+        tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
+
+        # TODO: Make this implicit
+        self.config['builder_path'] = builder_path
+        self.config['next_init_target'] = ''
+        if self.child and 'init' in self.child.config:
+            self.config['next_init_target'] = Path(builder_path) / self.child.get_name() / self.child.config['init']
 
         return [
             Script(
-                name="build.sh",
-                body=f'#!/usr/bin/env bash\n./{layer_dir}/init-dev-podman.sh'
+                name=name,
+                body=Template(data, undefined=StrictUndefined).render(**self.config)
             )
+            for name, data in tmpl_data.items()
         ]
-
-        venv_path = self.config.get('path', '/opt/venv')
-        
 
 
 class PodmanBuilder(Builder):
-    def emit_start(self, parent_cfg, layer_dir) -> Script:
-        #from jinja2 import Environment, FileSystemLoader
-        # env = Environment(loader=FileSystemLoader('./templates'))
-        # template = env.get_template('mytemplate.sh.j2')
-        # result = template.render(name="world", version="3.9")
+    def override_inheritance(self, config):
+        return {**config, 'proj_path': config['cri_proj_path']}
 
+
+    def emit_scripts(self, builder_path) -> list[Script]:
         from jinja2 import Template, StrictUndefined
-        template_path = Path("scripts") / "_" / "templates" / "init-dev-podman.sh.j2"
-        template_data = open(template_path).read()
 
-        self.config['layer_dir'] = layer_dir / self.get_name()
+        # TODO: Consider allowing user to override the download location for python packages.
+
+        tmpl_paths = {
+            'init-podman.sh': Path("scripts") / "_" / "templates" / "init-podman.sh.j2",
+            'run-podman.sh': Path("scripts") / "_" / "templates" / "run-podman.sh.j2",
+            # out of date
+            #'init-dev-podman.sh': Path("scripts") / "_" / "templates" / "init-dev-podman.sh.j2",
+            #'download-all-deps.sh': Path("scripts") / "_" / "templates" / "download-all-deps.sh.j2",
+            #'run-dev-docker.sh': Path("scripts") / "_" / "templates" / "run-dev-docker.sh.j2",
+            #'build-venv.sh': Path("scripts") / "_" / "templates" / "build-venv.sh.j2",
+            #'linux-collection.sh': Path("scripts") / "_" / "templates" / "linux-collection.sh.j2",
+        }
+        tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
+
+        # Normalize attributes for template use.
 
         if 'extra_preapt_commands' in self.config and isinstance(self.config['extra_preapt_commands'], list):
             self.config['extra_preapt_commands'] = '\n    '.join(self.config['extra_preapt_commands'])
@@ -139,31 +101,11 @@ class PodmanBuilder(Builder):
         elif 'apt_packages' not in self.config:
             self.config['apt_packages'] = ''
 
-        return Script(
-            name="init-dev-podman.sh",
-            body=Template(template_data, undefined=StrictUndefined).render(**self.config)
-        )
-
-    def emit_scripts(self, layer_dir) -> list[Script]:
-
-        from jinja2 import Template, StrictUndefined
-
-        # TODO: Consider allowing user to override the download location for python packages.
-
-        tmpl_path = {
-            'download-all-deps.sh': Path("scripts") / "_" / "templates" / "download-all-deps.sh.j2",
-            'run-dev-docker.sh': Path("scripts") / "_" / "templates" / "run-dev-docker.sh.j2",
-            'build-venv.sh': Path("scripts") / "_" / "templates" / "build-venv.sh.j2",
-            'linux-collection.sh': Path("scripts") / "_" / "templates" / "linux-collection.sh.j2",
-        }
-        tmpl_data = {
-            'download-all-deps.sh': open(tmpl_path['download-all-deps.sh']).read(),
-            'run-dev-docker.sh': open(tmpl_path['run-dev-docker.sh']).read(),
-            'build-venv.sh': open(tmpl_path['build-venv.sh']).read(),
-            'linux-collection.sh': open(tmpl_path['linux-collection.sh']).read(),
-        }
-
-        self.config['layer_path'] = layer_dir
+        #self.config['layer_dir'] = layer_dir / self.get_name()
+        self.config['builder_path'] = builder_path
+        self.config['next_init_target'] = ''
+        if self.child and 'init' in self.child.config:
+            self.config['next_init_target'] = Path(builder_path) / self.child.get_name() / self.child.config['init']
 
         return [
             Script(
@@ -174,29 +116,68 @@ class PodmanBuilder(Builder):
         ]
 
 
-class VenvBuilder(Builder):
-    def emit_start(self, parent_cfg, layer_dir) -> Script:
-
+class LinuxPythonEnv(Builder):
+    def emit_scripts(self, builder_path) -> list[Script]:
         from jinja2 import Template, StrictUndefined
-        template_path = Path("scripts") / "_" / "templates" / "start-venv.sh.j2"
-        template_data = open(template_path).read()
-        
-        return Script(
-            name="start-venv.sh",
-            body=Template(template_data, undefined=StrictUndefined).render(**self.config)
-        )
 
-    def emit_scripts(self, layer_dir) -> list[Script]:
-        venv_path = self.config.get('path', '/opt/venv')
-        return [Script(name="test.sh", body=f"# venv builder script {venv_path} {self.config['env_name']}")]
+        tmpl_paths = {
+            'init-python.sh': Path("scripts") / "_" / "templates" / "init-python.sh.linux.j2",
+        }
+        tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
+
+        # TODO: Make this implicit
+        self.config['builder_path'] = builder_path
+        self.config['next_init_target'] = ''
+        if self.child and 'init' in self.child.config:
+            self.config['next_init_target'] = Path(builder_path) / self.child.get_name() / self.child.config['init']
+
+        return [
+            Script(
+                name=name,
+                body=Template(data, undefined=StrictUndefined).render(**self.config)
+            )
+            for name, data in tmpl_data.items()
+        ]
+
+
+class WinePythonEnv(Builder):
+    def emit_scripts(self, builder_path) -> list[Script]:
+        from jinja2 import Template, StrictUndefined
+
+        tmpl_paths = {
+            'init-python.sh': Path("scripts") / "_" / "templates" / "init-python.sh.wine.j2",
+            'download-pkgs.sh': Path("scripts") / "_" / "templates" / "download-pkgs.sh.wine.j2",
+            'run-python.sh': Path("scripts") / "_" / "templates" / "run-python.sh.wine.j2",
+            'build-venv.sh': Path("scripts") / "_" / "templates" / "build-venv.sh.wine.j2",
+            'start-venv.sh': Path("scripts") / "_" / "templates" / "start-venv.sh.wine.j2",
+        }
+        tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
+
+        # Morph PROJ_PATH into WINE_PROJ_PATH
+        from pathlib import PurePosixPath, PureWindowsPath
+        self.config['wine_proj_path'] = f"{self.config['root_drive']}{self.config['proj_path']}"
+
+        # TODO: Make this implicit
+        self.config['builder_path'] = builder_path
+        self.config['next_init_target'] = ''
+        if self.child and 'init' in self.child.config:
+            self.config['next_init_target'] = Path(builder_path) / self.child.get_name() / self.child.config['init']
+
+        return [
+            Script(
+                name=name,
+                body=Template(data, undefined=StrictUndefined).render(**self.config)
+            )
+            for name, data in tmpl_data.items()
+        ]
 
 
 class Resolution:
 
-    def __init__(self, builder_cls: type[Builder], executor_cls: type[Executor], executor_kwargs: dict = {}):
+    def __init__(self, builder_cls: type[Builder]): #, executor_cls: type[Executor], executor_kwargs: dict = {}):
         self.builder_cls = builder_cls
-        self.executor_cls = executor_cls
-        self.executor_kwargs = executor_kwargs
+        # self.executor_cls = executor_cls
+        # self.executor_kwargs = executor_kwargs
     
     @classmethod
     def resolve(cls, config: dict) -> "Resolution":
@@ -216,33 +197,42 @@ class Resolution:
         
         return max(matches, key=lambda r: r.priority).resolution
 
+
 class Rule:
     def __init__(self, predicates: dict[str, Callable[[Any], bool]], resolution: Resolution, priority: int = 0):
         self.predicates = predicates
         self.resolution = resolution
         self.priority = priority
 
+
 Resolution.RULES = [
     Rule(
         predicates={
-            "platform": lambda v: v in ("linux"),
-            "runtime": lambda v: v == "podman",
+            "builder": lambda v: v == "host",
+            "platform": lambda v: v == "linux",
         },
-        resolution=Resolution(PodmanBuilder, PodmanExecutor),
-        priority=10,
+        resolution=Resolution(LinuxHostBuilder),
     ),
     Rule(
         predicates={
-            "runtime": lambda v: v in ("venv"),
+            "builder": lambda v: v == "podman",
+            # implicitly linux
         },
-        resolution=Resolution(VenvBuilder, PodmanExecutor),
-        priority=10,
+        resolution=Resolution(PodmanBuilder),
     ),
     Rule(
         predicates={
-            "platform": lambda v: v in ("linux"),
+            "builder": lambda v: v == "python",
+            "platform": lambda v: v == "linux",
         },
-        resolution=Resolution(LinuxHostBuilder, PodmanExecutor),
+        resolution=Resolution(LinuxPythonEnv),
+    ),
+    Rule(
+        predicates={
+            "builder": lambda v: v == "python",
+            "platform": lambda v: v in "wine",
+        },
+        resolution=Resolution(WinePythonEnv),
     ),
 ]
 
@@ -266,25 +256,8 @@ class Emitter:
             path.chmod(0o755)
         
         if builder.child:
-            bootstrap = builder.child.emit_start(builder.config, layer_dir) #inner_layer_type=builder.child.layer_type)
-            start_path = layer_dir / bootstrap.name
-            start_path.write_text(bootstrap.body)
-            start_path.chmod(0o755)
-
             self.emit(builder.child, current_dir=layer_dir)
 
-# class_registry = {
-#   'host': HostRouter,
-#   'podman': PodmanRouter,
-# #   'vars': VarsHandler,
-# #   'apt_collect': AptCollectionHandler,
-# #   'apt': AptHandler,
-#   'virtualenv': VirtualEnvRouter,
-# }
-
-# from_registry = {
-#   'env': FromEnvHandler,
-# }
 
 class FromEnvHandler:
     @classmethod
@@ -296,9 +269,11 @@ class FromEnvHandler:
                 return os.getenv(cfg['name'])
         raise Exception(f"From without name: {cfg}")
 
+
 FROM_REGISTRY = {
   'env': FromEnvHandler,
 }
+
 
 def resolve_value(cfg, attr):
     if attr in cfg:
@@ -306,6 +281,7 @@ def resolve_value(cfg, attr):
             return FROM_REGISTRY[cfg[attr]['from']].resolve(cfg[attr])
         else:
             return cfg[attr]
+
 
 def parse_config(cfg: dict, inherited_attrs: dict = {}) -> Builder:
 
@@ -320,29 +296,158 @@ def parse_config(cfg: dict, inherited_attrs: dict = {}) -> Builder:
 
     effective_attrs = {**inherited_attrs, **cfg}
 
+    # TODO: Block dynamically clobbered attributes.
+    # ['next_init_target', 'builder_path']
+
     # Do not permit inheritance of special attributes.
-    for blocked_inheritance in ['alias', 'runtime']:
+    for blocked_inheritance in ['alias', 'builder', 'init', 'inner']:
         if blocked_inheritance not in cfg and blocked_inheritance in effective_attrs:
             del effective_attrs[blocked_inheritance]
-
-    #print(f"PARSE_CONFIG: {effective_attrs}\n")
     
     resolution = Resolution.resolve(effective_attrs)
 
     inner_cfg = cfg.pop('inner', None)
-    child = parse_config(inner_cfg, inherited_attrs=effective_attrs) if inner_cfg else None
 
-    return resolution.builder_cls(effective_attrs, child=child)
-
-
-'''
+    return resolution.builder_cls(effective_attrs, inner_cfg=inner_cfg)
 
 
+def main():
 
-export PIP_UPSTREAM_VERIFIERS=${PIP_UPSTREAM_VERIFIERS:-"https://download.pytorch.org/whl/cpu https://pypi.org/simple"}
+    import argparse
+
+    parser = argparse.ArgumentParser(description='My tool')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--init', action='store_true', help='initialize environment')
+    group.add_argument('--run', action='store_true', help='run command')
+    parser.add_argument('--extra', action='store')
+
+    # TODO: This might be optional?
+    parser.add_argument('--proj_path', action='store', required=True)
+    parser.add_argument('--config_name', action='store', required=True)
+    parser.add_argument('--config_path', action='store', required=True)
+
+    args = parser.parse_args()
+
+    extra = ''
+    if args.extra:
+        extra = json.loads(extra)
+
+    # TODO: This might be optional?
+    os.environ['PROJ_PATH'] = args.proj_path
+    os.environ['CONFIG_NAME'] = args.config_name
+    os.environ['CONFIG_PATH'] = args.config_path
+
+    if args.init:
+
+        import yaml
+
+        # Test with: (. ./configs/env/yannt-py3.9-podman-wine/config ; ./scripts/_/build-env.py)
+        with open(Path(os.getenv('CONFIG_PATH')) / 'plan.yaml', "r") as plan_fobj:
+            root_builder = parse_config(yaml.safe_load(plan_fobj.read())['config_root'])
+
+        staging = Path('cache') / 'builder' / root_builder.config['env_name']
+        staging.mkdir(parents=True, exist_ok=True)
+
+        emitter = Emitter(staging)
+        emitter.emit(root_builder)
+
+    if args.run:
+        print(f"RUN: {extra}")
 
 
-'''
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class Builder:
+#     def __init__(self, config: dict, child: Optional['Builder']):
+#         self.config = config
+#         self.child = child
+
+
+#     def emit_scripts(self) -> list[Script]:
+#         raise NotImplementedError("abstract Builder.emit_scripts() not implemented")
+
+
+#     def get_name(self):
+#         layer_name = self.__class__.__name__
+#         if 'alias' in self.config:
+#             layer_name = self.config['alias']
+#         return layer_name
+
+
+#     # def build(self, ctx: BuildContext):
+#     #     scripts = self.emit_scripts(ctx)
+#     #     inner_ctx = ctx.executor.stage_and_run(scripts, ctx)
+
+#     #     if self.child:
+#     #         self.child.build(inner_ctx)
+
+
+# class BuildContext:
+#     def __init__(self, executor: Executor, config: dict): #, cache_dir: Path)
+#         self.executor = executor
+#         self.config = config
 
 
 # raw_yaml = '''
@@ -406,52 +511,48 @@ export PIP_UPSTREAM_VERIFIERS=${PIP_UPSTREAM_VERIFIERS:-"https://download.pytorc
 # '''
 
 
-def main():
+# class Executor:
+#     def emit(self, scripts: list[Script], ctx: BuildContext) -> BuildContext:
+#         raise NotImplementedError("abstract Executor.emit() not implemented")
+    
+#     def _resolve_order(self, scripts: list[Script]) -> list[Script]:
+#         by_name = {s.name: s for s in scripts}
+#         visited = set()
+#         in_progress = set()
+#         ordered = []
 
-    import argparse
+#         def visit(name: str):
+#             if name in visited:
+#                 return
+#             if name in in_progress:
+#                 raise ValueError(f"Circular dependency: {name}")
+            
+#             in_progress.add(name)
 
-    parser = argparse.ArgumentParser(description='My tool')
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--init', action='store_true', help='initialize environment')
-    group.add_argument('--run', action='store_true', help='run command')
-    parser.add_argument('--extra', action='store')
-
-    # TODO: This might be optional?
-    parser.add_argument('--proj_path', action='store', required=True)
-    parser.add_argument('--config_name', action='store', required=True)
-    parser.add_argument('--config_path', action='store', required=True)
-
-    args = parser.parse_args()
-
-    extra = ''
-    if args.extra:
-        extra = json.loads(extra)
-
-    # TODO: This might be optional?
-    os.environ['PROJ_PATH'] = args.proj_path
-    os.environ['CONFIG_NAME'] = args.config_name
-    os.environ['CONFIG_PATH'] = args.config_path
-
-    if args.init:
-
-        # Test with: (. ./configs/env/yannt-py3.9-podman-wine/config ; ./scripts/_/build-env.py)
-        with open(Path(os.getenv('CONFIG_PATH')) / 'plan.yaml', "r") as plan_fobj:
-            root_builder = parse_config(yaml.safe_load(plan_fobj.read())['config_root'])
-
-        staging = Path('cache') / 'builder' / root_builder.config['env_name']
-        staging.mkdir(parents=True, exist_ok=True)
-
-        emitter = Emitter(staging)
-        emitter.emit(root_builder)
-
-    if args.run:
-        print(f"RUN: {extra}")
+#             script = by_name.get(name)
+#             if script is None:
+#                 raise ValueError(f"Script {name} not defined")
+            
+#             for dep in script.depends_on:
+#                 visit(dep)
+            
+#             in_progress.discard(name)
+#             visited.add(name)
+#             ordered.append(script)
+        
+#         for script in scripts:
+#             visit(script.name)
+        
+#         return ordered
 
 
-
-
-if __name__ == "__main__":
-    main()
-
-
-
+# class PodmanExecutor(Executor):
+#     def stage_and_run(self, scripts, ctx):
+#         ordered = self._resolve_order(scripts)
+#         for script in ordered:
+#             tmp = Path(f'/tmp/{script.name}')
+#             tmp.write_text(script.body)
+#             #subprocess.run(f'podman cp {tmp} {self.container_id}:/scripts/{script.name}.sh')
+#             #subprocess.run(f'podman exec ...',
+#             #env={**os.environ, **script.env})
+#         return ctx

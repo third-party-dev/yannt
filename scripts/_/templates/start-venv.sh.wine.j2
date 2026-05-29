@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+# FROM TEMPLATE
+
+set -e
+
+ROOT_DRIVE=${ROOT_DRIVE:-"{{root_drive}}"}
+PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
+PYTHON_VENV_PREFIX=${PYTHON_VENV_PREFIX:-"{{python_venv_prefix}}"}
+CONFIG_NAME=${CONFIG_NAME:-"{{config_name}}"}
+
+# bash -i
+
+wine cmd.exe /k ${ROOT_DRIVE}/${PROJ_PATH}/${PYTHON_VENV_PREFIX}/${CONFIG_NAME}/Scripts/activate.bat
+
+# # Assuming in top yannt path (PROJ_PATH)
+
+# # Allow user to assign venv name and tag shell prompt
+# export ML_VENV_NAME=${ML_VENV_NAME:-"{{env_name}}"}
+
+# export PS1_TAG=${PS1_TAG:-"{{ps1_tag}} "}
+# export PS1="${PS1_TAG}${PS1:-\$ }"
+
+# source ./cache/venv/${ML_VENV_NAME}/bin/activate
+
+# if [ $# -gt 0 ]; then
+
+# $@
+
+# else
+
+# echo
+# echo "The environment is now ready. Try 'yannt --help' for information."
+
+# # Include yannt tab completion.
+# TMP_RC="$(mktemp)"
+# cat >> "$TMP_RC" <<'EOF'
+# [ -f "$HOME/.bashrc" ] && source $HOME/.bashrc
+# source ./cache/venv/${ML_VENV_NAME}/bin/activate
+# eval "$(register-python-argcomplete yannt)"
+# EOF
+
+# exec bash --rcfile "$TMP_RC" -i
+
+# fi

@@ -1,29 +1,25 @@
 #!/usr/bin/env bash
 
-# Load environment configuration
-#source ${CONFIG_PATH}/config
+echo RUNNING $0
 
-PROJ_PATH="{{proj_path}}"
-CONFIG_NAME="{{config_name}}"
-CONFIG_PATH="{{config_path}}"
-CRI_ROOT="{{cri_root}}"
-CRI_BIN="{{cri_bin}}"
-CRI_RUN="{{cri_run}}"
-CRI_HOME="{{cri_home}}"
-CRI_PROJ_PATH="{{cri_proj_path}}"
-ML_VENV_NAME="{{env_name}}"
-PY_VER="{{py_ver}}"
-CRI_RUN_ARGS="{{cri_run_args}}"
-APT_PKGS="{{apt_packages}}"
+ENV_NAME=${ENV_NAME:-"{{env_name}}"}
+PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
+CONFIG_NAME=${CONFIG_NAME:-"{{config_name}}"}
+CONFIG_PATH=${CONFIG_PATH:-"{{config_path}}"}
 
-PIP_UPSTREAM_VERIFIERS="{{pip_upstream_verifiers}}"
+CRI_ROOT=${CRI_ROOT:-"{{cri_root}}"}
+CRI_BIN=${CRI_BIN:-"{{cri_bin}}"}
+CRI_RUN=${CRI_RUN:-"{{cri_run}}"}
+CRI_HOME=${CRI_HOME:-"{{cri_home}}"}
+CRI_PROJ_PATH=${CRI_PROJ_PATH:-"{{cri_proj_path}}"}
+CRI_RUN_ARGS=${CRI_RUN_ARGS:-"{{cri_run_args}}"}
 
-PY_REQS="{{py_reqs}}"
-PY_CONSTRAINTS="{{py_constraints}}"
-PIP_IDX_ARGS="{{pip_idx_args}}"
-PYTHON="{{python}}"
-VENV_PYTHON="{{venv_python}}"
-PKG_SKIP_LIST="{{pkg_skip_list}}"
+APT_PKGS=${APT_PKGS:-"{{apt_packages}}"}
+
+NEXT_INIT_TARGET=${NEXT_INIT_TARGET:-"{{next_init_target}}"}
+
+# ----- End Of Config -----
+
 
 mkdir -p ${CRI_ROOT}
 
@@ -49,22 +45,22 @@ RUN() {
 
 BUILD_CONTAINER() {
     # Initial stop and rm allowed to fail.
-    ${CRI_BIN} stop $ML_VENV_NAME
-    ${CRI_BIN} rm $ML_VENV_NAME
+    ${CRI_BIN} stop $ENV_NAME
+    ${CRI_BIN} rm $ENV_NAME
 
-    echo "Creating container ${ML_VENV_NAME}"
+    echo "Creating container ${ENV_NAME}"
     CONTAINER=$(\
-    ${CRI_BIN} create --name $ML_VENV_NAME \
+    ${CRI_BIN} create --name $ENV_NAME \
         -v ${PROJ_PATH}:${CRI_PROJ_PATH} -w ${CRI_PROJ_PATH} \
-        -e PY_VER=${PY_VER} -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \
+        -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \
         ${CRI_RUN_ARGS} \
         docker.io/library/python:${PY_VER}-slim \
         tail -f /dev/null
     )
-    echo "Created container ${ML_VENV_NAME}@${CONTAINER}"
+    echo "Created container ${ENV_NAME}@${CONTAINER}"
 
     PODMAN start $CONTAINER
-    echo "Started ${ML_VENV_NAME}@${CONTAINER}"
+    echo "Started ${ENV_NAME}@${CONTAINER}"
 
     RUN chown root /var/lib/apt/lists/partial
     RUN chown root /var/lib/apt/lists/auxfiles
@@ -82,18 +78,18 @@ BUILD_CONTAINER() {
 
     {{extra_podman_run_commands}}
 
-    echo "Saving container as localhost/${ML_VENV_NAME}"
-    PODMAN commit ${ML_VENV_NAME} localhost/${ML_VENV_NAME}
-    echo "Committed \(i.e. saved\) ${ML_VENV_NAME}@${CONTAINER} image."
+    echo "Saving container as localhost/${ENV_NAME}"
+    PODMAN commit ${ENV_NAME} localhost/${ENV_NAME}
+    echo "Committed \(i.e. saved\) ${ENV_NAME}@${CONTAINER} image."
 
-    PODMAN stop ${ML_VENV_NAME}
-    echo "Stopped ${ML_VENV_NAME}@${CONTAINER}"
+    PODMAN stop ${ENV_NAME}
+    echo "Stopped ${ENV_NAME}@${CONTAINER}"
 }
 
 # Check if container already exists and ensure user is ok with restarting.
-RESULT=$(${CRI_BIN} ps -a --filter "name=${ML_VENV_NAME}" --format "{% raw %}{{.Names}}{% endraw %} 2>/dev/null")
+RESULT=$(${CRI_BIN} ps -a --filter "name=${ENV_NAME}" --format "{% raw %}{{.Names}}{% endraw %} 2>/dev/null")
 if [ -n "${RESULT}" ]; then
-    echo "Container ${ML_VENV_NAME} exists."
+    echo "Container ${ENV_NAME} exists."
     echo
     echo -n "[R]ebuild container, [s]kip build, or [a]bort? (r/s/a) "
     read answer
@@ -115,9 +111,14 @@ else
     BUILD_CONTAINER
 fi
 
+# Continue within the container.
 
-# --------------------------------------------------------------------------------------
-# TODO: We should create minimal venv, THEN download all the dependencies from the venv!
-# --------------------------------------------------------------------------------------
+mkdir -p ${PROJ_PATH}/${CRI_HOME}
+[ -z "${NEXT_INIT_TARGET}" ] || \
+  ${CRI_BIN} run -ti --rm \
+    -v ${PROJ_PATH}:${CRI_PROJ_PATH} -w ${CRI_PROJ_PATH} \
+    -e USER="user" -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \
+    -u $(id -u):$(id -g) ${CRI_RUN_ARGS} \
+    localhost/${ML_VENV_NAME} \
+    ${CRI_PROJ_PATH}/${NEXT_INIT_TARGET}
 
-${PROJ_PATH}/{{layer_dir}}/linux-collection.sh

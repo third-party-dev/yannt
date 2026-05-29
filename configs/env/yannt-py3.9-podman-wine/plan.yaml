@@ -1,6 +1,8 @@
 config_root:
   alias: host
+  builder: host
   platform: linux
+  init: init-host.sh
 
   proj_path: { from: env, name: PROJ_PATH }
   config_path: { from: env, name: CONFIG_PATH }
@@ -10,12 +12,17 @@ config_root:
   env_name: { from: env, name: ML_VENV_NAME }
 
   inner:
+    # Name of folder
     alias: podman
-    runtime: podman
-    platform: linux
 
-    # unused
-    image: ubuntu:22.04
+    # Triggers builder class that will build target scripts
+    builder: podman
+    # inherited => platform: linux
+
+    # What parent calls
+    init: init-podman.sh
+
+    # unused; image: ubuntu:22.04
 
     extra_preapt_commands:
     - RUN dpkg --add-architecture i386
@@ -43,7 +50,6 @@ config_root:
     - RUN wine reg add 'HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' /v Path /t REG_EXPAND_SZ /d 'C:\Python39;C:\Python39\Scripts' /f    
     - RUN wineserver --wait
 
-    ps1_tag: { from: env, name: PS1_TAG }
     cri_home: { from: env, name: CRI_HOME }
     cri_root: { from: env, name: CRI_ROOT }
     cri_bin: { from: env, name: CRI_BIN }
@@ -51,20 +57,33 @@ config_root:
     cri_run_args: { from: env, name: CRI_RUN_ARGS }
     cri_proj_path: { from: env, name: CRI_PROJ_PATH }
 
-    # TODO: Rethink how to push venv initialization into venv runtime.
-    # TODO: Re-do download-all-deps so its coming from wine python.
-    # TODO: Re-do build-venv so its using wine python.
-    # TODO: Re-do start-venv so its using cmd.exe or something.
-
-    python: { from: env, name: PYTHON }
-    pip_idx_args: { from: env, name: PIP_IDX_ARGS }
-    pip_upstream_verifiers: { from: env, name: PIP_UPSTREAM_VERIFIERS }
-    venv_python: { from: env, name: VENV_PYTHON }
-    py_constraints: { from: env, name: PY_CONSTRAINTS }
-    py_reqs: { from: env, name: PY_REQS }
-    pkg_skip_list: { from: env, name: PKG_SKIP_LIST }
-
     inner:
-        runtime: venv
-        path: /opt/myenv
-        packages: [numpy, pandas]
+      alias: python
+      builder: python
+      platform: wine
+      init: init-python.sh
+      # ? entry: run-python
+
+      # TODO: Rethink how to push venv initialization into venv runtime.
+      # TODO: Re-do download-all-deps so its coming from wine python.
+      # TODO: Re-do build-venv so its using wine python.
+      # TODO: Re-do start-venv so its using cmd.exe or something.
+
+      root_drive: { from: env, name: ROOT_DRIVE }
+      python_pkg_path: { from: env, name: PYTHON_PKG_PATH }
+      python_autoinstall_path: { from: env, name: PYTHON_AUTOINSTALL_PATH }
+      python_venv_prefix: { from: env, name: PYTHON_VENV_PREFIX }
+
+      ps1_tag: { from: env, name: PS1_TAG }
+      python: { from: env, name: PYTHON }
+      pip_idx_args: { from: env, name: PIP_IDX_ARGS }
+      pip_upstream_verifiers: { from: env, name: PIP_UPSTREAM_VERIFIERS }
+      venv_python: { from: env, name: VENV_PYTHON }
+      py_constraints: { from: env, name: PY_CONSTRAINTS }
+      py_reqs: { from: env, name: PY_REQS }
+      pkg_skip_list: { from: env, name: PKG_SKIP_LIST }
+
+      # inner:
+      #     runtime: venv
+      #     path: /opt/myenv
+      #     packages: [numpy, pandas]

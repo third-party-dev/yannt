@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+echo RUNNING BUILD_MODE="${BUILD_MODE}" $0 $@
+
+ENV_NAME=${ENV_NAME:-"{{env_name}}"}
+CONFIG_NAME=${CONFIG_NAME:-"{{config_name}}"}
+PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
+BUILDER_PATH=${BUILDER_PATH:-"{{builder_path}}"}
+
+# ----- End Of Config -----
+
+set -e
+
+if [ -n "${BUILD_MODE}" ]; then
+  echo "Building the venv."
+  ${PROJ_PATH}/${BUILDER_PATH}/build-venv.sh $@
+else
+  echo "Starting the venv."
+  if [ ! -e "${PROJ_PATH}/cache/venv/${ENV_NAME}" ]; then
+    # If we're running an environment that doesn't exist, stop.
+    echo "You are attempting to run an environment that doesn't exist. (${ENV_NAME})"
+    echo "Run: ./scripts/init-dev.sh ${CONFIG_NAME}"
+    exit 1
+  fi
+  ${PROJ_PATH}/${BUILDER_PATH}/start-venv.sh "$@"
+fi
+

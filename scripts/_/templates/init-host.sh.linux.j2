@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+echo RUNNING $0
+
+PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
+NEXT_INIT_TARGET=${NEXT_INIT_TARGET:-"{{next_init_target}}"}
+
+# ----- End Of Config -----
+
+# Nothing to do.
+
+# If there is a NEXT_INIT_TARGET set, run it.
+[ -z "${NEXT_INIT_TARGET}" ] || ./${NEXT_INIT_TARGET}

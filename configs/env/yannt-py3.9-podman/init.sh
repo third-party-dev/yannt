@@ -41,4 +41,4 @@ if len(sys.argv) > 1:
 subprocess.run(cmd)
 EOF
 
-${PROJ_PATH}/cache/builder/${CONFIG_NAME}/host/build.sh
+${PROJ_PATH}/cache/builder/${CONFIG_NAME}/host/init-host.sh
