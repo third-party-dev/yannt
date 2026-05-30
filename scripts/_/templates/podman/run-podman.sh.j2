@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+{{YOU_CAN_EDIT_THIS_FILE}}
+
+# # Note: Assuming podman is always run from linux.
+
+# echo RUNNING BUILD_MODE="${BUILD_MODE}" PROJ_PATH="${PROJ_PATH}" $0 $@
+
+ENV_NAME=${ENV_NAME:-"{{env_name}}"}
+PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
+# CONFIG_NAME=${CONFIG_NAME:-"{{config_name}}"}
+# CONFIG_PATH=${CONFIG_PATH:-"{{config_path}}"}
+
+CRI_ROOT=${CRI_ROOT:-"{{cri_root}}"}
+CRI_BIN=${CRI_BIN:-"{{cri_bin}}"}
+CRI_HOME=${CRI_HOME:-"{{cri_home}}"}
+CRI_PROJ_PATH=${CRI_PROJ_PATH:-"{{cri_proj_path}}"}
+CRI_RUN_ARGS=${CRI_RUN_ARGS:-"{{cri_run_args}}"}
+
+BUILDER_PATH=${BUILDER_PATH:-"{{builder_path}}"}
+NEXT_RUN_TARGET=${NEXT_RUN_TARGET:-"{{next_run_target}}"}
+
+# # ----- End Of Config -----
+
+# set -e
+
+# if [ -n "${BUILD_MODE}" ]; then
+#   echo "Building the venv."
+#   CONTAINER_CMD=${CRI_PROJ_PATH}/${BUILDER_PATH}/python/build-venv.sh $@
+# else
+#   echo "Starting the venv."
+#   if [ ! -e "${PROJ_PATH}/cache/venv/${ENV_NAME}" ]; then
+#     # If we're running an environment that doesn't exist, stop.
+#     echo "You are attempting to run an environment that doesn't exist. (${ENV_NAME})"
+#     echo "Run: ./scripts/init-dev.sh ${CONFIG_NAME}"
+#     exit 1
+#   fi
+#   CONTAINER_CMD="${CRI_PROJ_PATH}/${BUILDER_PATH}/python/start-venv.sh $@"
+#   echo CONTAINER_CMD: $CONTAINER_CMD
+# fi
+
+# Run the environment
+mkdir -p ${PROJ_PATH}/${CRI_HOME}
+
+${CRI_BIN} run -ti --rm \
+    -u $(id -u):$(id -g) \
+    -v ${PROJ_PATH}:${CRI_PROJ_PATH} \
+    -w ${CRI_PROJ_PATH} \
+    -e NO_SHELL="$NO_SHELL" \
+    -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \
+    -e USER="user" \
+    ${CRI_RUN_ARGS} \
+    localhost/${ENV_NAME} \
+    ${CRI_PROJ_PATH}/${NEXT_RUN_TARGET}

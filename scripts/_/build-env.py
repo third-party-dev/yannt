@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
-from pprint import pprint
+from pprint import pprint # useful for breakpoint()
 from pathlib import Path
 import os
-import shlex
-
-
 
 
 class Script:
@@ -31,6 +28,17 @@ class Builder:
         raise NotImplementedError("abstract Builder.emit_scripts() not implemented")
 
 
+    def common_config_fixups(self, builder_path):
+        self.config['YOU_CAN_EDIT_THIS_FILE'] = '# === DO NOT EDIT. Auto generated file. Edit the template. === #'
+        self.config['builder_path'] = builder_path
+        self.config['next_init_target'] = ''
+        self.config['next_run_target'] = ''
+        if self.child and 'init' in self.child.config:
+            self.config['next_init_target'] = Path(builder_path) / self.child.get_name() / self.child.config['init']
+        if self.child and 'run' in self.child.config:
+            self.config['next_run_target'] = Path(builder_path) / self.child.get_name() / self.child.config['run']
+
+
     def get_name(self):
         layer_name = self.__class__.__name__
         if 'alias' in self.config:
@@ -43,15 +51,19 @@ class LinuxHostBuilder(Builder):
         from jinja2 import Template, StrictUndefined
 
         tmpl_paths = {
-            'init-host.sh': Path("scripts") / "_" / "templates" / "init-host.sh.linux.j2",
+            'init-host.sh': Path("scripts/_/templates/host") / "init-host.sh.linux.j2",
         }
         tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
 
         # TODO: Make this implicit
+        self.config['YOU_CAN_EDIT_THIS_FILE'] = '# === DO NOT EDIT. Auto generated file. Edit the template. === #'
         self.config['builder_path'] = builder_path
         self.config['next_init_target'] = ''
+        self.config['next_run_target'] = ''
         if self.child and 'init' in self.child.config:
             self.config['next_init_target'] = Path(builder_path) / self.child.get_name() / self.child.config['init']
+        if self.child and 'run' in self.child.config:
+            self.config['next_run_target'] = Path(builder_path) / self.child.get_name() / self.child.config['run']
 
         return [
             Script(
@@ -73,8 +85,8 @@ class PodmanBuilder(Builder):
         # TODO: Consider allowing user to override the download location for python packages.
 
         tmpl_paths = {
-            'init-podman.sh': Path("scripts") / "_" / "templates" / "init-podman.sh.j2",
-            'run-podman.sh': Path("scripts") / "_" / "templates" / "run-podman.sh.j2",
+            'init-podman.sh': Path("scripts/_/templates/podman") / "init-podman.sh.j2",
+            'run-podman.sh': Path("scripts/_/templates/podman") / "run-podman.sh.j2",
             # out of date
             #'init-dev-podman.sh': Path("scripts") / "_" / "templates" / "init-dev-podman.sh.j2",
             #'download-all-deps.sh': Path("scripts") / "_" / "templates" / "download-all-deps.sh.j2",
@@ -101,11 +113,8 @@ class PodmanBuilder(Builder):
         elif 'apt_packages' not in self.config:
             self.config['apt_packages'] = ''
 
-        #self.config['layer_dir'] = layer_dir / self.get_name()
-        self.config['builder_path'] = builder_path
-        self.config['next_init_target'] = ''
-        if self.child and 'init' in self.child.config:
-            self.config['next_init_target'] = Path(builder_path) / self.child.get_name() / self.child.config['init']
+        # TODO: Make this implicit
+        self.common_config_fixups(builder_path)
 
         return [
             Script(
@@ -121,15 +130,16 @@ class LinuxPythonEnv(Builder):
         from jinja2 import Template, StrictUndefined
 
         tmpl_paths = {
-            'init-python.sh': Path("scripts") / "_" / "templates" / "init-python.sh.linux.j2",
+            'init-python.sh': Path("scripts") / "_" / "templates" / "python" / "init-python.sh.linux.j2",
+            'download-pkgs.sh': Path("scripts") / "_" / "templates" / "python" / "download-pkgs.sh.linux.j2",
+            'run-python.sh': Path("scripts") / "_" / "templates" / "python" / "run-python.sh.linux.j2",
+            'build-venv.sh': Path("scripts") / "_" / "templates" / "python" / "build-venv.sh.linux.j2",
+            'start-venv.sh': Path("scripts") / "_" / "templates" / "python" / "start-venv.sh.linux.j2",
         }
         tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
 
         # TODO: Make this implicit
-        self.config['builder_path'] = builder_path
-        self.config['next_init_target'] = ''
-        if self.child and 'init' in self.child.config:
-            self.config['next_init_target'] = Path(builder_path) / self.child.get_name() / self.child.config['init']
+        self.common_config_fixups(builder_path)
 
         return [
             Script(
@@ -145,11 +155,11 @@ class WinePythonEnv(Builder):
         from jinja2 import Template, StrictUndefined
 
         tmpl_paths = {
-            'init-python.sh': Path("scripts") / "_" / "templates" / "init-python.sh.wine.j2",
-            'download-pkgs.sh': Path("scripts") / "_" / "templates" / "download-pkgs.sh.wine.j2",
-            'run-python.sh': Path("scripts") / "_" / "templates" / "run-python.sh.wine.j2",
-            'build-venv.sh': Path("scripts") / "_" / "templates" / "build-venv.sh.wine.j2",
-            'start-venv.sh': Path("scripts") / "_" / "templates" / "start-venv.sh.wine.j2",
+            'init-python.sh': Path("scripts") / "_" / "templates" / "python" / "init-python.sh.wine.j2",
+            'download-pkgs.sh': Path("scripts") / "_" / "templates" / "python" / "download-pkgs.sh.wine.j2",
+            'run-python.sh': Path("scripts") / "_" / "templates" / "python" / "run-python.sh.wine.j2",
+            'build-venv.sh': Path("scripts") / "_" / "templates" / "python" / "build-venv.sh.wine.j2",
+            'start-venv.sh': Path("scripts") / "_" / "templates" / "python" / "start-venv.sh.wine.j2",
         }
         tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
 
@@ -158,10 +168,7 @@ class WinePythonEnv(Builder):
         self.config['wine_proj_path'] = f"{self.config['root_drive']}{self.config['proj_path']}"
 
         # TODO: Make this implicit
-        self.config['builder_path'] = builder_path
-        self.config['next_init_target'] = ''
-        if self.child and 'init' in self.child.config:
-            self.config['next_init_target'] = Path(builder_path) / self.child.get_name() / self.child.config['init']
+        self.common_config_fixups(builder_path)
 
         return [
             Script(

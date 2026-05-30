@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-echo RUNNING BUILD_MODE="${BUILD_MODE}" $0 $@
+# --- run-python.sh.j2 ---
+# Note: Designed to work with both linux and wine.
+
+{{YOU_CAN_EDIT_THIS_FILE}}
+
+#echo RUNNING BUILD_MODE="${BUILD_MODE}" $0 $@
 
 ENV_NAME=${ENV_NAME:-"{{env_name}}"}
 CONFIG_NAME=${CONFIG_NAME:-"{{config_name}}"}

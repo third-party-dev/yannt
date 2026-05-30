@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+{{YOU_CAN_EDIT_THIS_FILE}}
+
+set -e
+
+ROOT_DRIVE=${ROOT_DRIVE:-"{{root_drive}}"}
+PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
+PYTHON_VENV_PREFIX=${PYTHON_VENV_PREFIX:-"{{python_venv_prefix}}"}
+CONFIG_NAME=${CONFIG_NAME:-"{{config_name}}"}
+
+wine cmd /c echo "The environment is now ready. Try 'yannt --help' for information."
+# Note: grep filter at the end is to remove the error noise from:
+#   Can't recognize 'CMD.EXE /C "C:\windows\System32\chcp.com"' as an internal or external command, or batch script.
+wine cmd.exe /k "@echo off && ${ROOT_DRIVE}/${PROJ_PATH}/${PYTHON_VENV_PREFIX}/${CONFIG_NAME}/Scripts/activate.bat && echo on" 2> >(grep -v chcp >&2)
+

@@ -9,7 +9,7 @@ config_root:
   config_name: { from: env, name: CONFIG_NAME }
 
   py_ver: { from: env, name: PY_VER }
-  env_name: { from: env, name: ML_VENV_NAME }
+  env_name: { from: env, name: ENV_NAME }
 
   inner:
     # Name of folder
@@ -21,6 +21,7 @@ config_root:
 
     # What parent calls
     init: init-podman.sh
+    run: run-podman.sh
 
     # unused; image: ubuntu:22.04
 
@@ -62,7 +63,7 @@ config_root:
       builder: python
       platform: wine
       init: init-python.sh
-      # ? entry: run-python
+      run: run-python.sh
 
       # TODO: Rethink how to push venv initialization into venv runtime.
       # TODO: Re-do download-all-deps so its coming from wine python.

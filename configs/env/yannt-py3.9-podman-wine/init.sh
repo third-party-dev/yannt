@@ -38,7 +38,6 @@ if len(sys.argv) > 1:
 subprocess.run(cmd)
 EOF
 
+# Builder scripts should now be generated, lets run it.
 ${PROJ_PATH}/cache/builder/${CONFIG_NAME}/host/init-host.sh
 
-# Forward to generic script.
-#${CONFIG_PATH}/init.py $@

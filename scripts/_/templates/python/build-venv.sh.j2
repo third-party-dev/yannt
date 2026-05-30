@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 
+{{YOU_CAN_EDIT_THIS_FILE}}
+
+# --- build-venv.sh.j2 ---
+# Note: Designed to work with both linux and wine.
+
 echo RUNNING $0 $@
 
 set -e
 
 # Assuming we're in top level yannt folder.
 
+PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
 PYTHON_AUTOINSTALL_PATH=${PYTHON_AUTOINSTALL_PATH:-"{{python_autoinstall_path}}"}
 ENV_NAME=${ENV_NAME:-"{{env_name}}"}
 PY_VER=${PY_VER:-"{{py_ver}}"}
@@ -96,7 +102,7 @@ echo VIRTUALENV BUILD COMPLETE
 if [ -z "$NO_SHELL" ]; then
   echo "This is where we can do yannt things."
   # If the user did not request NO_SHELL, start a shell.
-  #${PROJ_PATH}/${BUILDER_PATH}/start-venv.sh "$@"
+  ${PROJ_PATH}/${BUILDER_PATH}/start-venv.sh "$@"
 fi
 
 

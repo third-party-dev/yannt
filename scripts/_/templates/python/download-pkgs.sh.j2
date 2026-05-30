@@ -1,15 +1,15 @@
 #!/bin/sh
 
-# !! Note: This script is intended to be run from inside a docker container.
+{{YOU_CAN_EDIT_THIS_FILE}}
 
-# TODO: Things not windows friendly:
-# TODO: - "./cache/pip_pkgs/${PY_VER}"
-# TODO: - "./configs/auto_install"
-# TODO: - "./configs/auto_install/$ext"
+# --- download-pkgs.sh.j2 ---
+# Note: Designed to work with both linux and wine.
 
+echo RUNNING $0
+
+PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
 PY_VER=${PY_VER:-"{{py_ver}}"}
-
-# Assuming we're in the top level yannt folder regardless of CRI or host.
+PYTHON_PKG_PATH=${PYTHON_PKG_PATH:-"{{python_pkg_path}}"}
 
 PY_CONSTRAINTS=${PY_CONSTRAINTS:-"{{py_constraints}}"}
 if [ -n "${PY_CONSTRAINTS}" ]; then
@@ -25,21 +25,22 @@ else
     PY_REQS_ARGS=
 fi
 
-PIP_IDX_ARGS="{{pip_idx_args}}"
-PIP_DL_ARGS=${PIP_DL_ARGS:-"${PIP_IDX_ARGS} -d ./cache/pip_pkgs/${PY_VER}"}
+PIP_IDX_ARGS=${PIP_IDX_ARGS:-"{{pip_idx_args}}"}
+PIP_DL_ARGS=${PIP_DL_ARGS:-"${PIP_IDX_ARGS} -d ${PYTHON_PKG_PATH}"}
 PYTHON=${PYTHON:-"{{python}}"}
 PIP=${PIP:-"${PYTHON} -m pip"}
 
-mkdir -p ./cache/pip_pkgs/${PY_VER}
+mkdir -p ${PROJ_PATH}/${PYTHON_PKG_PATH}
 
 echo PIP_DL_ARGS: ${PIP_DL_ARGS}
 echo PIP DOWNLOAD: ${PIP} download ${PIP_DL_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
 ${PIP} download ${PIP_DL_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
 
 PKG_SKIP_LIST=${PKG_SKIP_LIST:-"{{pkg_skip_list}}"}
+PYTHON_AUTOINSTALL_PATH=${PYTHON_AUTOINSTALL_PATH:-"{{python_autoinstall_path}}"}
 
 # Do enabled python packages
-for ext in `ls -1 ./configs/auto_install`; do
+for ext in `ls -1 ${PYTHON_AUTOINSTALL_PATH}`; do
 
     skip=0
     for blocked in $PKG_SKIP_LIST; do
@@ -53,6 +54,6 @@ for ext in `ls -1 ./configs/auto_install`; do
         continue
     fi
 
-    ${PIP} download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ./configs/auto_install/$ext
+    ${PIP} download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ${PYTHON_AUTOINSTALL_PATH}/$ext
 done
 

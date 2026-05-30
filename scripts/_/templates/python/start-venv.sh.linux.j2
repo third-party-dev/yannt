@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
-# FROM TEMPLATE
+{{YOU_CAN_EDIT_THIS_FILE}}
 
 set -e
 
 # Assuming in top yannt path (PROJ_PATH)
 
 # Allow user to assign venv name and tag shell prompt
-export ML_VENV_NAME=${ML_VENV_NAME:-"{{env_name}}"}
+export ENV_NAME=${ENV_NAME:-"{{env_name}}"}
 
 export PS1_TAG=${PS1_TAG:-"{{ps1_tag}} "}
 export PS1="${PS1_TAG}${PS1:-\$ }"
 
-source ./cache/venv/${ML_VENV_NAME}/bin/activate
+source ./cache/venv/${ENV_NAME}/bin/activate
 
 if [ $# -gt 0 ]; then
 
@@ -27,7 +27,7 @@ echo "The environment is now ready. Try 'yannt --help' for information."
 TMP_RC="$(mktemp)"
 cat >> "$TMP_RC" <<'EOF'
 [ -f "$HOME/.bashrc" ] && source $HOME/.bashrc
-source ./cache/venv/${ML_VENV_NAME}/bin/activate
+source ./cache/venv/${ENV_NAME}/bin/activate
 eval "$(register-python-argcomplete yannt)"
 EOF
 
