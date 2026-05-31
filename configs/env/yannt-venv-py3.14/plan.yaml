@@ -1,0 +1,33 @@
+config_root:
+  alias: host
+  builder: host
+  platform: linux
+  init: init-host.sh
+
+  proj_path: { from: env, name: PROJ_PATH }
+  config_path: { from: env, name: CONFIG_PATH }
+  config_name: { from: env, name: CONFIG_NAME }
+
+  py_ver: { from: env, name: PY_VER }
+  env_name: { from: env, name: ENV_NAME }
+
+  inner:
+    alias: python
+    builder: python
+    platform: linux
+    init: init-python.sh
+    run: run-python.sh
+
+    root_drive: { from: env, name: ROOT_DRIVE }
+    python_pkg_path: { from: env, name: PYTHON_PKG_PATH }
+    python_autoinstall_path: { from: env, name: PYTHON_AUTOINSTALL_PATH }
+    python_venv_prefix: { from: env, name: PYTHON_VENV_PREFIX }
+
+    ps1_tag: { from: env, name: PS1_TAG }
+    python: { from: env, name: PYTHON }
+    pip_idx_args: { from: env, name: PIP_IDX_ARGS }
+    pip_upstream_verifiers: { from: env, name: PIP_UPSTREAM_VERIFIERS }
+    venv_python: { from: env, name: VENV_PYTHON }
+    py_constraints: { from: env, name: PY_CONSTRAINTS }
+    py_reqs: { from: env, name: PY_REQS }
+    pkg_skip_list: { from: env, name: PKG_SKIP_LIST }

@@ -9,4 +9,3 @@ Cython
 meson-python
 ninja
 patchelf
-virtualenv

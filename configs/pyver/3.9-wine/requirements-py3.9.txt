@@ -4,4 +4,3 @@ wheel
 build
 pytest
 ipykernel
-virtualenv

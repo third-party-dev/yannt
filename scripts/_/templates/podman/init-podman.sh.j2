@@ -123,6 +123,6 @@ mkdir -p ${PROJ_PATH}/${CRI_HOME}
     -v ${PROJ_PATH}:${CRI_PROJ_PATH} -w ${CRI_PROJ_PATH} \
     -e USER="user" -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \
     -u $(id -u):$(id -g) ${CRI_RUN_ARGS} \
-    localhost/${ML_VENV_NAME} \
+    localhost/${ENV_NAME} \
     ${CRI_PROJ_PATH}/${NEXT_INIT_TARGET}
 

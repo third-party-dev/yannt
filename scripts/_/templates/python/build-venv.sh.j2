@@ -33,10 +33,6 @@ else
     PY_REQS_ARGS=
 fi
 
-# TODO: Export these?
-PS1_TAG=${PS1_TAG:-"({{ps1_tag}}) "}
-PS1="${PS1_TAG}${PS1:-\$ }"
-
 # Assuming we've already collected.
 PIP_INST_ARGS=${PIP_INST_ARGS:-"--no-index -f ${PYTHON_PKG_PATH}"}
 PYTHON=${PYTHON:-"{{python}}"}
@@ -47,22 +43,20 @@ BUILDER_PATH=${BUILDER_PATH:-"{{builder_path}}"}
 
 # ----- End Of Config -----
 
-# Ensure virtualenv is available.
-echo INSTALL VIRTUALENV: ${PYTHON} -m pip install --upgrade ${PIP_INST_ARGS} virtualenv
-${PYTHON} -m pip install --upgrade ${PIP_INST_ARGS} virtualenv
+# Assuming venv was actually created before the download phase in init-python.
 
-mkdir -p ${PYTHON_VENV_PREFIX}
-if [ ! -e "${PYTHON_VENV_PREFIX}/${ENV_NAME}" ]; then
-  # Note: The following line is the only place we enforce python version for venv.
+# mkdir -p ${PYTHON_VENV_PREFIX}
+# if [ ! -e "${PYTHON_VENV_PREFIX}/${ENV_NAME}" ]; then
+#   # Note: The following line is the only place we enforce python version for venv.
   
-  echo CREATE VENV: ${PYTHON} -m virtualenv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
-  ${PYTHON} -m virtualenv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
-  [ $? -ne 0 ] && { echo "Failed to create venv"; exit 1; }
+#   echo CREATE VENV: ${PYTHON} -m virtualenv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+#   ${PYTHON} -m virtualenv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+#   [ $? -ne 0 ] && { echo "Failed to create venv"; exit 1; }
 
   echo "--------------------- Setting Up Base Python Requirements ---------------------"
   ${VENV_PYTHON} -m pip install --upgrade \
     ${PIP_INST_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
-fi
+# fi
 
 # We don't activate to maintain cross platform patterns.
 #source ./cache/venv/${ENV_NAME}/bin/activate

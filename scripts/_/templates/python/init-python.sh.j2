@@ -16,9 +16,35 @@ PROJ_PATH="{{proj_path}}"
 
 PY_VER="{{py_ver}}"
 PYTHON_PKG_PATH=${PYTHON_PKG_PATH:-"{{python_pkg_path}}"}
-
+PYTHON=${PYTHON:-"{{python}}"}
 PIP_UPSTREAM_VERIFIERS="{{pip_upstream_verifiers}}"
 BUILDER_PATH=${BUILDER_PATH:-"{{builder_path}}"}
+PYTHON_VENV_PREFIX=${PYTHON_VENV_PREFIX:-"{{python_venv_prefix}}"}
+
+# ----- Try one of venv, virtualenv, pipx, or uv to create python virtual environment. -----
+# Note: Intentionally performed before the download phase.
+
+mkdir -p ${PYTHON_VENV_PREFIX}
+if ${PYTHON} -m venv --help &>/dev/null; then
+    echo "CREATE VENV (with venv)": ${PYTHON} -m venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    ${PYTHON} -m venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    [ $? -ne 0 ] && { echo "Failed to create venv with venv"; exit 1; }
+elif ${PYTHON} -m virtualenv --help &>/dev/null; then
+    echo "CREATE VENV (with virtualenv)": ${PYTHON} -m virtualenv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    ${PYTHON} -m virtualenv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    [ $? -ne 0 ] && { echo "Failed to create venv with virtualenv"; exit 1; }
+elif ${PYTHON} -m pipx --help &>/dev/null; then
+    echo "CREATE VENV (with pipx)": ${PYTHON} -m pipx venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    ${PYTHON} -m pipx venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    [ $? -ne 0 ] && { echo "Failed to create venv with pipx"; exit 1; }
+elif ${PYTHON} -m uv --help &>/dev/null; then
+    echo "CREATE VENV (with uv)": ${PYTHON} -m uv venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    ${PYTHON} -m uv venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    [ $? -ne 0 ] && { echo "Failed to create venv with uv"; exit 1; }
+else
+    echo "You need one of venv, virtualenv, pipx, or uv to setup environment." >&2
+    exit 1
+fi
 
 # ----- Fetch and cache python deps ----
 
