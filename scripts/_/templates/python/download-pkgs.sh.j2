@@ -8,52 +8,101 @@
 echo RUNNING $0
 
 PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
-PY_VER=${PY_VER:-"{{py_ver}}"}
 PYTHON_PKG_PATH=${PYTHON_PKG_PATH:-"{{python_pkg_path}}"}
-
-PY_CONSTRAINTS=${PY_CONSTRAINTS:-"{{py_constraints}}"}
-if [ -n "${PY_CONSTRAINTS}" ]; then
-    PY_CONSTRAINTS_ARGS="-c ${PY_CONSTRAINTS}"
-else
-    PY_CONSTRAINTS_ARGS=
-fi
-
-PY_REQS=${PY_REQS:-"{{py_reqs}}"}
-if [ -n "${PY_REQS}" ]; then
-    PY_REQS_ARGS="-r ${PY_REQS}"
-else
-    PY_REQS_ARGS=
-fi
-
-PIP_IDX_ARGS=${PIP_IDX_ARGS:-"{{pip_idx_args}}"}
-PIP_DL_ARGS=${PIP_DL_ARGS:-"${PIP_IDX_ARGS} -d ${PYTHON_PKG_PATH}"}
+PIP_UPSTREAM_VERIFIERS=${PIP_UPSTREAM_VERIFIERS:-"{{pip_upstream_verifiers}}"}
 PYTHON=${PYTHON:-"{{python}}"}
-PIP=${PIP:-"${PYTHON} -m pip"}
-
-mkdir -p ${PROJ_PATH}/${PYTHON_PKG_PATH}
-
-echo PIP_DL_ARGS: ${PIP_DL_ARGS}
-echo PIP DOWNLOAD: ${PIP} download ${PIP_DL_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
-${PIP} download ${PIP_DL_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
-
+BUILDER_PATH=${BUILDER_PATH:-"{{builder_path}}"}
+PYTHON_VENV_PREFIX=${PYTHON_VENV_PREFIX:-"{{python_venv_prefix}}"}
+PY_CONSTRAINTS=${PY_CONSTRAINTS:-"{{py_constraints}}"}
+PY_REQS=${PY_REQS:-"{{py_reqs}}"}
 PKG_SKIP_LIST=${PKG_SKIP_LIST:-"{{pkg_skip_list}}"}
 PYTHON_AUTOINSTALL_PATH=${PYTHON_AUTOINSTALL_PATH:-"{{python_autoinstall_path}}"}
 
-# Do enabled python packages
-for ext in `ls -1 ${PYTHON_AUTOINSTALL_PATH}`; do
+# ----- End Of Config -----
 
-    skip=0
-    for blocked in $PKG_SKIP_LIST; do
-        if [ "$ext" = "$blocked" ]; then
-            skip=1
+PY_CONSTRAINTS_ARGS=$([ -n "${PY_CONSTRAINTS}" ] && echo "-c ${PY_CONSTRAINTS}")
+# if [ -n "${PY_CONSTRAINTS}" ]; then
+#     PY_CONSTRAINTS_ARGS="-c ${PY_CONSTRAINTS}"
+# else
+#     PY_CONSTRAINTS_ARGS=
+# fi
+
+PY_REQS_ARGS=$([ -n "${PY_REQS}" ] && echo "-r ${PY_REQS}")
+# if [ -n "${PY_REQS}" ]; then
+#     PY_REQS_ARGS="-r ${PY_REQS}"
+# else
+#     PY_REQS_ARGS=
+# fi
+
+PIP_IDX_ARGS=${PIP_IDX_ARGS:-"{{pip_idx_args}}"}
+PIP_DL_ARGS=${PIP_DL_ARGS:-"${PIP_IDX_ARGS} -d ${PYTHON_PKG_PATH}"}
+
+PIP=${PIP:-"${PYTHON} -m pip"}
+
+
+if [ -z "$SKIP_COLLECT" ]; then
+
+  # ----- Verify we have a connection to upstream repo. -----
+  if [ -n "$(echo ${PIP_UPSTREAM_VERIFIERS} | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')" ]; then
+    # Detect if we can run the collector
+    # BUG: Logic should be reversed so we know _all_ URLs work.
+    CAN_ACCESS_UPSTREAM=${CAN_ACCESS_UPSTREAM:-false}
+    for url in ${PIP_UPSTREAM_VERIFIERS}; do
+        if curl -fsI "$url" >/dev/null 2>&1; then
+            CAN_ACCESS_UPSTREAM=true
             break
         fi
     done
-    if [ "$skip" = "1" ]; then
-        echo "Skipping $ext."
-        continue
+    if [ "$CAN_ACCESS_UPSTREAM" = false ]; then
+        echo "No access to upstream repository detected. (Internet disconnected?)"
+        echo "Assuming deps in: ${PROJ_PATH}/${PYTHON_PKG_PATH}"
+        exit 0
     fi
+  fi
 
-    ${PIP} download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ${PYTHON_AUTOINSTALL_PATH}/$ext
-done
+  # ----- Do the actual download -----
+  mkdir -p ${PROJ_PATH}/${PYTHON_PKG_PATH}
+
+  echo PIP_DL_ARGS: ${PIP_DL_ARGS}
+  echo PIP DOWNLOAD: ${PIP} download ${PIP_DL_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
+  ${PIP} download ${PIP_DL_ARGS} ${PY_REQS_ARGS} ${PY_CONSTRAINTS_ARGS}
+
+  # Do enabled python packages
+  for ext in `ls -1 ${PYTHON_AUTOINSTALL_PATH}`; do
+
+      skip=0
+      for blocked in $PKG_SKIP_LIST; do
+          if [ "$ext" = "$blocked" ]; then
+              skip=1
+              break
+          fi
+      done
+      if [ "$skip" = "1" ]; then
+          echo "Skipping $ext."
+          continue
+      fi
+
+      ${PIP} download ${PIP_DL_ARGS} ${PY_CONSTRAINTS_ARGS} ${PYTHON_AUTOINSTALL_PATH}/$ext
+  done
+
+fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

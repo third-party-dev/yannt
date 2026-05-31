@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+{{YOU_CAN_EDIT_THIS_FILE}}
+
+# --- create-venv.sh.j2 ---
+# Note: Designed to work with both linux and wine.
+
+# echo RUNNING $0 $@
+
+ENV_NAME="{{env_name}}"
+PYTHON=${PYTHON:-"{{python}}"}
+PYTHON_VENV_PREFIX=${PYTHON_VENV_PREFIX:-"{{python_venv_prefix}}"}
+
+# ----- Try one of venv, virtualenv, pipx, or uv to create python virtual environment. -----
+
+mkdir -p ${PYTHON_VENV_PREFIX}
+if ${PYTHON} -m venv --help &>/dev/null; then
+    echo "CREATE VENV (with venv)": ${PYTHON} -m venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    ${PYTHON} -m venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    [ $? -ne 0 ] && { echo "Failed to create venv with venv"; exit 1; }
+elif ${PYTHON} -m virtualenv --help &>/dev/null; then
+    echo "CREATE VENV (with virtualenv)": ${PYTHON} -m virtualenv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    ${PYTHON} -m virtualenv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    [ $? -ne 0 ] && { echo "Failed to create venv with virtualenv"; exit 1; }
+elif ${PYTHON} -m pipx --help &>/dev/null; then
+    echo "CREATE VENV (with pipx)": ${PYTHON} -m pipx venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    ${PYTHON} -m pipx venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    [ $? -ne 0 ] && { echo "Failed to create venv with pipx"; exit 1; }
+elif ${PYTHON} -m uv --help &>/dev/null; then
+    echo "CREATE VENV (with uv)": ${PYTHON} -m uv venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    ${PYTHON} -m uv venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    [ $? -ne 0 ] && { echo "Failed to create venv with uv"; exit 1; }
+else
+    echo "You need one of venv, virtualenv, pipx, or uv to setup environment." >&2
+    exit 1
+fi

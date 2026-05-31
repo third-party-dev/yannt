@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+{{YOU_CAN_EDIT_THIS_FILE}}
+
+# Note: Assuming conda is always run from linux.
+
+echo RUNNING $0
+
+ENV_NAME=${ENV_NAME:-"{{env_name}}"}
+PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
+CONFIG_NAME=${CONFIG_NAME:-"{{config_name}}"}
+CONFIG_PATH=${CONFIG_PATH:-"{{config_path}}"}
+CONDA_PREFIX=${CONDA_PREFIX:="{{conda_prefix}}"}
+
+NEXT_INIT_TARGET=${NEXT_INIT_TARGET:-"{{next_init_target}}"}
+
+# ----- End Of Config -----
+
+set -e
+
+# -------- Initialize CONDA Environment ---------
+
+# Attempt to activate conda
+if [ -z "$(which conda)" ]; then
+  echo "Could not locate conda. Please add conda to PATH."
+  echo 
+  echo "  Example: export PATH=\$PATH:/opt/conda/bin"
+  echo
+  echo "To install from upstream (~150M download and assuming write perms to /opt):"
+  echo
+  echo "  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+  echo "  chmod +x Miniconda3-latest-Linux-x86_64.sh"
+  echo "  ./Miniconda3-latest-Linux-x86_64.sh -b -p ./cache/conda/miniconda3"
+  echo "  export PATH=\$PATH:$(pwd)/cache/conda/miniconda3/bin"
+  echo
+  exit 1
+fi
+source $(dirname $(which conda))/activate
+
+# Note: Assuming it is OK to not check if the environment exists.
+
+#echo "Automatically accepting TOS."
+#conda tos accept
+
+# Create conda environment.
+mkdir -p ${PROJ_PATH}/${CONDA_PREFIX}
+conda create -y -c defaults -c conda-forge \
+  -p ${PROJ_PATH}/${CONDA_PREFIX}/${ENV_NAME} python=${PY_VER}
+
+# # Similar to `conda init`
+# eval "$(conda shell.bash hook)"
+# # Similar to `conda activate` (minus PS1 update)
+# export PATH="$(conda info --base)/envs/myenv/bin:$PATH"
+
+# conda activate ${PROJ_PATH}/cache/conda/envs/${ENV_NAME}
+
+# If there is a NEXT_INIT_TARGET set, run it.
+# [ -z "${NEXT_INIT_TARGET}" ] || ./${NEXT_INIT_TARGET}
+
+# # -------------- Dropping to shell ----------------
+# if [ -z "$NO_SHELL" ]; then
+
+# echo
+# echo "The environment is now ready. Try 'yannt --help' for information."
+
+# # Include yannt tab completion.
+# TMP_RC="$(mktemp)"
+# cat >> "$TMP_RC" <<'EOF'
+# [ -f "$HOME/.bashrc" ] && source $HOME/.bashrc
+# export PATH=${PROJ_PATH}/cache/conda/envs/${ENV_NAME}/bin:$PATH
+# eval "$(register-python-argcomplete yannt)"
+# source "$(dirname $(dirname $(which conda)))/bin/activate"
+# conda activate ${PROJ_PATH}/cache/conda/envs/${ENV_NAME}
+# EOF
+
+# exec bash --rcfile "$TMP_RC" -i
+
+# fi

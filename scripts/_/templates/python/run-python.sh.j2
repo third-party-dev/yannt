@@ -18,7 +18,7 @@ set -e
 
 if [ -n "${BUILD_MODE}" ]; then
   echo "Building the venv."
-  ${PROJ_PATH}/${BUILDER_PATH}/build-venv.sh $@
+  ${PROJ_PATH}/${BUILDER_PATH}/install-pkgs.sh $@
 else
   echo "Starting the venv."
   if [ ! -e "${PROJ_PATH}/cache/venv/${ENV_NAME}" ]; then

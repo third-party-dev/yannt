@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+{{YOU_CAN_EDIT_THIS_FILE}}
+
+# --- init-python.sh.j2 ---
+# Note: Designed to work with both linux and wine.
+
+echo RUNNING SKIP_COLLECT="$SKIP_COLLECT" $0 $@
+
+# This is the "Wine" python setup script. This means all python actions must be done
+# through the `wine` interface, but we can still use linux-ish CLI tools and paths.
+
+ENV_NAME="{{env_name}}"
+CONFIG_NAME="{{config_name}}"
+PROJ_PATH="{{proj_path}}"
+
+PY_VER="{{py_ver}}"
+PYTHON_PKG_PATH=${PYTHON_PKG_PATH:-"{{python_pkg_path}}"}
+PYTHON=${PYTHON:-"{{python}}"}
+PIP_UPSTREAM_VERIFIERS="{{pip_upstream_verifiers}}"
+BUILDER_PATH=${BUILDER_PATH:-"{{builder_path}}"}
+PYTHON_VENV_PREFIX=${PYTHON_VENV_PREFIX:-"{{python_venv_prefix}}"}
+
+# ----- Try one of venv, virtualenv, pipx, or uv to create python virtual environment. -----
+# Note: Intentionally performed before the download phase.
+
+mkdir -p ${PYTHON_VENV_PREFIX}
+if ${PYTHON} -m venv --help &>/dev/null; then
+    echo "CREATE VENV (with venv)": ${PYTHON} -m venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    ${PYTHON} -m venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    [ $? -ne 0 ] && { echo "Failed to create venv with venv"; exit 1; }
+elif ${PYTHON} -m virtualenv --help &>/dev/null; then
+    echo "CREATE VENV (with virtualenv)": ${PYTHON} -m virtualenv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    ${PYTHON} -m virtualenv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    [ $? -ne 0 ] && { echo "Failed to create venv with virtualenv"; exit 1; }
+elif ${PYTHON} -m pipx --help &>/dev/null; then
+    echo "CREATE VENV (with pipx)": ${PYTHON} -m pipx venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    ${PYTHON} -m pipx venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    [ $? -ne 0 ] && { echo "Failed to create venv with pipx"; exit 1; }
+elif ${PYTHON} -m uv --help &>/dev/null; then
+    echo "CREATE VENV (with uv)": ${PYTHON} -m uv venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    ${PYTHON} -m uv venv ${PYTHON_VENV_PREFIX}/${ENV_NAME}
+    [ $? -ne 0 ] && { echo "Failed to create venv with uv"; exit 1; }
+else
+    echo "You need one of venv, virtualenv, pipx, or uv to setup environment." >&2
+    exit 1
+fi
+
+# ----- Fetch and cache python deps ----
+
+if [ -z "$SKIP_COLLECT" ]; then
+
+  if [ -n "$(echo ${PIP_UPSTREAM_VERIFIERS} | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')" ]; then
+    # Detect if we can run the collector
+    # BUG: Logic should be reversed so we know _all_ URLs work.
+    CAN_ACCESS_UPSTREAM=${CAN_ACCESS_UPSTREAM:-false}
+    for url in ${PIP_UPSTREAM_VERIFIERS}; do
+        if curl -fsI "$url" >/dev/null 2>&1; then
+            CAN_ACCESS_UPSTREAM=true
+            break
+        fi
+    done
+    if [ "$CAN_ACCESS_UPSTREAM" = false ]; then
+        echo "No internet detected."
+        echo "Assuming deps in: ${PROJ_PATH}/${PYTHON_PKG_PATH}"
+        exit 0
+    fi
+  fi
+
+  mkdir -p ${PROJ_PATH}/${PYTHON_PKG_PATH}
+  ${PROJ_PATH}/${BUILDER_PATH}/download-pkgs.sh
+
+fi
+
+echo RUNNING: BUILD_MODE="build" ${PROJ_PATH}/${BUILDER_PATH}/run-python.sh
+BUILD_MODE="build" ${PROJ_PATH}/${BUILDER_PATH}/run-python.sh
+
+# This is the old way. (or the way a user from host should do it?)
+#echo RUNNING: BUILD_MODE="build" ${PROJ_PATH}/scripts/run-dev.sh ${CONFIG_NAME}
+#BUILD_MODE="build" ${PROJ_PATH}/scripts/run-dev.sh ${CONFIG_NAME}

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+{{YOU_CAN_EDIT_THIS_FILE}}
+
+# --- init-venv.sh.j2 ---
+# Note: Designed to work with both linux and wine.
+
+# echo RUNNING $0 $@
+
+PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
+BUILDER_PATH=${BUILDER_PATH:-"{{builder_path}}"}
+NEXT_INIT_TARGET=${NEXT_INIT_TARGET:-"{{next_init_target}}"}
+
+# ----- Create virtual python environment -----
+${PROJ_PATH}/${BUILDER_PATH}/create-venv.sh
+
+# If there is a NEXT_INIT_TARGET set, run it.
+[ -z "${NEXT_INIT_TARGET}" ] || ./${NEXT_INIT_TARGET}
