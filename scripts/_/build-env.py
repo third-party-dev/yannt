@@ -9,13 +9,16 @@ from typing import Any
 
 # For yannt-venv-py3.9:
 #   docker run -ti -v $(pwd):/opt/yannt debian:11 bash
-#   apt-get update && apt-get install -y python3 python3-yaml python3-jinja2 python3-venv curl
+#   apt-get update && apt-get install -y python3 python3-yaml python3-jinja2 python3-venv curl python3-pip
+#   cd /opt/yannt && ./do init yannt-venv-py3.9
 # For yannt-venv-py3.11:
 #   docker run -ti -v $(pwd):/opt/yannt debian:12 bash
 #   apt-get update && apt-get install -y python3 python3-yaml python3-jinja2 python3-venv curl
+#   cd /opt/yannt && ./do init yannt-venv-py3.11
 # For yannt-venv-py3.13:
 #   docker run -ti -v $(pwd):/opt/yannt debian:13 bash
 #   apt-get update && apt-get install -y python3 python3-yaml python3-jinja2 python3-venv curl
+#   cd /opt/yannt && ./do init yannt-venv-py3.13
 
 class Script:
     def __init__(self, name="unnamed.sh", body="", interpreter="/bin/sh", env={}, depends_on=[]):
@@ -68,14 +71,7 @@ class LinuxHostBuilder(Builder):
         tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
 
         # TODO: Make this implicit
-        self.config['YOU_CAN_EDIT_THIS_FILE'] = '# === DO NOT EDIT. Auto generated file. Edit the template. === #'
-        self.config['builder_path'] = builder_path
-        self.config['next_init_target'] = ''
-        self.config['next_run_target'] = ''
-        if self.child and 'init' in self.child.config:
-            self.config['next_init_target'] = Path(builder_path) / self.child.get_name() / self.child.config['init']
-        if self.child and 'run' in self.child.config:
-            self.config['next_run_target'] = Path(builder_path) / self.child.get_name() / self.child.config['run']
+        self.common_config_fixups(builder_path)
 
         return [
             Script(
@@ -84,6 +80,52 @@ class LinuxHostBuilder(Builder):
             )
             for name, data in tmpl_data.items()
         ]
+
+
+class CondaBuilder(Builder):
+    def emit_scripts(self, builder_path) -> list[Script]:
+        from jinja2 import Template, StrictUndefined
+
+        tmpl_paths = {
+            'init-conda.sh': Path("scripts/_/templates/conda") / "init-conda.sh.j2",
+            'run-conda.sh': Path("scripts/_/templates/conda") / "run-conda.sh.j2",
+        }
+        tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
+
+        # TODO: Make this implicit
+        self.common_config_fixups(builder_path)
+
+        return [
+            Script(
+                name=name,
+                body=Template(data, undefined=StrictUndefined).render(**self.config)
+            )
+            for name, data in tmpl_data.items()
+        ]
+
+
+class VenvBuilder(Builder):
+    def emit_scripts(self, builder_path) -> list[Script]:
+        from jinja2 import Template, StrictUndefined
+
+        tmpl_paths = {
+            'init-venv.sh': Path("scripts/_/templates/venv") / "init-venv.sh.j2",
+            'create-venv.sh': Path("scripts/_/templates/venv") / "create-venv.sh.j2",
+            'run-venv.sh': Path("scripts/_/templates/venv") / "run-venv.sh.j2",
+        }
+        tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
+
+        # TODO: Make this implicit
+        self.common_config_fixups(builder_path)
+
+        return [
+            Script(
+                name=name,
+                body=Template(data, undefined=StrictUndefined).render(**self.config)
+            )
+            for name, data in tmpl_data.items()
+        ]
+
 
 
 class PodmanBuilder(Builder):
@@ -142,10 +184,10 @@ class LinuxPythonEnv(Builder):
         from jinja2 import Template, StrictUndefined
 
         tmpl_paths = {
-            'init-python.sh': Path("scripts") / "_" / "templates" / "python" / "init-python.sh.linux.j2",
-            'download-pkgs.sh': Path("scripts") / "_" / "templates" / "python" / "download-pkgs.sh.linux.j2",
-            'run-python.sh': Path("scripts") / "_" / "templates" / "python" / "run-python.sh.linux.j2",
-            'build-venv.sh': Path("scripts") / "_" / "templates" / "python" / "build-venv.sh.linux.j2",
+            'init-python.sh': Path("scripts") / "_" / "templates" / "python" / "init-python.sh.j2",
+            'download-pkgs.sh': Path("scripts") / "_" / "templates" / "python" / "download-pkgs.sh.j2",
+            'run-python.sh': Path("scripts") / "_" / "templates" / "python" / "run-python.sh.j2",
+            'install-pkgs.sh': Path("scripts") / "_" / "templates" / "python" / "install-pkgs.sh.j2",
             'start-venv.sh': Path("scripts") / "_" / "templates" / "python" / "start-venv.sh.linux.j2",
         }
         tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
@@ -167,10 +209,10 @@ class WinePythonEnv(Builder):
         from jinja2 import Template, StrictUndefined
 
         tmpl_paths = {
-            'init-python.sh': Path("scripts") / "_" / "templates" / "python" / "init-python.sh.wine.j2",
-            'download-pkgs.sh': Path("scripts") / "_" / "templates" / "python" / "download-pkgs.sh.wine.j2",
-            'run-python.sh': Path("scripts") / "_" / "templates" / "python" / "run-python.sh.wine.j2",
-            'build-venv.sh': Path("scripts") / "_" / "templates" / "python" / "build-venv.sh.wine.j2",
+            'init-python.sh': Path("scripts") / "_" / "templates" / "python" / "init-python.sh.j2",
+            'download-pkgs.sh': Path("scripts") / "_" / "templates" / "python" / "download-pkgs.sh.j2",
+            'run-python.sh': Path("scripts") / "_" / "templates" / "python" / "run-python.sh.j2",
+            'install-pkgs.sh': Path("scripts") / "_" / "templates" / "python" / "install-pkgs.sh.j2",
             'start-venv.sh': Path("scripts") / "_" / "templates" / "python" / "start-venv.sh.wine.j2",
         }
         tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
@@ -238,6 +280,20 @@ Resolution.RULES = [
             # implicitly linux
         },
         resolution=Resolution(PodmanBuilder),
+    ),
+    Rule(
+        predicates={
+            "builder": lambda v: v == "conda",
+            # implicitly linux
+        },
+        resolution=Resolution(CondaBuilder),
+    ),
+    Rule(
+        predicates={
+            "builder": lambda v: v == "venv",
+            # implicitly linux
+        },
+        resolution=Resolution(VenvBuilder),
     ),
     Rule(
         predicates={
