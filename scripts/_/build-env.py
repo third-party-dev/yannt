@@ -4,6 +4,18 @@ from pprint import pprint # useful for breakpoint()
 from pathlib import Path
 import os
 
+from collections.abc import Callable
+from typing import Any
+
+# For yannt-venv-py3.9:
+#   docker run -ti -v $(pwd):/opt/yannt debian:11 bash
+#   apt-get update && apt-get install -y python3 python3-yaml python3-jinja2 python3-venv curl
+# For yannt-venv-py3.11:
+#   docker run -ti -v $(pwd):/opt/yannt debian:12 bash
+#   apt-get update && apt-get install -y python3 python3-yaml python3-jinja2 python3-venv curl
+# For yannt-venv-py3.13:
+#   docker run -ti -v $(pwd):/opt/yannt debian:13 bash
+#   apt-get update && apt-get install -y python3 python3-yaml python3-jinja2 python3-venv curl
 
 class Script:
     def __init__(self, name="unnamed.sh", body="", interpreter="/bin/sh", env={}, depends_on=[]):
