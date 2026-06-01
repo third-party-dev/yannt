@@ -7,7 +7,7 @@ set -e
 # Assuming in top yannt path (PROJ_PATH)
 
 export ENV_NAME=${ENV_NAME:-"{{env_name}}"}
-PYTHON_VENV_PREFIX=${PYTHON_VENV_PREFIX:-"{{python_venv_prefix}}"}
+export PYTHON_VENV_PREFIX=${PYTHON_VENV_PREFIX:-"{{python_venv_prefix}}"}
 
 if [ $# -gt 0 ]; then
 

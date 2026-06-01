@@ -1,0 +1,11 @@
+ARG PY_VER={{py_ver}}
+ARG APT_PKGS={{apt_packages}}
+
+FROM docker.io/library/python:${PY_VER}-slim
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=shared \
+    --mount=type=cache,target=/var/lib/apt,sharing=shared \
+    apt-get update && apt-get install -y --no-install-recommends \
+    vim unzip git wget curl ${APT_PKGS}
+
+RUN useradd -m user

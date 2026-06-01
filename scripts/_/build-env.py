@@ -166,12 +166,6 @@ class PodmanBuilder(Builder):
         tmpl_paths = {
             'init-podman.sh': Path("scripts/_/templates/podman") / "init-podman.sh.j2",
             'run-podman.sh': Path("scripts/_/templates/podman") / "run-podman.sh.j2",
-            # out of date
-            #'init-dev-podman.sh': Path("scripts") / "_" / "templates" / "init-dev-podman.sh.j2",
-            #'download-all-deps.sh': Path("scripts") / "_" / "templates" / "download-all-deps.sh.j2",
-            #'run-dev-docker.sh': Path("scripts") / "_" / "templates" / "run-dev-docker.sh.j2",
-            #'build-venv.sh': Path("scripts") / "_" / "templates" / "build-venv.sh.j2",
-            #'linux-collection.sh': Path("scripts") / "_" / "templates" / "linux-collection.sh.j2",
         }
         tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
 
@@ -186,6 +180,52 @@ class PodmanBuilder(Builder):
             self.config['extra_podman_run_commands'] = '\n    '.join(self.config['extra_podman_run_commands'])
         elif 'extra_podman_run_commands' not in self.config:
             self.config['extra_podman_run_commands'] = ''
+
+        if 'apt_packages' in self.config and isinstance(self.config['apt_packages'], list):
+            self.config['apt_packages'] = ' '.join(self.config['apt_packages'])
+        elif 'apt_packages' not in self.config:
+            self.config['apt_packages'] = ''
+
+        # TODO: Make this implicit
+        self.common_config_fixups(builder_path)
+
+        return [
+            Script(
+                name=name,
+                body=Template(data, undefined=StrictUndefined).render(**self.config)
+            )
+            for name, data in tmpl_data.items()
+        ]
+
+
+class DockerBuilder(Builder):
+    def override_inheritance(self, config):
+        return {**config, 'proj_path': config['cri_proj_path']}
+
+
+    def emit_scripts(self, builder_path) -> list[Script]:
+        from jinja2 import Template, StrictUndefined
+
+        # TODO: Consider allowing user to override the download location for python packages.
+
+        tmpl_paths = {
+            'init-docker.sh': Path("scripts/_/templates/docker") / "init-docker.sh.j2",
+            'init.dockerfile': Path("scripts/_/templates/docker") / "init.dockerfile.j2",
+            'run-docker.sh': Path("scripts/_/templates/docker") / "run-docker.sh.j2",
+        }
+        tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
+
+        # Normalize attributes for template use.
+
+        # if 'extra_preapt_commands' in self.config and isinstance(self.config['extra_preapt_commands'], list):
+        #     self.config['extra_preapt_commands'] = '\n    '.join(self.config['extra_preapt_commands'])
+        # elif 'extra_preapt_commands' not in self.config:
+        self.config['extra_preapt_commands'] = ''
+
+        # if 'extra_podman_run_commands' in self.config and isinstance(self.config['extra_podman_run_commands'], list):
+        #     self.config['extra_podman_run_commands'] = '\n    '.join(self.config['extra_podman_run_commands'])
+        # elif 'extra_podman_run_commands' not in self.config:
+        self.config['extra_docker_run_commands'] = ''
 
         if 'apt_packages' in self.config and isinstance(self.config['apt_packages'], list):
             self.config['apt_packages'] = ' '.join(self.config['apt_packages'])
@@ -279,6 +319,13 @@ Resolution.RULES = [
             # implicitly linux
         },
         resolution=Resolution(PodmanBuilder),
+    ),
+    Rule(
+        predicates={
+            "builder": lambda v: v == "docker",
+            # implicitly linux
+        },
+        resolution=Resolution(DockerBuilder),
     ),
     Rule(
         predicates={

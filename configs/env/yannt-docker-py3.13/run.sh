@@ -9,6 +9,6 @@ if [ -z "${PROJ_PATH}" ]; then
   exit 1
 fi
 
-# Forward to generic script.
-${PROJ_PATH}/scripts/_/run-dev-docker.sh $@
+source ${CONFIG_PATH}/config.env
 
+${PROJ_PATH}/cache/builder/${CONFIG_NAME}/host/docker/run-docker.sh

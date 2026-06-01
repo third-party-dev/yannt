@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+
+{{YOU_CAN_EDIT_THIS_FILE}}
+
+# Note: Assuming docker is always run from linux.
+
+echo RUNNING $0
+
+ENV_NAME=${ENV_NAME:-"{{env_name}}"}
+PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
+CONFIG_NAME=${CONFIG_NAME:-"{{config_name}}"}
+CONFIG_PATH=${CONFIG_PATH:-"{{config_path}}"}
+
+CRI_BIN=${CRI_BIN:-"{{cri_bin}}"}
+CRI_RUN=${CRI_RUN:-"{{cri_run}}"}
+CRI_HOME=${CRI_HOME:-"{{cri_home}}"}
+CRI_PROJ_PATH=${CRI_PROJ_PATH:-"{{cri_proj_path}}"}
+CRI_RUN_ARGS=${CRI_RUN_ARGS:-"{{cri_run_args}}"}
+
+APT_PKGS=${APT_PKGS:-"{{apt_packages}}"}
+
+BUILDER_PATH=${BUILDER_PATH:-"{{builder_path}}"}
+NEXT_INIT_TARGET=${NEXT_INIT_TARGET:-"{{next_init_target}}"}
+
+# Construct the base container image (venv created from container runtime)
+mkdir -p ${PROJ_PATH}/cache/empty-context
+${CRI_BIN} build \
+  -t localhost/${ENV_NAME} \
+  -f ${PROJ_PATH}/${BUILDER_PATH}/init.dockerfile \
+  ${PROJ_PATH}/cache/empty-context
+
+
+# Continue within the container.
+
+mkdir -p ${PROJ_PATH}/${CRI_HOME}
+[ -z "${NEXT_INIT_TARGET}" ] || \
+  ${CRI_BIN} run -ti --rm \
+    -v ${PROJ_PATH}:${CRI_PROJ_PATH} -w ${CRI_PROJ_PATH} \
+    -e USER="user" -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \
+    -u $(id -u):$(id -g) ${CRI_RUN_ARGS} \
+    localhost/${ENV_NAME} \
+    ${CRI_PROJ_PATH}/${NEXT_INIT_TARGET}
+
+
+
+# ${CRI_BIN} run -ti --rm \
+#   -v ${PROJ_PATH}:${CRI_PROJ_PATH} \
+#   -w ${CRI_PROJ_PATH} \
+#   -e USER="user" \
+#   -e HOME=${CRI_PROJ_PATH}${CRI_HOME} \
+#   -u $(id -u):$(id -g) \
+#   ${CRI_RUN_ARGS} \
+#   localhost/${ENV_NAME} \
+#   ${CRI_PROJ_PATH}/${NEXT_INIT_TARGET}
+
+# RUN() {
+#     ${CRI_RUN} "$@"
+#     if [ $? -ne 0 ]; then
+#         echo "Failed to run: $@"
+#         echo "Cancelling."
+#         exit 1
+#     fi
+# }
+
+# BUILD_CONTAINER() {
+#     # Initial stop and rm allowed to fail.
+#     ${CRI_BIN} stop $ENV_NAME
+#     ${CRI_BIN} rm $ENV_NAME
+
+#     echo "Creating container ${ENV_NAME}"
+#     CONTAINER=$(\
+#     ${CRI_BIN} create --name $ENV_NAME \
+#         -v ${PROJ_PATH}:${CRI_PROJ_PATH} -w ${CRI_PROJ_PATH} \
+#         -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} -e USER=user -u 1000 \
+#         ${CRI_RUN_ARGS} \
+#         docker.io/library/python:${PY_VER}-slim \
+#         tail -f /dev/null
+#     )
+#     echo "Created container ${ENV_NAME}@${CONTAINER}"
+
+#     ${CRI_BIN} start $CONTAINER
+#     echo "Started ${ENV_NAME}@${CONTAINER}"
+
+#     # extra_preapt_commands here
+
+#     ${CRI_BIN} exec -u 0:0 ${ENV_NAME} mkdir -p ${CRI_PROJ_PATH}/${CRI_HOME}/.cache/apt/partial
+#     ${CRI_BIN} exec -u 0:0 ${ENV_NAME} echo APT_PATH: ${CRI_PROJ_PATH}/${CRI_HOME}/.cache/apt/partial
+#     ${CRI_BIN} exec -u 0:0 ${ENV_NAME} apt-get -o Dir::Cache::archives=${CRI_PROJ_PATH}/${CRI_HOME}/.cache/apt -o APT::Sandbox::User=root update
+#     # Note: `openssh-client`` post-install script fails on NFS: Ignoring errors for now.
+#     ${CRI_BIN} exec -u 0:0 ${ENV_NAME} apt-get -o Dir::Cache::archives=${CRI_PROJ_PATH}/${CRI_HOME}/.cache/apt -o APT::Sandbox::User=root install -y ${APT_PKGS}
+
+#     # extra_docker_run_commands here
+
+#     echo "Saving container as localhost/${ENV_NAME}"
+#     ${CRI_BIN} commit ${ENV_NAME} localhost/${ENV_NAME}
+#     echo "Committed \(i.e. saved\) ${ENV_NAME}@${CONTAINER} image."
+
+#     ${CRI_BIN} stop ${ENV_NAME}
+#     echo "Stopped ${ENV_NAME}@${CONTAINER}"
+# }
+
+# # Check if container already exists and ensure user is ok with restarting.
+# RESULT=$(${CRI_BIN} ps -a --filter "name=${ENV_NAME}" --format "{% raw %}{{.Names}}{% endraw %} 2>/dev/null")
+# if [ -n "${RESULT}" ]; then
+#     echo "Container ${ENV_NAME} exists."
+#     echo
+#     echo -n "[R]ebuild container, [s]kip build, or [a]bort? (r/s/a) "
+#     read answer
+
+#     case "$answer" in
+#         [Rr]*)
+#             BUILD_CONTAINER
+#             ;;
+#         [Ss]*)
+#             echo "Using the existing container image."
+#             ;;
+#         *)
+#             echo "Aborting the process."
+#             exit 1
+#             ;;
+#     esac
+# else
+#     echo "Existing container not found. Building now."
+#     BUILD_CONTAINER
+# fi
+

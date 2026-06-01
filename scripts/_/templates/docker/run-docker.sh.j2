@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+{{YOU_CAN_EDIT_THIS_FILE}}
+
+# Note: Assuming docker is always run from linux.
+
+echo RUNNING $0
+
+ENV_NAME=${ENV_NAME:-"{{env_name}}"}
+PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
+
+CRI_BIN=${CRI_BIN:-"{{cri_bin}}"}
+CRI_HOME=${CRI_HOME:-"{{cri_home}}"}
+CRI_PROJ_PATH=${CRI_PROJ_PATH:-"{{cri_proj_path}}"}
+CRI_RUN_ARGS=${CRI_RUN_ARGS:-"{{cri_run_args}}"}
+
+BUILDER_PATH=${BUILDER_PATH:-"{{builder_path}}"}
+NEXT_RUN_TARGET=${NEXT_RUN_TARGET:-"{{next_run_target}}"}
+
+# Continue within the container.
+[ -z "${NEXT_RUN_TARGET}" ] || \
+  ${CRI_BIN} run -ti --rm \
+    -v ${PROJ_PATH}:${CRI_PROJ_PATH} -w ${CRI_PROJ_PATH} \
+    -e USER="user" -e HOME=${CRI_PROJ_PATH}/${CRI_HOME} \
+    -u $(id -u):$(id -g) ${CRI_RUN_ARGS} \
+    localhost/${ENV_NAME} \
+    ${CRI_PROJ_PATH}/${NEXT_RUN_TARGET}
+
