@@ -16,3 +16,9 @@ ${PROJ_PATH}/${BUILDER_PATH}/create-venv.sh
 
 # If there is a NEXT_INIT_TARGET set, run it.
 [ -z "${NEXT_INIT_TARGET}" ] || ./${NEXT_INIT_TARGET}
+
+if [ -z "$NO_SHELL" ]; then
+  echo "This is where we can do yannt things."
+  # If the user did not request NO_SHELL, start a shell.
+  ${PROJ_PATH}/${BUILDER_PATH}/start-venv.sh "$@"
+fi

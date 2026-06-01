@@ -16,7 +16,6 @@ PYTHON_AUTOINSTALL_PATH=${PYTHON_AUTOINSTALL_PATH:-"{{python_autoinstall_path}}"
 ENV_NAME=${ENV_NAME:-"{{env_name}}"}
 PY_VER=${PY_VER:-"{{py_ver}}"}
 PYTHON_PKG_PATH=${PYTHON_PKG_PATH:-"{{python_pkg_path}}"}
-PYTHON_VENV_PREFIX=${PYTHON_VENV_PREFIX:-"{{python_venv_prefix}}"}
 PKG_SKIP_LIST=${PKG_SKIP_LIST:-"{{pkg_skip_list}}"}
 PY_CONSTRAINTS=${PY_CONSTRAINTS:-"{{py_constraints}}"}
 PY_REQS=${PY_REQS:-"{{py_reqs}}"}
@@ -65,10 +64,10 @@ done
 
 echo VIRTUALENV BUILD COMPLETE
 
-if [ -z "$NO_SHELL" ]; then
-  echo "This is where we can do yannt things."
-  # If the user did not request NO_SHELL, start a shell.
-  ${PROJ_PATH}/${BUILDER_PATH}/start-venv.sh "$@"
-fi
+# if [ -z "$NO_SHELL" ]; then
+#   echo "This is where we can do yannt things."
+#   # If the user did not request NO_SHELL, start a shell.
+#   ${PROJ_PATH}/${BUILDER_PATH}/start-venv.sh "$@"
+# fi
 
 

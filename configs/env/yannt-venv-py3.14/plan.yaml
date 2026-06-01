@@ -16,7 +16,7 @@ config_root:
     builder: venv
     platform: linux
     init: init-venv.sh
-    run: run-venv.sh
+    run: start-venv.sh
 
     python: { from: env, name: SYSTEM_PYTHON }
     python_venv_prefix: { from: env, name: PYTHON_VENV_PREFIX }
@@ -26,7 +26,6 @@ config_root:
       builder: python
       platform: linux
       init: init-python.sh
-      run: run-python.sh
 
       root_drive: { from: env, name: ROOT_DRIVE }
       python_pkg_path: { from: env, name: PYTHON_PKG_PATH }

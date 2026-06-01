@@ -10,9 +10,11 @@ ENV_NAME=${ENV_NAME:-"{{env_name}}"}
 PROJ_PATH=${PROJ_PATH:-"{{proj_path}}"}
 CONFIG_NAME=${CONFIG_NAME:-"{{config_name}}"}
 CONFIG_PATH=${CONFIG_PATH:-"{{config_path}}"}
-CONDA_PREFIX=${CONDA_PREFIX:="{{conda_prefix}}"}
+CACHED_CONDA_PREFIX=${CONDA_PREFIX:="{{cached_conda_prefix}}"}
 
+BUILDER_PATH=${BUILDER_PATH:-"{{builder_path}}"}
 NEXT_INIT_TARGET=${NEXT_INIT_TARGET:-"{{next_init_target}}"}
+PIP_VERSION_SPEC=${PIP_VERSION_SPEC:-"{{pip_version_spec}}"}
 
 # ----- End Of Config -----
 
@@ -35,7 +37,7 @@ if [ -z "$(which conda)" ]; then
   echo
   exit 1
 fi
-source $(dirname $(which conda))/activate
+#source $(dirname $(which conda))/activate
 
 # Note: Assuming it is OK to not check if the environment exists.
 
@@ -43,9 +45,13 @@ source $(dirname $(which conda))/activate
 #conda tos accept
 
 # Create conda environment.
-mkdir -p ${PROJ_PATH}/${CONDA_PREFIX}
+mkdir -p ${PROJ_PATH}/${CACHED_CONDA_PREFIX}
+echo conda create -y -c defaults -c conda-forge -p ${PROJ_PATH}/${CACHED_CONDA_PREFIX}/${ENV_NAME} python=${PY_VER}
 conda create -y -c defaults -c conda-forge \
-  -p ${PROJ_PATH}/${CONDA_PREFIX}/${ENV_NAME} python=${PY_VER}
+  -p ${PROJ_PATH}/${CACHED_CONDA_PREFIX}/${ENV_NAME} python=${PY_VER} ${PIP_VERSION_SPEC}
+
+# Must use pip<23 with Python versions <3.10 (e.g. 3.9)
+#conda install -y -p ${PROJ_PATH}/${CACHED_CONDA_PREFIX}/${ENV_NAME} 
 
 # # Similar to `conda init`
 # eval "$(conda shell.bash hook)"
@@ -76,3 +82,13 @@ conda create -y -c defaults -c conda-forge \
 # exec bash --rcfile "$TMP_RC" -i
 
 # fi
+
+
+# If there is a NEXT_INIT_TARGET set, run it.
+[ -z "${NEXT_INIT_TARGET}" ] || ./${NEXT_INIT_TARGET}
+
+if [ -z "$NO_SHELL" ]; then
+  echo "This is where we can do yannt things."
+  # If the user did not request NO_SHELL, start a shell.
+  ${PROJ_PATH}/${BUILDER_PATH}/run-conda.sh "$@"
+fi

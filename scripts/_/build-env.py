@@ -104,7 +104,7 @@ class CondaBuilder(Builder):
         ]
 
 
-class VenvBuilder(Builder):
+class LinuxVenvBuilder(Builder):
     def emit_scripts(self, builder_path) -> list[Script]:
         from jinja2 import Template, StrictUndefined
 
@@ -112,6 +112,31 @@ class VenvBuilder(Builder):
             'init-venv.sh': Path("scripts/_/templates/venv") / "init-venv.sh.j2",
             'create-venv.sh': Path("scripts/_/templates/venv") / "create-venv.sh.j2",
             'run-venv.sh': Path("scripts/_/templates/venv") / "run-venv.sh.j2",
+            'start-venv.sh': Path("scripts/_/templates/venv") / "start-venv.sh.linux.j2",
+        }
+        tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
+
+        # TODO: Make this implicit
+        self.common_config_fixups(builder_path)
+
+        return [
+            Script(
+                name=name,
+                body=Template(data, undefined=StrictUndefined).render(**self.config)
+            )
+            for name, data in tmpl_data.items()
+        ]
+
+
+class WineVenvBuilder(Builder):
+    def emit_scripts(self, builder_path) -> list[Script]:
+        from jinja2 import Template, StrictUndefined
+
+        tmpl_paths = {
+            'init-venv.sh': Path("scripts/_/templates/venv") / "init-venv.sh.j2",
+            'create-venv.sh': Path("scripts/_/templates/venv") / "create-venv.sh.j2",
+            'run-venv.sh': Path("scripts/_/templates/venv") / "run-venv.sh.j2",
+            'start-venv.sh': Path("scripts/_/templates/venv") / "start-venv.sh.wine.j2",
         }
         tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
 
@@ -179,41 +204,15 @@ class PodmanBuilder(Builder):
         ]
 
 
-class LinuxPythonEnv(Builder):
+class PythonEnv(Builder):
     def emit_scripts(self, builder_path) -> list[Script]:
         from jinja2 import Template, StrictUndefined
 
         tmpl_paths = {
-            'init-python.sh': Path("scripts") / "_" / "templates" / "python" / "init-python.sh.j2",
-            'download-pkgs.sh': Path("scripts") / "_" / "templates" / "python" / "download-pkgs.sh.j2",
-            'run-python.sh': Path("scripts") / "_" / "templates" / "python" / "run-python.sh.j2",
-            'install-pkgs.sh': Path("scripts") / "_" / "templates" / "python" / "install-pkgs.sh.j2",
-            'start-venv.sh': Path("scripts") / "_" / "templates" / "python" / "start-venv.sh.linux.j2",
-        }
-        tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
-
-        # TODO: Make this implicit
-        self.common_config_fixups(builder_path)
-
-        return [
-            Script(
-                name=name,
-                body=Template(data, undefined=StrictUndefined).render(**self.config)
-            )
-            for name, data in tmpl_data.items()
-        ]
-
-
-class WinePythonEnv(Builder):
-    def emit_scripts(self, builder_path) -> list[Script]:
-        from jinja2 import Template, StrictUndefined
-
-        tmpl_paths = {
-            'init-python.sh': Path("scripts") / "_" / "templates" / "python" / "init-python.sh.j2",
-            'download-pkgs.sh': Path("scripts") / "_" / "templates" / "python" / "download-pkgs.sh.j2",
-            'run-python.sh': Path("scripts") / "_" / "templates" / "python" / "run-python.sh.j2",
-            'install-pkgs.sh': Path("scripts") / "_" / "templates" / "python" / "install-pkgs.sh.j2",
-            'start-venv.sh': Path("scripts") / "_" / "templates" / "python" / "start-venv.sh.wine.j2",
+            'init-python.sh': Path("scripts/_/templates/python") / "init-python.sh.j2",
+            'download-pkgs.sh': Path("scripts/_/templates/python") / "download-pkgs.sh.j2",
+            #'run-python.sh': Path("scripts/_/templates/python") / "run-python.sh.j2",
+            'install-pkgs.sh': Path("scripts/_/templates/python") / "install-pkgs.sh.j2",
         }
         tmpl_data = {tgt_fname: open(tmpl_path).read() for tgt_fname, tmpl_path in tmpl_paths.items()}
 
@@ -291,23 +290,22 @@ Resolution.RULES = [
     Rule(
         predicates={
             "builder": lambda v: v == "venv",
-            # implicitly linux
-        },
-        resolution=Resolution(VenvBuilder),
-    ),
-    Rule(
-        predicates={
-            "builder": lambda v: v == "python",
             "platform": lambda v: v == "linux",
         },
-        resolution=Resolution(LinuxPythonEnv),
+        resolution=Resolution(LinuxVenvBuilder),
+    ),
+    Rule(
+        predicates={
+            "builder": lambda v: v == "venv",
+            "platform": lambda v: v in "wine",
+        },
+        resolution=Resolution(WineVenvBuilder),
     ),
     Rule(
         predicates={
             "builder": lambda v: v == "python",
-            "platform": lambda v: v in "wine",
         },
-        resolution=Resolution(WinePythonEnv),
+        resolution=Resolution(PythonEnv),
     ),
 ]
 
@@ -375,7 +373,7 @@ def parse_config(cfg: dict, inherited_attrs: dict = {}) -> Builder:
     # ['next_init_target', 'builder_path']
 
     # Do not permit inheritance of special attributes.
-    for blocked_inheritance in ['alias', 'builder', 'init', 'inner']:
+    for blocked_inheritance in ['alias', 'builder', 'init', 'run', 'inner']:
         if blocked_inheritance not in cfg and blocked_inheritance in effective_attrs:
             del effective_attrs[blocked_inheritance]
     

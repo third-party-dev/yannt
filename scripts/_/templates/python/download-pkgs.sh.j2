@@ -12,7 +12,6 @@ PYTHON_PKG_PATH=${PYTHON_PKG_PATH:-"{{python_pkg_path}}"}
 PIP_UPSTREAM_VERIFIERS=${PIP_UPSTREAM_VERIFIERS:-"{{pip_upstream_verifiers}}"}
 PYTHON=${PYTHON:-"{{python}}"}
 BUILDER_PATH=${BUILDER_PATH:-"{{builder_path}}"}
-PYTHON_VENV_PREFIX=${PYTHON_VENV_PREFIX:-"{{python_venv_prefix}}"}
 PY_CONSTRAINTS=${PY_CONSTRAINTS:-"{{py_constraints}}"}
 PY_REQS=${PY_REQS:-"{{py_reqs}}"}
 PKG_SKIP_LIST=${PKG_SKIP_LIST:-"{{pkg_skip_list}}"}
@@ -21,19 +20,7 @@ PYTHON_AUTOINSTALL_PATH=${PYTHON_AUTOINSTALL_PATH:-"{{python_autoinstall_path}}"
 # ----- End Of Config -----
 
 PY_CONSTRAINTS_ARGS=$([ -n "${PY_CONSTRAINTS}" ] && echo "-c ${PY_CONSTRAINTS}")
-# if [ -n "${PY_CONSTRAINTS}" ]; then
-#     PY_CONSTRAINTS_ARGS="-c ${PY_CONSTRAINTS}"
-# else
-#     PY_CONSTRAINTS_ARGS=
-# fi
-
 PY_REQS_ARGS=$([ -n "${PY_REQS}" ] && echo "-r ${PY_REQS}")
-# if [ -n "${PY_REQS}" ]; then
-#     PY_REQS_ARGS="-r ${PY_REQS}"
-# else
-#     PY_REQS_ARGS=
-# fi
-
 PIP_IDX_ARGS=${PIP_IDX_ARGS:-"{{pip_idx_args}}"}
 PIP_DL_ARGS=${PIP_DL_ARGS:-"${PIP_IDX_ARGS} -d ${PYTHON_PKG_PATH}"}
 

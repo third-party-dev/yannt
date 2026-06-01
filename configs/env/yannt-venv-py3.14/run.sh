@@ -11,5 +11,4 @@ fi
 
 source ${CONFIG_PATH}/config.env
 
-#${PROJ_PATH}/cache/builder/${CONFIG_NAME}/host/podman/run-dev-docker.sh $@
-${PROJ_PATH}/cache/builder/${CONFIG_NAME}/host/python/run-python.sh
+${PROJ_PATH}/cache/builder/${CONFIG_NAME}/host/venv/start-venv.sh

@@ -17,3 +17,5 @@ packages/thirdparty_pparse_rust
 *.xml
 docs/ignored
 tests/labs/ignored
+
+Miniconda3-latest-Linux-x86_64.sh
