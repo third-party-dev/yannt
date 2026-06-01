@@ -42,13 +42,14 @@ config_root:
 
     extra_podman_run_commands:
     - RUN wineboot --init
-    - '[ ! -e "${PROJ_PATH}/${CRI_HOME}/python-3.9.13-embed-amd64.zip" ] && wget -O "${PROJ_PATH}/${CRI_HOME}/python-3.9.13-embed-amd64.zip" ${PYTHON_EMBED_ZIP_URL}'
+    - 'echo FETCH PYTHON: wget -O "${PROJ_PATH}/${CRI_HOME}/python-${PY_VER}-embed-amd64.zip" ${PYTHON_EMBED_ZIP_URL}'
+    - '[ ! -e "${PROJ_PATH}/${CRI_HOME}/python-${PY_VER}-embed-amd64.zip" ] && wget -O "${PROJ_PATH}/${CRI_HOME}/python-${PY_VER}-embed-amd64.zip" ${PYTHON_EMBED_ZIP_URL}'
     - '[ ! -e "${PROJ_PATH}/${CRI_HOME}/get-pip.py" ] && wget -O "${PROJ_PATH}/${CRI_HOME}/get-pip.py" ${PYPA_GETPIP_URL}'
-    - unzip -o "${PROJ_PATH}/${CRI_HOME}/python-3.9.13-embed-amd64.zip" -d "${PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python39/"
-    - RUN wine ${CRI_PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python39/python.exe ${CRI_PROJ_PATH}/${CRI_HOME}/get-pip.py
-    - echo sed -i 's/#import site/import site/' ${PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python39/python39._pth
-    - sed -i 's/#import site/import site/' ${PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python39/python39._pth
-    - RUN wine reg add 'HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' /v Path /t REG_EXPAND_SZ /d 'C:\Python39;C:\Python39\Scripts' /f    
+    - unzip -o "${PROJ_PATH}/${CRI_HOME}/python-${PY_VER}-embed-amd64.zip" -d "${PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python311/"
+    - RUN wine ${CRI_PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python311/python.exe ${CRI_PROJ_PATH}/${CRI_HOME}/get-pip.py
+    - echo sed -i 's/#import site/import site/' ${PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python311/python311._pth
+    - sed -i 's/#import site/import site/' ${PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python311/python311._pth
+    - RUN wine reg add 'HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' /v Path /t REG_EXPAND_SZ /d 'C:\Python311;C:\Python311\Scripts' /f    
     - RUN wineserver --wait
     - RUN wine ${CRI_PROJ_PATH}/${CRI_HOME}/.wine/drive_c/Python311/python.exe -m pip install virtualenv
 
@@ -78,6 +79,7 @@ config_root:
         init: init-python.sh
         run: run-python.sh
 
+        root_drive: { from: env, name: ROOT_DRIVE }
         python_pkg_path: { from: env, name: PYTHON_PKG_PATH }
         python_autoinstall_path: { from: env, name: PYTHON_AUTOINSTALL_PATH }
 
