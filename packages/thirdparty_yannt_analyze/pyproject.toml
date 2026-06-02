@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "thirdparty-yannt-analyze"
+description = "Yannt Analysis Framework"
+dependencies = []
+
+requires-python = ">=3.9"
+# Requires PEP 621 (setuptools>=61)
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = true
+
+
+[project.entry-points."yannt_command"]
+# Register pparse as a yannt subcommand
+analyze = "thirdparty.yannt.analysis.cli.yannt_plugin:register_yannt_analyze"
+
+
+# register_analysis_plugin(framework)
+# framework.register_format(name, AnalysisFactor)
+# framework.register_factor(name, AnalysisFactor)
+# framework.register_process(name, AnalysisProcess)
+# framework.register_report(name, AnalysisReport)
+
+
+[project.entry-points."yannt_analysis_plugin"]
+analysis_plugin_pparse = "thirdparty.yannt.analysis.pparse.plugin:register_analysis_plugin"
+
+
+
+
+
+
+
+
+
+
+# [project.entry-points."naive_command"]
+
+# # Register safetensors as a pparse subcommand
+# safetensors = "thirdparty.yannt.naive.cli.naive_safetensors:register_naive_safetensors"
+
+# ## Register pytorch as a pparse subcommand
+# #pytorch = "thirdparty.pparse.cli.pparse_pytorch:register_pparse_pytorch"
+
