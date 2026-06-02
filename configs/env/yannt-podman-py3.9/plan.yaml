@@ -33,6 +33,10 @@ config_root:
     cri_run: { from: env, name: CRI_RUN }
     cri_run_args: { from: env, name: CRI_RUN_ARGS }
     cri_proj_path: { from: env, name: CRI_PROJ_PATH }
+    root_drive: { from: env, name: ROOT_DRIVE }
+    # Note: A bit hacky, but req'd for the moment.
+    pypa_getpip_url: nil
+    python_embed_zip_url: nil
 
     inner:
       alias: venv
@@ -50,7 +54,6 @@ config_root:
         platform: linux
         init: init-python.sh
 
-        root_drive: { from: env, name: ROOT_DRIVE }
         python_pkg_path: { from: env, name: PYTHON_PKG_PATH }
         python_autoinstall_path: { from: env, name: PYTHON_AUTOINSTALL_PATH }
 
