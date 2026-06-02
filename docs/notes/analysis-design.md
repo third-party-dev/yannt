@@ -44,6 +44,8 @@ Note: Pparse should not depend on anything from analyze subcommand. Therefore th
 
 The nature of pparse is to take a single file and extract multiple formats and multiple node trees per format. This creates a complex situation for fully automated analysis. Each extraction has results based on the name of the parser. Each AnalysisProcess _could_ trigger on these names and then do its own "I'm going in" thing. We could also do a predicate matching of results to AnalysisProcess or AnalysisResult. We could also do a matching on AnalysisFactor to results and dynamically generate an AnalysisProcess. In practice, I don't know what value we're striving for in any of these situations. Its likely more prudent to stick with "single file can have one to many AnalysisProcesses/AnalysisReports" to keep things manageable until the more complex scenario is better understood.
 
+IDEA #1:
+
 In relation to the above uncertainty, there are certain smaller aspects we should consider when moving forward (to not prohibit any of the above complexity in the future). I'm talking about advertising features or tags of some kind of whats available in a given AnalysisFactor. When we wrap a pparse object, we'll need a definitive way to determine if tensors or the graph is available for reading. There is an inherient challenge with using tags because someone needs to govern the volcabulary that is used and understood across all of the other plugins. For this, I'm considering an AnalysisTaxonomy. Each node can advertise that is supports a named/registered AnalysisTaxonomy and it can list the type of the information it provides in the namespace of the AnalysisTaxonomy.
 
 Example:
@@ -52,6 +54,10 @@ AnalysisTaxonomy('mlmodel') -> mlmodel:graph means we're getting a computational
 AnalysisTaxonomy('excel') -> excel:graph means we're getting a visual graph from a spreadsheet.
 
 At the moment, this is as complex as I want any vocabulary to be in yannt. Trees, overlaps, or ambiguities between taxonomys is getting to far from the problem we're trying to solve.
+
+IDEA #2:
+
+Instead of a vocabulary, taxonomoy, ontology ... we consider each node its own universe. Dependents should expect that specific universe since its marked the node as a dependency. The dynamic nature of what the provider can ship is advertised based on an array of tags that are specific to the node itself. An AnalysisFactor called thirdparty.yannt.analysis.factors.pparse.Tensors may include tags `['ops', 'weights', 'bias']` for one model and `['ops', 'bias']` for another model. Dependent AnalysisFactors must decide whether they are going to perform their intended operation based on these tags. Subsequent AnalysisFactors will also know if the previous factor was able to complete based on the tags available to it. Therefore, a string of AnalysisFactor classes should always be able to finish execution regardless of whether a node in the middle of the graph failed or not. Note: child factors can determine this based on the results dictionary as well if desired. The expected behavior is specified by each individual node ... but all nodes should provide their resulting tags in the associated results database section.
 
 ### DEMO
 
