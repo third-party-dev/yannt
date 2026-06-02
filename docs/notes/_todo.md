@@ -37,15 +37,16 @@
 
 ### New Features (after 0.0.4)
 
-- Control Recursion
+- ~~Control Recursion~~
 
 - ~~Provide URLDataSource~~
 
 - Analyzers (per extraction)
   - Layer Count, Activation ID
 
-- Test on Windows
-  - PLAN: Use wine to test yannt/pparse via python.exe in linux (new env).
+
+- ~~Test on Windows~~
+  - ~~PLAN: Use wine to test yannt/pparse via python.exe in linux (new env).~~
 
 - Export / Import State
   - DataSource
@@ -85,3 +86,5 @@
 - AL uses FILTER, EXTRACT, CORE, SECONDARY, POST, REVIEW per file.
 
 - pparse (conceptually) uses Filter, Parse, Analyze, Alter, Serialize, but not as automated pipeline.
+
+
