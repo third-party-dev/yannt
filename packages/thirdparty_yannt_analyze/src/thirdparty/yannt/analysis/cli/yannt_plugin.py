@@ -8,10 +8,15 @@ def parse_process_arg(value: str) -> tuple[str, dict]:
     name, opts_str = value.split(":", 1)
     opts = {}
     for pair in opts_str.split(","):
+        pair = pair.strip()
+        if not pair:
+            continue
         if "=" not in pair:
-            raise argparse.ArgumentTypeError(f"Invalid option '{pair}', expected key=value")
-        k, v = pair.split("=", 1)
-        opts[k.strip()] = v.strip()
+            # No value — treat as boolean flag
+            opts[pair] = True
+        else:
+            k, v = pair.split("=", 1)
+            opts[k.strip()] = v.strip()
     return name, opts
 
 
@@ -95,34 +100,74 @@ def register_yannt_analyze(subparsers):
     analyze_parser.set_defaults(func=do_analysis)
 
 
-def print_process_help(name: str, arg_name, obj):
-    import argparse
-    process_parser = obj._arg_parser
-    formatter = process_parser._get_formatter()
+# def print_process_help(obj):
+#     import argparse
+#     parser = obj.get_parser()
+#     formatter = process_parser._get_formatter()
     
-    formatter.add_usage(f"--{arg_name} {name}[:key=value,...]", [], [], prefix="Usage: ")
-    formatter.add_text(process_parser.description)
+#     formatter.add_usage(f"{parser.prog}[:key=value,...]", [], [], prefix="Usage: ")
+#     formatter.add_text(parser.description)
     
-    # harvest option groups directly from the process parser
-    formatter.start_section("Options")
-    for action in process_parser._actions:
-        if isinstance(action, argparse._HelpAction):
-            continue
-        # reformat as key=value instead of --key VALUE
-        option = f"{action.dest}={action.metavar or action.type.__name__ if action.type else 'value'}"
-        formatter.add_text(f"  {option:<30} {action.help} (default: {action.default})")
-    formatter.end_section()
+#     # harvest option groups directly from the process parser
+#     formatter.start_section("Options")
+#     for action in parser._actions:
+#         if isinstance(action, argparse._HelpAction):
+#             continue
+#         # reformat as key=value instead of --key VALUE
+#         breakpoint()
+#         option = f"{action.dest}={action.metavar or action.type.__name__ if action.type else 'value'}"
+#         formatter.add_text(f"  {option:<30} {action.help} (default: {action.default})")
+#     formatter.end_section()
     
-    print(formatter.format_help())
+#     print(formatter.format_help())
+
+
+# def _dedup_name_key_val(params: list[tuple[str, dict]]) -> list[tuple[str, dict]]:
+#     result = {}
+#     for name, opts in params:
+#         result.setdefault(name, {})
+#         result[name] = {**result[name], **opts}
+#     return result
+
+
+# _dedup_name_key_val(args.format or [])
 
 
 def do_analysis(args):
 
-    if args.format_help:
-        print_process_help(args.format_help, 'format', AnalysisFramework._formats[args.format_help])
+    # if args.format_help:
+    #     print_process_help(args.format_help, 'format', AnalysisFramework._formats[args.format_help])
+    
+    # if args.format:
+    #     format_args = _dedup_name_key_val(args.format)
+    #     AnalysisFramework._formats[args.format_help].parse_args(format_args[])
 
 
+    # `yannt analyze --format onnx:depth=123,another=435 --format onnx:depth=2`
 
+    print("--- Loaded Analysis Framework Features ---")
+    print("Registered formats:")
+    for fmt_key, fmt in AnalysisFramework._formats.items():
+        print(f"  - {fmt_key} => {fmt.__class__}:{fmt._id}")
 
+    print("Registered factors:")
+    for factor_key, factor in AnalysisFramework._factors.items():
+        print(f"  - {factor_key} => {factor.__class__}:{factor._id}")
 
-    breakpoint()
+    print("Registered processes:")
+    for process_key, process in AnalysisFramework._processes.items():
+        print(f"  - {process_key}: {process.__class__}")
+
+    print("Registered reports:")
+    for report_key, report in AnalysisFramework._reports.items():
+        print(f"  - {report_key}: {report.__class__}")
+
+    print("--- Merged Process Execution ---")
+    # TODO: Work merge example.
+    AnalysisFramework._processes['basic'].run()
+
+    basic = AnalysisFramework._processes['basic']
+
+    print("--- Merged Process Results ---")
+    from pprint import pprint
+    pprint(basic.results)

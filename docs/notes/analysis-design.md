@@ -77,3 +77,21 @@ yannt analyze \
 - `--process-help`, `--report-help`, `--format-help` tells argparse to use the associated entrypoint for help output.
 - `--process NAME[:key[=value]]` is the pattern for adding options. Repeated uses of `--process NAME` do not add `NAME`, only opts.
 
+
+
+
+
+### THINGS
+
+What does it mean when we provide a format configuration to AnalysisFramework?
+  - Are we configuring a format that will be registered into pparse framework?
+  - Are we only saying that we are specifying the parser to use with the target?
+
+**PLAN:** To move forward without limiting the bigger design, gate features with a `simple` subcommand. Simple means we're doing a single "parser extraction's node tree" to file/target (i.e. no multi-extraction recursion).
+
+**PLAN**: In the event that we have 2 plugins that register the same type of object with the same alias, we should indicate to the user they must use a FQN. Users should always be able to use a FQN in place of an alias. FQN and aliases are determined by the presence of a `.` and therefore a `.` must not appear in an alias.
+
+**PLAN**: Each factor, process, and report have reserved parameters:
+- `id` - The instance id of the factor/process/report, defaults to `_init`.
+
+**NOTE**: The more I think it through, the more edge cases I'm finding for CLI complexity. Need to flesh out the Python API and revisit. For now, everything will have single instance (not singleton) and have no arguments. Need to flesh out the DAG, factor mapping, process running, report masking ... then revisit CLI, config, and so forth.
