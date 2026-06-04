@@ -95,3 +95,275 @@ What does it mean when we provide a format configuration to AnalysisFramework?
 - `id` - The instance id of the factor/process/report, defaults to `_init`.
 
 **NOTE**: The more I think it through, the more edge cases I'm finding for CLI complexity. Need to flesh out the Python API and revisit. For now, everything will have single instance (not singleton) and have no arguments. Need to flesh out the DAG, factor mapping, process running, report masking ... then revisit CLI, config, and so forth.
+
+
+
+### Multi-Input Managements
+
+In the "simple" scenario, we may limit a user request to a single target file/path. How does the AnalysisProcess get the model format type and how do we map that process to that format if there are multiple inputs with multiple formats?
+
+- Run all processes over all inputs?
+
+
+
+- Define the input as a process parameter?
+
+yannt analyze --process tensor_metrics:input=model.onnx,fmt=onnx
+
+- We can do it like a qemu network mapping?
+
+`yannt analyze --target onnx:id=mine,path=model.onnx --process tensor_metrics:with=mine,with=another`
+
+```yaml
+config:
+  framework:
+    formats:
+      - name: onnx
+        module: thirdparty.yannt.analysis.pparse.plugin
+        class: OnnxFormat
+
+    factors:
+      - name: tensors
+        module: thirdparty.yannt.analysis.pparse.plugin
+        class: TensorsFactor
+
+    processes:
+      - name: basic
+        module: thirdparty.yannt.analysis.pparse.plugin
+        class: BasicProcess
+      - name: second_process
+        module: thirdparty.yannt.analysis.pparse.plugin
+        class: SecondProcess
+
+    reports:
+      - name: tensor_metrics
+        module: thirdparty.yannt.analysis.pparse.plugin
+        class: TensorMetricsReport
+
+  targets:
+    - name: mine
+      fmt: onnx
+      path: model.onnx
+      opts:
+        key: value
+
+    - name: another
+      fmt: pytorch
+      path: model.bin
+      opts:
+        key: value
+
+  processes:
+    - name: tmetric
+      process: tensor_metrics
+      with: [ mine, another ]
+```
+
+Order of precendence (least to most):
+- Hard coded defaults
+- Installed defaults (entry points)
+- Config File
+- Environment Variables
+- CLI Arguments
+
+AnalysisFactors are really the only generalization we can make. Everything should be constructed of AnalysisFactors and they should be in a DAG. Any simplification of AnalysisProcess feels constricting for reasonable use cases. The most flexible scenario is to define the tree of factors and indicate the required input for the AnalysisProcess. When an analysis process knows its inputs, it may execute. The AnalysisProcess should be definable via Python or Yaml.
+
+```
+# Explicitly build a process in CLI
+yannt analyze \
+  # Indicate we want to load factors
+  --load factor:name=pparse,mod=thirdparty.yannt.analysis.pparse.plugin,cls=PparseFormat \
+  --load factor:name=tensors,mod=thirdparty.yannt.analysis.pparse.plugin,cls=TensorsFactor \
+  # Indicate we want to register factors with process "fine_tuned"
+  --factor input:procedure=fine_tuned,name=model_a,factor=pparse \
+  --factor worker:procedure=fine_tuned,name=tensors_a,factor=tensors,dependency=model_a \
+  --factor worker:procedure=fine_tuned,name=fine_tuned,factor=fine_tuned \
+    # process fine_tuned's fine_tuned factor options continued
+    --factor worker:procedure=fine_tuned,name=fine_tuned,dependency=tensor_metrics_a,dependency=tensor_metrics_b \
+    --factor worker:procedure=fine_tuned,name=fine_tuned,dependency=graph_a,dependency=graph_b \
+  # create process from procedure
+  --request process:procedure=fine_tuned,name=fine_tuned \
+  # assign input to process
+  --input process:name=fine_tuned,factor=model_a,path=model.onnx
+  # Note: Once we're done with CLI processing, we implicitly run all processes.
+
+
+# Define inputs for named process to implicitly run the process.
+yannt analyze \
+  --load config:path=config.yaml \
+  --input target:process=fine_tuned,name=model_a,path=model.onnx \
+  --input target:process=fine_tuned,name=model_b,path=model.onnx
+
+
+# Define inputs for named report to implicitly run the process via a report.
+# Add report specific option for output.
+yannt analyze \
+  --load config:path=config.yaml \
+  --input target:report=fine_tuned,name=model_a,path=model.onnx \
+  --input target:report=fine_tuned,name=model_b,path=model.onnx \
+  --report output:report=fine_tuned,fmt=xml,path=report.xml
+```
+
+
+```yaml
+
+framework:
+  factors:
+    - name: pparse
+      module: thirdparty.yannt.analysis.pparse.plugin
+      class: PparseFormat
+      config:
+        registry:
+          onnx: pparse.onnx
+          pytoroch: pparse.pytorch
+
+    - name: tensors
+      module: thirdparty.yannt.analysis.pparse.plugin
+      class: TensorsFactor
+
+    - name: graph
+      module: thirdparty.yannt.analysis.pparse.plugin
+      class: GraphFactor
+
+    - name: tensor_metrics
+      module: thirdparty.yannt.analysis.pparse.plugin
+      class: TensorsMetrics
+
+    - name: fine_tuned
+      module: thirdparty.yannt.analysis.pparse.plugin
+      class: FineTuned
+
+procedure:
+  - name: fine_tuned
+    inputs:
+      model_a:
+        factor: pparse
+
+      model_b:
+        factor: pparse
+
+    factors:
+      - name: tensors_a
+        factor: tensors
+        dependencies:
+        - model_a
+      
+      - name: graph_a
+        factor: graph
+        dependencies:
+        - model_a
+      
+      - name: tensor_metrics_a
+        factor: tensor_metrics
+        dependencies:
+        - tensors_a
+
+      - name: tensors_b
+        factor: tensors
+        dependencies:
+        - model_b
+      
+      - name: graph_b
+        factor: graph
+        dependencies:
+        - model_b
+      
+      - name: tensor_metrics_b
+        factor: tensor_metrics
+        dependencies:
+        - tensors_b
+
+      - name: fine_tuned
+        factor: fine_tuned
+        dependencies:
+        - tensor_metrics_a
+        - tensor_metrics_b
+        - graph_a
+        - graph_b
+```
+
+```python
+
+def pparse_plugin(cls_name):
+  return ('thirdparty.yannt.analysis.pparse.plugin', cls_name)
+
+config = { 'registry': { 'onnx': 'pparse.onnx', 'pytoroch': 'pparse.pytorch' } }
+framework.register_factor('pparse', pparse_plugin('PparseFormat'), config)
+
+framework.register_factor('tensors', pparse_plugin('TensorsFactor'))
+framework.register_factor('graph', pparse_plugin('GraphFactor'))
+framework.register_factor('tensor_metrics', pparse_plugin('TensorsMetrics'))
+framework.register_factor('fine_tuned', pparse_plugin('FineTuned'))
+
+fine_tuned_process = AnalysisProcedure()
+fine_tuned_process.add_input('model_a', factor=framework.factor['pparse'])
+fine_tuned_process.add_input('model_b', factor=framework.factor['pparse'])
+
+fine_tuned_process.add_factor('tensors_a', factor=framework.factor['tensors'], dependencies=['model_a'])
+fine_tuned_process.add_factor('graph_a', factor=framework.factor['graph'], dependencies=['model_a'])
+fine_tuned_process.add_factor('tensor_metrics_a', factor=framework.factor['tensor_metrics'], dependencies=['tensors_a'])
+fine_tuned_process.add_factor('tensors_b', factor=framework.factor['tensors'], dependencies=['model_b'])
+fine_tuned_process.add_factor('graph_b', factor=framework.factor['graph'], dependencies=['model_b'])
+fine_tuned_process.add_factor('tensor_metrics_b', factor=framework.factor['tensor_metrics'], dependencies=['tensors_b'])
+
+fine_tuned_process.add_factor('fine_tuned', 
+  factor=framework.factor['fine_tuned'],
+  dependencies=['tensor_metrics_a', 'tensor_metrics_b', 'graph_a', 'graph_b'],
+)
+
+framework.register_process('fine_tuned', fine_tuned_process)
+
+```
+
+
+
+
+
+We can optimize merging of the above and another process by computing the lineage with root+input and deduplicate nodes across processes:
+
+```python
+def compute_lineage(node, parent_map, root_inputs):
+    ancestors = set()
+
+    def collect(n):
+        for parent in parent_map.get(n, []):
+            if parent not in ancestors:
+                ancestors.add(parent)
+                collect(parent)
+
+    collect(node)
+
+    sorted_ancestors = topological_sort(ancestors, parent_map)
+
+    # substitute root nodes with (node, input) pairs
+    def with_input(n):
+        if n not in parent_map or not parent_map[n]:
+            return (n, n.get_input_value())
+        return n
+
+    return (*[with_input(n) for n in sorted_ancestors], node)
+
+
+def topological_sort(nodes, parent_map):
+    result = []
+    visited = set()
+
+    def visit(n):
+        if n in visited:
+            return
+        visited.add(n)
+        for parent in sorted(parent_map.get(n, []), key=lambda n: n.id):
+            visit(parent)
+        result.append(n)
+
+    for node in sorted(nodes, key=lambda n: n.id):
+        visit(node)
+
+    return tuple(result)
+```
+
+Given: `R1(input_a) -> A -> C` and `R2(input_b) -> B -> C`
+Result: `compute_lineage(C) == ((R1, input_a), (R2, input_b), A, B, C)`
+And `((R1, input_a), (R2, input_b), A, B, C)` becomes the unique ID for the node and we can remove any duplicates.
+
+**Note**: This only works if all nodes in the graph only read from dependencies and not outside inputs.

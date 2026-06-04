@@ -45,13 +45,13 @@ def register_yannt_analyze(subparsers):
         action="store_true",
         help="breakpoint() after operation"
     )
-    analyze_parser.add_argument(
-        "--format",
-        action="append",
-        type=parse_process_arg,
-        metavar="NAME[:key=value,...]",
-        help="Analysis process to run, with optional configuration"
-    )
+    # analyze_parser.add_argument(
+    #     "--format",
+    #     action="append",
+    #     type=parse_process_arg,
+    #     metavar="NAME[:key=value,...]",
+    #     help="Analysis process to run, with optional configuration"
+    # )
     analyze_parser.add_argument(
         "--factor",
         action="append",
@@ -59,44 +59,44 @@ def register_yannt_analyze(subparsers):
         metavar="NAME[:key=value,...]",
         help="Analysis process to run, with optional configuration"
     )
-    analyze_parser.add_argument(
-        "--process",
-        action="append",
-        type=parse_process_arg,
-        metavar="NAME[:key=value,...]",
-        help="Analysis process to run, with optional configuration"
-    )
-    analyze_parser.add_argument(
-        "--report",
-        action="append",
-        type=parse_process_arg,
-        metavar="NAME[:key=value,...]",
-        help="Report to generate, with optional configuration"
-    )
-    analyze_parser.add_argument(
-        "--format-help",
-        choices=list(AnalysisFramework._formats.keys()),
-        metavar="NAME",
-        help=f"Show help for a process. Available: {', '.join(AnalysisFramework._formats.keys())}"
-    )
+    # analyze_parser.add_argument(
+    #     "--process",
+    #     action="append",
+    #     type=parse_process_arg,
+    #     metavar="NAME[:key=value,...]",
+    #     help="Analysis process to run, with optional configuration"
+    # )
+    # analyze_parser.add_argument(
+    #     "--report",
+    #     action="append",
+    #     type=parse_process_arg,
+    #     metavar="NAME[:key=value,...]",
+    #     help="Report to generate, with optional configuration"
+    # )
+    # analyze_parser.add_argument(
+    #     "--format-help",
+    #     choices=list(AnalysisFramework._formats.keys()),
+    #     metavar="NAME",
+    #     help=f"Show help for a process. Available: {', '.join(AnalysisFramework._formats.keys())}"
+    # )
     analyze_parser.add_argument(
         "--factor-help",
         choices=list(AnalysisFramework._factors.keys()),
         metavar="NAME",
         help=f"Show help for a process. Available: {', '.join(AnalysisFramework._factors.keys())}"
     )
-    analyze_parser.add_argument(
-        "--process-help",
-        choices=list(AnalysisFramework._processes.keys()),
-        metavar="NAME",
-        help=f"Show help for a process. Available: {', '.join(AnalysisFramework._processes.keys())}"
-    )
-    analyze_parser.add_argument(
-        "--report-help",
-        choices=list(AnalysisFramework._reports.keys()),
-        metavar="NAME",
-        help=f"Show help for a process. Available: {', '.join(AnalysisFramework._reports.keys())}"
-    )
+    # analyze_parser.add_argument(
+    #     "--process-help",
+    #     choices=list(AnalysisFramework._processes.keys()),
+    #     metavar="NAME",
+    #     help=f"Show help for a process. Available: {', '.join(AnalysisFramework._processes.keys())}"
+    # )
+    # analyze_parser.add_argument(
+    #     "--report-help",
+    #     choices=list(AnalysisFramework._reports.keys()),
+    #     metavar="NAME",
+    #     help=f"Show help for a process. Available: {', '.join(AnalysisFramework._reports.keys())}"
+    # )
     analyze_parser.set_defaults(func=do_analysis)
 
 
@@ -146,28 +146,38 @@ def do_analysis(args):
     # `yannt analyze --format onnx:depth=123,another=435 --format onnx:depth=2`
 
     print("--- Loaded Analysis Framework Features ---")
-    print("Registered formats:")
-    for fmt_key, fmt in AnalysisFramework._formats.items():
-        print(f"  - {fmt_key} => {fmt.__class__}:{fmt._id}")
 
     print("Registered factors:")
-    for factor_key, factor in AnalysisFramework._factors.items():
-        print(f"  - {factor_key} => {factor.__class__}:{factor._id}")
+    for factor_key, factor_cls in AnalysisFramework.factor.items():
+        print(f"  - {factor_key} => {factor_cls.__module__}:{factor_cls.__name__}")
 
-    print("Registered processes:")
-    for process_key, process in AnalysisFramework._processes.items():
-        print(f"  - {process_key}: {process.__class__}")
-
-    print("Registered reports:")
-    for report_key, report in AnalysisFramework._reports.items():
-        print(f"  - {report_key}: {report.__class__}")
+    print("Registered procedures:")
+    for procedure_key, procedure in AnalysisFramework.procedure.items():
+        print(f"  - {procedure_key}: {procedure.__class__}")
 
     print("--- Merged Process Execution ---")
-    # TODO: Work merge example.
-    AnalysisFramework._processes['basic'].run()
-
-    basic = AnalysisFramework._processes['basic']
+    
+    process = AnalysisFramework.procedure['fine_tuned'].create_process()
+    process.set_input('model_a', "model.onnx")
+    process.set_input('model_b', "model.bin")
+    process.run()
 
     print("--- Merged Process Results ---")
     from pprint import pprint
-    pprint(basic.results)
+    pprint(dict(process.results))
+
+    print("--- init_report Results ---")
+
+    report = AnalysisFramework.init_report('fine_tuned', procedure='fine_tuned')
+    report.set_input('model_a', "model.onnx")
+    report.set_input('model_b', "model.bin")
+    report.process()
+    print("REPORT:")
+    pprint(dict(report.results))
+    
+
+    print("--- post_process_report Results ---")
+
+    report = AnalysisFramework.post_process_report('fine_tuned', process=process)
+    print("REPORT:")
+    pprint(dict(report.results))
