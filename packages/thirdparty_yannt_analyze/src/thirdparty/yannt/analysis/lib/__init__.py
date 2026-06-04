@@ -46,7 +46,6 @@ class AnalysisInput(AnalysisFactor):
         return self
 
 
-
 class AnalysisProcess:
     def __init__(self, factor_obj_list):
         self.factor_obj_list = factor_obj_list
@@ -85,7 +84,7 @@ class AnalysisProcedure:
 
         self.framework = framework
         if self.framework is None:
-            self.framework = AnalysisFramework
+            self.framework = FRAMEWORKS['default']
 
         self.inputs = {}
         self.factors = {}
@@ -149,7 +148,7 @@ class AnalysisProcedure:
 class AnalysisReport:
     def __init__(self, name='unnamed', procedure=None, framework=None, process=None):
         self.name = name
-        self.framework = framework or AnalysisFramework
+        self.framework = framework or FRAMEWORKS['default']
 
         if (not procedure and not process) or (procedure and process):
             raise Exception("Must only define procedure xor process.")
@@ -179,7 +178,7 @@ class AnalysisReport:
         return {}
 
 
-class _AnalysisFramework:
+class AnalysisFramework:
     def __init__(self, name='unnamed'):
         self.name = name
         self._formats = {}
@@ -203,12 +202,7 @@ class _AnalysisFramework:
         return self._reports
 
 
-    def register_factor(self, name: str, factor: Union[type, tuple[str, str]], config=None):
-        '''
-            factor can be a tuple of module_name and class_name (or the object class itself):
-                ('thirdparty.yannt.analysis.pparse.plugin', 'PparseFormat')
-                PparseFormat
-        '''
+    def _force_register_factor(self, name, factor, config=None):
         if isinstance(factor, tuple):
             from importlib import import_module
             (module_name, class_name) = factor
@@ -218,14 +212,21 @@ class _AnalysisFramework:
 
         self._factors[name] = type(class_name, (factor,), {'factor_config': config})
         return self._factors[name]
-    
 
-    def register_report(self, name: str, report: Union[type, tuple[str, str]], config=None):
+
+    def register_factor(self, name: str, factor: Union[type, tuple[str, str]], config=None):
         '''
-            report can be a tuple of module_name and class_name (or the object class itself):
+            factor can be a tuple of module_name and class_name (or the object class itself):
                 ('thirdparty.yannt.analysis.pparse.plugin', 'PparseFormat')
                 PparseFormat
         '''
+        if name in self._factors:
+            raise Exception(f"Factor {name} is already registered.")
+
+        return self._force_register_factor(name, factor, config=config)
+
+
+    def _force_register_report(self, name: str, report: Union[type, tuple[str, str]], config=None):
         if isinstance(report, tuple):
             from importlib import import_module
             (module_name, class_name) = report
@@ -235,6 +236,18 @@ class _AnalysisFramework:
 
         self._reports[name] = type(class_name, (report,), {'report_config': config})
         return self._reports[name]
+
+    
+    def register_factor(self, name: str, report: Union[type, tuple[str, str]], config=None):
+        '''
+            report can be a tuple of module_name and class_name (or the object class itself):
+                ('thirdparty.yannt.analysis.pparse.plugin', 'PparseFormat')
+                PparseFormat
+        '''
+        if name in self._reports:
+            raise Exception(f"Report {name} is already registered.")
+
+        return self._force_register_report(name, report, config=config)
 
 
     def init_report(self, name, procedure):
@@ -264,4 +277,5 @@ class _AnalysisFramework:
     #     return self._reports[name]
 
 
-AnalysisFramework = _AnalysisFramework(name='default')
+FRAMEWORKS = {'default': AnalysisFramework(name='default')}
+
