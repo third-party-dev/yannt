@@ -58,10 +58,10 @@ def register_yannt_analyze(subparsers):
     analyze_parser.add_argument("--config", help="config.yaml")
 
     '''
-        TODO: Load a factor class
+        Load a factor class:
         --load factor:name=pparse,mod=thirdparty.yannt.analysis.pparse.plugin,cls=PparseFormat
 
-        TODO: Load a report class
+        Load a report class:
         --load report:name=fine_tuned,mod=thirdparty.yannt.analysis.pparse.plugin,cls=FineTunedReport
     '''
     analyze_parser.add_argument(
@@ -73,11 +73,11 @@ def register_yannt_analyze(subparsers):
     )
 
     '''
-        TODO: Add input to a procedure.
-        --factor input:procedure=fine_tuned,name=model_a,factor=pparse
+        Add input to a procedure:
+        --factor input:proc=fine_tuned,name=model_a,factor=pparse
 
-        TODO: Add a worker to a procedure.
-        --factor worker:procedure=fine_tuned,name=tensors_a,factor=tensors,dependency=model_a
+        Add a worker to a procedure:
+        --factor worker:proc=fine_tuned,name=tensors_a,factor=tensors,dependency=model_a
     '''
     analyze_parser.add_argument(
         "--factor",
@@ -88,11 +88,11 @@ def register_yannt_analyze(subparsers):
     )
 
     '''
-        TODO: Create a process request
-        --request process:procedure=fine_tuned,name=fine_tuned
+        Create a process request:
+        --request process:proc=fine_tuned,name=fine_tuned
 
-        TODO: Create a report request
-        --request report:procedure=fine_tuned,name=fine_tuned
+        Create a report request:
+        --request report:proc=fine_tuned,name=fine_tuned
     '''
     analyze_parser.add_argument(
         "--request",
@@ -103,10 +103,10 @@ def register_yannt_analyze(subparsers):
     )
 
     '''
-        TODO: Assign an input to a process
+        Assign an input to a process:
         --input process:name=fine_tuned,factor=model_a,path=model.onnx
 
-        TODO: Assign an input to a report
+        Assign an input to a report:
         --input report:name=fine_tuned,factor=model_b,path=model.bin
     '''
     analyze_parser.add_argument(
@@ -571,6 +571,7 @@ def handle_request_input_args(request_args, input_args):
                     opt.append(value)
     
     # TODO: Verify request proc and report's exist in FRAMEWORKS?
+    # TODO: Verify all input is satisfied.
 
     # --- Now create requests and assign inputs. ---
     processes = {}
@@ -629,7 +630,6 @@ def do_analysis(args):
 
             (Pdb) processes['default-mine'].results
         '''
-
 
         # ---- Run processes and reports. ----
         # TODO: Optionally merge the procedures and execute as a single tree here.
