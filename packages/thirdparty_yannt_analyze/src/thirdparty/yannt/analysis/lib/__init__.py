@@ -90,6 +90,14 @@ class AnalysisProcedure:
         self.factors = {}
 
 
+    def _force_add_input(self, name, factor):
+        if factor not in self.framework.factor:
+            raise KeyError(f"Factor {factor} not registered in framework {self.framework.name}.")
+        self.inputs[name] = self.framework.factor[factor]
+        self._force_add_factor(name, factor)
+        return self
+
+
     def add_input(self, name, factor):
         if factor not in self.framework.factor:
             raise KeyError(f"Factor {factor} not registered in framework {self.framework.name}.")
@@ -100,12 +108,17 @@ class AnalysisProcedure:
         return self
 
 
-    def add_factor(self, name, factor, dependencies=None):
+    def _force_add_factor(self, name, factor, dependencies=None):
         if factor not in self.framework.factor:
             raise KeyError(f"Factor {factor} not registered in framework {self.framework.name}.")
+        self.factors[name] = (self.framework.factor[factor], dependencies or [])
+        return self
+
+
+    def add_factor(self, name, factor, dependencies=None):
         if name in self.factors:
             raise ValueError(f"Duplicate factor name {name} added to process {self.name}.")
-        self.factors[name] = (self.framework.factor[factor], dependencies or [])
+        self._force_add_factor(name, factor, dependencies=dependencies)
         return self
 
     

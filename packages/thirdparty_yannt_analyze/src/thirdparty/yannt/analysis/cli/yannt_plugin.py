@@ -305,7 +305,7 @@ def handle_load_args(load_args):
             raise Exception(f"--load must be factor or report, not {cat}.")
         if cat == 'factor':
             if 'name' not in opts:
-                raise Exception(f"--load missing a name (--load factor:name=name_here).")
+                raise Exception(f"--factor missing a name (--load factor:name=name_here).")
             factor_name = opts.pop('name')
             factor_class_entry = to_load['factor_classes'].setdefault(factor_name, {'mod':None, 'cls':None, 'config': {}})
             
@@ -364,51 +364,258 @@ def handle_load_args(load_args):
         FRAMEWORKS['default']._force_register_report(report_name, (report_class['mod'], report_class['cls']), report_class['config'])
 
 
+def handle_factor_args(factor_args):
+
+    '''
+        When adding factors (inputs and workers) to procedures, there is no configuration. All factor configuration
+        is bound at the loading phase. Factors are stored in the procedure as class objects (not object instances)
+        and therefore have no state themselves. The only thing factors can build on across multiple arguments are 
+        dependencies and reset of factor_class. This operation is only additive. If there is no framework (fw) 
+        specified, default is used.
+    '''
+
+    procedures = {}
+
+    # May (overwrite) existing procedure classes.
+    for cat, opts in factor_args:
+        if cat not in ['input', 'worker']:
+            raise Exception(f"--factor must be input or worker, not {cat}.")
+        if cat == 'input':
+            if 'name' not in opts:
+                raise Exception(f"--factor missing a name (--factor input:proc=procedure_here,name=name_here).")
+            if 'proc' not in opts:
+                raise Exception(f"--factor missing procedure (--factor input:proc=procedure_here,name=name_here).")
+
+            framework_name = opts.pop('fw', 'default')
+            procedure_name = opts.pop('proc')
+            factor_name = opts.pop('name')
+
+            procedure_entry = procedures.setdefault(procedure_name, {'fw': framework_name, 'inputs': {}, 'workers': {}})
+            factor_entry = procedure_entry['inputs'].setdefault(factor_name, {'name': factor_name, 'factor_class': None})
+            
+            for key, value in opts.items():
+                if key == 'factor':
+                    # Last write wins
+                    factor_entry['factor_class'] = value
+                    continue
+                #if key == 'dependency' and value not in factor_entry['dependency']:
+                #    factor_entry['dependency'].append(value)
+                #    continue
+                if key == 'dependency':
+                    msg = f"Found --factor input:procedure={procedure_name},name={factor_name} " \
+                          f"with dependencies. Inputs have no dependencies."
+                    raise Exception(msg)
+
+                raise Exception(f"--factor input only accepts fw, proc, and name as options. Not {key}.")
+                # opt = factor_entry['opts'].setdefault(key, [])
+                # # De-dup for now. Not sure if this is desired.
+                # if value not in opt:
+                #     opt.append(value)
+
+        if cat == 'worker':
+            if 'name' not in opts:
+                raise Exception(f"--factor missing a name (--factor worker:proc=procedure_here,name=name_here).")
+            if 'proc' not in opts:
+                raise Exception(f"--factor missing procedure (--factor worker:proc=procedure_here,name=name_here).")
+
+            framework_name = opts.pop('fw', 'default')
+            procedure_name = opts.pop('proc')
+            factor_name = opts.pop('name')
+
+            procedure_entry = procedures.setdefault(procedure_name, {'fw': framework_name, 'inputs': {}, 'workers': {}})
+            init_factor_entry = {'name': factor_name, 'factor_class': None, 'dependencies': []}
+            factor_entry = procedure_entry['workers'].setdefault(factor_name, init_factor_entry)
+            
+            for key, value in opts.items():
+                if key == 'factor':
+                    # Last write wins
+                    factor_entry['factor_class'] = value
+                    continue
+                if key == 'dependency' and value not in factor_entry['dependency']:
+                    factor_entry['dependency'].append(value)
+                    continue
+
+                raise Exception(f"--factor worker only accepts fw, proc, name, and dependency as options. Not {key}.")
+                # opt = factor_entry['opts'].setdefault(key, [])
+                # # De-dup for now. Not sure if this is desired.
+                # if value not in opt:
+                #     opt.append(value)
+    
+    # Sanity check the procedures.
+    # Verify worker has deps, verify factor_class defined.
+    for procedure_name, procedure_entry in procedures.items():
+        for factor_name, factor_entry in procedure_entry['inputs'].items():
+            if not isinstance(factor_entry['factor_class'], str):
+                raise Exception(f"factor input {factor_name} missing factor_class")
+        for factor_name, factor_entry in procedure_entry['workers'].items():
+            if not isinstance(factor_entry['factor_class'], str):
+                raise Exception(f"factor worker {factor_name} missing factor_class")
+            if len(factor_entry['dependencies']) == 0:
+                raise Exception(f"factor worker {factor_name} missing dependencies")
+
+    # Apply the new procedures
+    for procedure_name, procedure_entry in procedures.items():
+        framework = FRAMEWORKS[procedure_entry['fw']]
+        # Get existing procedure or create new one
+        procedure = framework.procedure.setdefault(procedure_name, framework.create_procedure(name=procedure_name))
+
+        for input_name, input_entry in procedure_entry['inputs'].items():
+            procedure._force_add_input(input_name, input_entry['factor_class'])
+
+        for worker_name, worker_entry in procedure_entry['workers'].items():
+            procedure._force_add_factor(worker_name, worker_entry['factor_class'], dependencies=worker_entry['dependencies'])
+
+
+def handle_request_input_args(request_args, input_args):
+    requests = {}
+    #requests = 
+
+    # --- First process requests, so we can apply inputs to something. ---
+    # May overwrite process and report classes.
+    for cat, opts in request_args:
+        if cat not in ['process']: #, 'report']:
+            raise Exception(f"--request must be process or report, not {cat}.")
+        if cat == 'process':
+            if 'name' not in opts:
+                raise Exception(f"--request process missing a name (--request process:name=name_here,proc=procedure_here).")
+            if 'proc' not in opts:
+                raise Exception(f"--request process missing a procedure (--request process:name=name_here,proc=procedure_here).")
+
+            framework_name = opts.pop('fw', 'default')
+            framework_entry = requests.setdefault(framework_name, {'processes': {}, 'reports': {}})
+
+            process_name = opts.pop('name')
+            procedure_name = opts.pop('proc')
+            init_process_entry = {'fw': framework_name, 'name': process_name, 'procedure': procedure_name, 'opts': {}}
+            process_entry = framework_entry['processes'].setdefault(process_name, init_process_entry)
+
+            for key, value in opts.items():
+                raise Exception(f"--request input only accepts fw, proc, and name as options. Not {key}.")
+
+        # if cat == 'report':
+        #     if 'name' not in opts:
+        #         raise Exception(f"--request report missing a name (--request report:name=name_here,report=procedure_here).")
+        #     if 'report' not in opts:
+        #         raise Exception(f"--request report missing a report class (--request report:name=name_here,report=report_class_here).")
+
+        #     framework_name = opts.pop('fw', 'default')
+        #     framework_entry = requests.setdefault(framework_name, {'processes': {}, 'reports': {}})
+
+        #     report_name = opts.pop('name')
+        #     report_class = opts.pop('report')
+        #     init_report_entry = {'fw': framework_name, 'name': report_name, 'report_class': report_class, 'opts': {}}
+        #     report_entry = framework_entry['reports'].setdefault(report_name, init_report_entry)
+
+        #     for key, value in opts.items():
+        #         raise Exception(f"--request report only accepts fw, report, and name as options. Not {key}.")
+
+    # --- Now assign all inputs to existing request entries. ---
+    for cat, opts in input_args:
+        if cat not in ['process', 'report']:
+            raise Exception(f"--input must be process or report, not {cat}.")
+
+        if 'name' not in opts:
+            raise Exception(f"--input {cat} missing a name (--input {cat}:name=name_here,factor=factor_here).")
+        if 'factor' not in opts:
+            raise Exception(f"--input {cat} missing a factor (--request {cat}:name=name_here,factor=factor_here).")
+        
+        if cat == 'process':
+
+            framework_name = opts.pop('fw', 'default')
+            # ** Inputs args only apply to CLI requests.
+            if framework_name not in requests:
+                raise Exception(f"During --input process, no request in specified framework {framework_name}.")
+            framework_entry = requests[framework_name]
+            process_name = opts.pop('name')
+            factor_name = opts.pop('factor')
+
+            if process_name not in framework_entry['processes']:
+                raise Exception(f"During --input process, process {process_name} not defined.")
+            process_entry = framework_entry['processes'][process_name]
+
+            for key, value in opts.items():
+                opt = process_entry['opts'].setdefault(key, [])
+                if value not in opt:
+                    opt.append(value)
+
+        # if cat == 'report':
+
+        #     framework_name = opts.pop('fw', 'default')
+        #     # ** Inputs args only apply to CLI requests.
+        #     if framework_name not in requests:
+        #         raise Exception(f"During --input report, no request in specified framework {framework_name}.")
+        #     framework_entry = requests[framework_name]
+        #     report_name = opts.pop('name')
+        #     factor_name = opts.pop('factor')
+
+        #     if report_name not in framework_entry['reports']:
+        #         raise Exception(f"During --input report, report {report_name} not defined.")
+        #     report_entry = framework_entry['reports'][report_name]
+
+        #     for key, value in opts.items():
+        #         opt = report_entry['opts'].setdefault(key, [])
+        #         if value not in opt:
+        #             opt.append(value)
+    
+    # TODO: Verify request proc and report's exist in FRAMEWORKS.
+
+    processes = {}
+    reports = {}
+    # --- Now create requests and assign inputs. ---
+    for framework_name, framework_entry in requests.items():
+        framework = FRAMEWORKS[framework_name]
+        for process_name, process_entry in framework_entry['processes']:
+            process_fwname = f"{framework_name}-{process_name}"
+            processes[process_fwname] = framework.procedure[process_entry['procedure']].create_process()
+            for opt_name, opt_value in process_entry['opts']:
+                processes[process_fwname].set_input(opt_name, opt_value)
+        
+        # # ! How does report requiring a procedure make sense?
+        # for report_name, report_entry in framework_entry['reports']:
+        #     report_fwname = f"{framework_name}-{report_name}"
+
+        #     framework.init_report(report_name, report_entry['report'])
+        #     reports[report_fwname] = framework.init_report(report_entry['name']].create_process()
+        #     for opt_name, opt_value in process_entry['opts']:
+        #         processes[process_fwname].set_input(opt_name, opt_value)
+
+    return processes, reports
+
+
 def do_analysis(args):
+    '''
+        Order of precedence (least to most):
+            - Hard coded defaults
+            - Installed defaults (entry points)
+            - Config File
+            - Environment Variables
+            - CLI Arguments
+    '''
 
     if args.config:
-        '''
-            Order of precedence (least to most):
-                - Hard coded defaults
-                - Installed defaults (entry points)
-                - Config File
-                - Environment Variables
-                - CLI Arguments
-        '''
-
         from thirdparty.yannt.analysis.lib.config import load_config
         process_config(load_config(args.config))
 
-    # ---- Load the factor and report classes from --load args. ---
+    # ---- Load the factor and report classes from --load args. ----
     if args.load:
         handle_load_args(args.load)
 
-    # TODO: ---- Create or update procedures from --factor args. ---
-
-    breakpoint()
-                
-
-    # Load (overwrite) factor and report classes.
+    # ---- Create or update procedures from --factor args. ----
     if args.factor:
-        for factor_arg in args.factor:
-            print(f"factor_arg: {factor_arg}")
+        handle_factor_args(args.factor)
 
-    # TODO: ---- Apply the load and factor arguments here. ----
-
-    # TODO: ---- Generate processes and reports entries ----
-
-    # Create processes (and reports) in CLI
+    # ---- Create processes (and reports) in CLI ----
     if args.request:
-        for request_arg in args.request_arg:
-            print(f"request_arg: {request_arg}")
+        processes, reports = handle_request_input_args(args.request, args.input)
 
-    # Assign inputs to processes from CLI
-    if args.input:
-        for input_arg in args.input:
-            print(f"input_arg: {input_arg}")
+        # ---- Run processes and reports. ----
+        # TODO: Optionally merge the procedures and execute as a single tree here.
 
-    # TODO: ---- Run processes and reports here. ----
+        for process_name, process in processes.items():
+            process.run()
 
+        for report_name, report in report.items():
+            report.process()
 
     if args.test:
         do_simple_test()
