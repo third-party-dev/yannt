@@ -175,7 +175,7 @@ yannt analyze \
   --load factor:name=pparse,mod=thirdparty.yannt.analysis.pparse.plugin,cls=PparseFormat \
   --load factor:name=tensors,mod=thirdparty.yannt.analysis.pparse.plugin,cls=TensorsFactor \
   # Indicate we want to register factors with process "fine_tuned"
-  --factor input:procedure=fine_tuned,name=model_a,factor=pparse \
+  --factor input:fw=default,proc=fine_tuned,name=model_a,factor=pparse \
   --factor worker:procedure=fine_tuned,name=tensors_a,factor=tensors,dependency=model_a \
   --factor worker:procedure=fine_tuned,name=fine_tuned,factor=fine_tuned \
     # process fine_tuned's fine_tuned factor options continued

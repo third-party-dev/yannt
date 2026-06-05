@@ -473,7 +473,7 @@ def handle_request_input_args(request_args, input_args):
     # --- First process requests, so we can apply inputs to something. ---
     # May overwrite process and report classes.
     for cat, opts in request_args:
-        if cat not in ['process']: #, 'report']:
+        if cat not in ['process', 'report']:
             raise Exception(f"--request must be process or report, not {cat}.")
         if cat == 'process':
             if 'name' not in opts:
@@ -486,28 +486,37 @@ def handle_request_input_args(request_args, input_args):
 
             process_name = opts.pop('name')
             procedure_name = opts.pop('proc')
-            init_process_entry = {'fw': framework_name, 'name': process_name, 'procedure': procedure_name, 'opts': {}}
+            init_process_entry = {'fw': framework_name, 'name': process_name, 'procedure': procedure_name, 'inputs': {}}
             process_entry = framework_entry['processes'].setdefault(process_name, init_process_entry)
 
             for key, value in opts.items():
                 raise Exception(f"--request input only accepts fw, proc, and name as options. Not {key}.")
 
-        # if cat == 'report':
-        #     if 'name' not in opts:
-        #         raise Exception(f"--request report missing a name (--request report:name=name_here,report=procedure_here).")
-        #     if 'report' not in opts:
-        #         raise Exception(f"--request report missing a report class (--request report:name=name_here,report=report_class_here).")
+        if cat == 'report':
+            if 'name' not in opts:
+                raise Exception(f"--request report missing a name (--request report:name=name_here,report=procedure_here).")
+            if 'proc' not in opts:
+                raise Exception(f"--request report missing a procedure (--request report:name=name_here,proc=procedure_here).")
+            if 'report' not in opts:
+                raise Exception(f"--request report missing a report class (--request report:name=name_here,report=report_class_here).")
 
-        #     framework_name = opts.pop('fw', 'default')
-        #     framework_entry = requests.setdefault(framework_name, {'processes': {}, 'reports': {}})
+            framework_name = opts.pop('fw', 'default')
+            framework_entry = requests.setdefault(framework_name, {'processes': {}, 'reports': {}})
 
-        #     report_name = opts.pop('name')
-        #     report_class = opts.pop('report')
-        #     init_report_entry = {'fw': framework_name, 'name': report_name, 'report_class': report_class, 'opts': {}}
-        #     report_entry = framework_entry['reports'].setdefault(report_name, init_report_entry)
+            report_name = opts.pop('name')
+            report_class = opts.pop('report')
+            procedure_name = opts.pop('proc')
+            init_report_entry = {
+                'fw': framework_name,
+                'name': report_name,
+                'report_class': report_class,
+                'procedure': procedure_name,
+                'inputs': {}
+            }
+            report_entry = framework_entry['reports'].setdefault(report_name, init_report_entry)
 
-        #     for key, value in opts.items():
-        #         raise Exception(f"--request report only accepts fw, report, and name as options. Not {key}.")
+            for key, value in opts.items():
+                raise Exception(f"--request report only accepts fw, report, and name as options. Not {key}.")
 
     # --- Now assign all inputs to existing request entries. ---
     for cat, opts in input_args:
@@ -533,51 +542,53 @@ def handle_request_input_args(request_args, input_args):
                 raise Exception(f"During --input process, process {process_name} not defined.")
             process_entry = framework_entry['processes'][process_name]
 
+            input_entry = process_entry['inputs'].setdefault(factor_name, {})
+
             for key, value in opts.items():
-                opt = process_entry['opts'].setdefault(key, [])
+                opt = input_entry.setdefault(key, [])
                 if value not in opt:
                     opt.append(value)
 
-        # if cat == 'report':
+        if cat == 'report':
 
-        #     framework_name = opts.pop('fw', 'default')
-        #     # ** Inputs args only apply to CLI requests.
-        #     if framework_name not in requests:
-        #         raise Exception(f"During --input report, no request in specified framework {framework_name}.")
-        #     framework_entry = requests[framework_name]
-        #     report_name = opts.pop('name')
-        #     factor_name = opts.pop('factor')
+            framework_name = opts.pop('fw', 'default')
+            # ** Inputs args only apply to CLI requests.
+            if framework_name not in requests:
+                raise Exception(f"During --input report, no request in specified framework {framework_name}.")
+            framework_entry = requests[framework_name]
+            report_name = opts.pop('name')
+            factor_name = opts.pop('factor')
 
-        #     if report_name not in framework_entry['reports']:
-        #         raise Exception(f"During --input report, report {report_name} not defined.")
-        #     report_entry = framework_entry['reports'][report_name]
+            if report_name not in framework_entry['reports']:
+                raise Exception(f"During --input report, report {report_name} not defined.")
+            report_entry = framework_entry['reports'][report_name]
 
-        #     for key, value in opts.items():
-        #         opt = report_entry['opts'].setdefault(key, [])
-        #         if value not in opt:
-        #             opt.append(value)
+            input_entry = report_entry['inputs'].setdefault(factor_name, {})
+
+            for key, value in opts.items():
+                opt = input_entry.setdefault(key, [])
+                if value not in opt:
+                    opt.append(value)
     
-    # TODO: Verify request proc and report's exist in FRAMEWORKS.
+    # TODO: Verify request proc and report's exist in FRAMEWORKS?
 
+    # --- Now create requests and assign inputs. ---
     processes = {}
     reports = {}
-    # --- Now create requests and assign inputs. ---
     for framework_name, framework_entry in requests.items():
         framework = FRAMEWORKS[framework_name]
-        for process_name, process_entry in framework_entry['processes']:
+        for process_name, process_entry in framework_entry['processes'].items():
             process_fwname = f"{framework_name}-{process_name}"
             processes[process_fwname] = framework.procedure[process_entry['procedure']].create_process()
-            for opt_name, opt_value in process_entry['opts']:
-                processes[process_fwname].set_input(opt_name, opt_value)
+            for factor_name, factor_entry in process_entry['inputs'].items():
+                processes[process_fwname].set_input(factor_name, factor_entry)
         
-        # # ! How does report requiring a procedure make sense?
-        # for report_name, report_entry in framework_entry['reports']:
-        #     report_fwname = f"{framework_name}-{report_name}"
-
-        #     framework.init_report(report_name, report_entry['report'])
-        #     reports[report_fwname] = framework.init_report(report_entry['name']].create_process()
-        #     for opt_name, opt_value in process_entry['opts']:
-        #         processes[process_fwname].set_input(opt_name, opt_value)
+        # TODO: Describe how does report requiring a procedure make sense?
+        for report_name, report_entry in framework_entry['reports'].items():
+            report_fwname = f"{framework_name}-{report_name}"
+            reports[report_fwname] = framework.init_report(name=report_entry['report'], procedure=report_entry['procedure'])
+            for factor_name, factor_entry in report_entry['inputs'].items():
+                reports[report_fwname].set_input(factor_name, factor_entry)
 
     return processes, reports
 
@@ -608,13 +619,25 @@ def do_analysis(args):
     if args.request:
         processes, reports = handle_request_input_args(args.request, args.input)
 
+        '''
+            Quick dumb test:
+
+            yannt analyze --breakpoint --config config.yaml \
+                --request process:name=mine,proc=fine_tuned \
+                --input process:name=mine,factor=model_a,path=model.onnx \
+                --input process:name=mine,factor=model_b,path=model.bin
+
+            (Pdb) processes['default-mine'].results
+        '''
+
+
         # ---- Run processes and reports. ----
         # TODO: Optionally merge the procedures and execute as a single tree here.
 
         for process_name, process in processes.items():
             process.run()
 
-        for report_name, report in report.items():
+        for report_name, report in reports.items():
             report.process()
 
     if args.test:

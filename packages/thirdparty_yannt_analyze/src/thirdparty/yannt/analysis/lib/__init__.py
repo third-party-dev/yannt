@@ -251,7 +251,7 @@ class AnalysisFramework:
         return self._reports[name]
 
     
-    def register_factor(self, name: str, report: Union[type, tuple[str, str]], config=None):
+    def register_report(self, name: str, report: Union[type, tuple[str, str]], config=None):
         '''
             report can be a tuple of module_name and class_name (or the object class itself):
                 ('thirdparty.yannt.analysis.pparse.plugin', 'PparseFormat')
