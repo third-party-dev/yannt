@@ -173,6 +173,52 @@ class AnalysisProcedure:
             visit(name)
 
         return [(name, *self.factors[name]) for name in result]
+    
+
+    def topo_sorted_levels(self, thread_count: int) -> List[List[tuple]]:
+        # Parallel topological sort (BFS) with dependency tree level awareness.
+        # Allows multi-threaded distribution of factor processing.
+
+        in_degree = {name: 0 for name in self.factors}
+        dependents = {name: [] for name in self.factors}
+
+        for name, (_, dependencies) in self.factors.items():
+            for dep in dependencies:
+                if dep not in self.factors:
+                    raise KeyError(f"Factor {name} depends on unknown factor {dep} in procedure {self.name}.")
+                in_degree[name] += 1
+                dependents[dep].append(name)
+
+        ready = [name for name, degree in in_degree.items() if degree == 0]
+        levels = []
+
+        while ready:
+            for i in range(0, len(ready), thread_count):
+                chunk = ready[i:i + thread_count]
+                levels.append([(name, *self.factors[name]) for name in chunk])
+
+            next_ready = []
+            for name in ready:
+                for dependent in dependents[name]:
+                    in_degree[dependent] -= 1
+                    if in_degree[dependent] == 0:
+                        next_ready.append(dependent)
+            ready = next_ready
+
+        if sum(len(level) for level in levels) != len(self.factors):
+            raise ValueError(f"Circular dependency detected in procedure {self.name}.")
+
+        return levels
+
+
+    '''
+        Example Usage of topo_sorted_levels:
+            from concurrent.futures import ThreadPoolExecutor, wait
+            levels = obj.topo_sorted_levels(thread_count=4)
+            with ThreadPoolExecutor(max_workers=4) as executor:
+                for level in levels:
+                    wait([executor.submit(factor.run) for (name, factor, _) in level])
+    '''
 
 
 class AnalysisReport:
