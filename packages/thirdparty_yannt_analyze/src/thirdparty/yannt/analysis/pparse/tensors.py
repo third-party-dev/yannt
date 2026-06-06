@@ -7,6 +7,18 @@ Thoughts on terminology:
 - qualifier - what is this like? (metrics, stats, characteristics)
 - characteristics - properties of the tensor itself
 - characterization - interpretation or description of the tensor
+
+Factor Use Cases:
+- Tensor Sha256 - Identical parameter (e.g. weight) detection.
+- Architectural Sha256 - Compare structure across models within framework.
+- Shape Sequence Sha256 - Compare structure across models and frameworks.
+- Statistical Metrics - Indication of fine tuning / similarity.
+- Data type Distribution - Indication of similarity / complexity.
+- Value count - Count of all values in all observed tensors (ATM, includes non-learnable values.)
+- Singular Value Decomposition (SVD) Metrics
+  - Detect low rank adapters (LoRA has very low effective_rank).
+  - Identify over-parameterized tensors.
+  - Detect architectural familiar across retraining.
 '''
 
 import hashlib
@@ -59,8 +71,6 @@ class ModelTensorMetrics:
 
     # shape seq sha256
     shape_seq_sha256: str
-
-
 
 
 def calc_stat_metrics(arr: np.ndarray) -> dict[str, float]:
@@ -192,7 +202,7 @@ class TensorsCharacter(AnalysisFactor):
             shape = tensor.get_shape()
             numpy_arr = tensor.as_numpy()
             stat_metrics = calc_stat_metrics(numpy_arr)
-            spectral_metrics = calc_spectral_metrics(numpy_arr)
+            svd_metrics = calc_svd_metrics(numpy_arr)
 
             # Increment model dtype count.
             dtype_dist[dtype] = dtype_dist.setdefault(dtype, 0) + 1
@@ -220,9 +230,9 @@ class TensorsCharacter(AnalysisFactor):
                 sparsity=stat_metrics["sparsity"],
                 kurtosis=stat_metrics["kurtosis"],
                 skewness=stat_metrics["skewness"],
-                top_sv_ratio=spectral_metrics["top_sv_ratio"],
-                sv_entropy=spectral_metrics["sv_entropy"],
-                effective_rank=spectral_metrics["effective_rank"],
+                top_sv_ratio=svd_metrics["top_sv_ratio"],
+                sv_entropy=svd_metrics["sv_entropy"],
+                effective_rank=svd_metrics["effective_rank"],
             )
 
         return ModelTensorMetrics(
