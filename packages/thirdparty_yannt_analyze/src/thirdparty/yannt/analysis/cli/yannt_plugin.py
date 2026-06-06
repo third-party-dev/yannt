@@ -633,6 +633,8 @@ def do_analysis(args):
 
         # ---- Run processes and reports. ----
         # TODO: Optionally merge the procedures and execute as a single tree here.
+        # TODO: Consider allowing a requests section in config.yaml (or requests.yaml)
+        # TODO:   and supply it via a --request with_yaml:path=request.yaml argument.
 
         for process_name, process in processes.items():
             process.run()

@@ -367,3 +367,37 @@ Result: `compute_lineage(C) == ((R1, input_a), (R2, input_b), A, B, C)`
 And `((R1, input_a), (R2, input_b), A, B, C)` becomes the unique ID for the node and we can remove any duplicates.
 
 **Note**: This only works if all nodes in the graph only read from dependencies and not outside inputs.
+
+
+
+## Impl Notes
+
+PyTorch, recursive tensor construction:
+
+```sh
+yannt analyze --breakpoint --config config.yaml \
+  --request process:name=mine,proc=fine_tuned \
+  --input process:name=mine,factor=model_a,parser=onnx,path=models/yolo/yolov5su.onnx \
+  --input process:name=mine,factor=model_b,parser=pytorch,path=models/bert/pt/bert-AutoModel.complete.pt
+```
+
+PyTorch, linear tensor construction:
+
+```sh
+yannt analyze --breakpoint --config config.yaml \
+  --request process:name=mine,proc=fine_tuned \
+  --input process:name=mine,factor=model_a,parser=onnx,path=models/yolo/yolov5su.onnx \
+  --input process:name=mine,factor=model_b,parser=pytorch,path=models/bert/pt/bert-AutoModel.params.pt
+```
+
+PyTorch, failing tensor construction:
+
+```sh
+yannt analyze --breakpoint --config config.yaml \
+  --request process:name=mine,proc=fine_tuned \
+  --input process:name=mine,factor=model_a,parser=onnx,path=models/yolo/yolov5su.onnx \
+  --input process:name=mine,factor=model_b,parser=pytorch,path=models/yolo/yolov5su.pt
+```
+
+BUG: pparse PyTorch fails to get tensors from yolov5su.pt
+- pparse assumes NewCall or ReduceCall, but yolo returns dict, need to know how its serialized.

@@ -35,6 +35,8 @@
 
 - Consider a base class for StreamParser and base class for DiskParser
 
+- Yolov5su does not work with pparse pytorch parsing.
+
 ### New Features (after 0.0.4)
 
 - ~~Control Recursion~~

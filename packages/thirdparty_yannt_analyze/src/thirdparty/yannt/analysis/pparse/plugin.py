@@ -9,36 +9,6 @@ from thirdparty.yannt.analysis.lib import (
     AnalysisReport,
 )
 
-class PparseFormat(AnalysisInput):
-    def __init__(self, name = "_init", dependencies = []):
-        super().__init__(name=name, dependencies=dependencies)
-        self._arg_parser = self._build_parser()
-
-    def _build_parser(self):
-        import argparse
-        parser = argparse.ArgumentParser(
-            prog="--format onnx",
-            description="Derives statistical properties of all tensors in the model",
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter
-        )
-        parser.add_argument("--depth", type=int, default=3, help="Depth of tensor analysis")
-        parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
-        return parser
-    
-    def get_parser(self):
-        return self._arg_parser
-    
-    def parse_args(self, opts):
-        # Convert the passed (key=value) option dictionary to argparse as argv
-        argv = []
-        parser = self.get_parser()
-        for k, v in opts.items():
-            argv.append(f"--{k}")
-            if v is not None and v != "":
-                argv.append(str(v))
-        return parser.parse_args(argv)
-
-
 class TensorsFactor(AnalysisFactor):
     def __init__(self, name = "_init", dependencies = []):
         super().__init__(name=name, dependencies=dependencies)
@@ -70,11 +40,50 @@ class TensorMetricsReport(AnalysisReport):
         pass
 
 
+'''
+    # SEE pparse.py
+    class PparseFormat(AnalysisInput):
+        def __init__(self, name = "_init", dependencies = []):
+            super().__init__(name=name, dependencies=dependencies)
+            self._arg_parser = self._build_parser()
+
+        def _build_parser(self):
+            import argparse
+            parser = argparse.ArgumentParser(
+                prog="--format onnx",
+                description="Derives statistical properties of all tensors in the model",
+                formatter_class=argparse.ArgumentDefaultsHelpFormatter
+            )
+            parser.add_argument("--depth", type=int, default=3, help="Depth of tensor analysis")
+            parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+            return parser
+        
+        def get_parser(self):
+            return self._arg_parser
+        
+        def parse_args(self, opts):
+            # Convert the passed (key=value) option dictionary to argparse as argv
+            argv = []
+            parser = self.get_parser()
+            for k, v in opts.items():
+                argv.append(f"--{k}")
+                if v is not None and v != "":
+                    argv.append(str(v))
+            return parser.parse_args(argv)
+'''
+
+
 def pparse_plugin(cls_name):
     return ('thirdparty.yannt.analysis.pparse.plugin', cls_name)
 
 
 def register_analysis_plugin(framework):
+
+    #from thirdparty.yannt.analysis.pparse import PparseFormat
+    #config = { 'registry': { 'onnx': 'pparse.onnx', 'pytoroch': 'pparse.pytorch' } }
+    #framework.register_factor('pparse', pparse_plugin('PparseFormat'), config)
+
+
 
     # config = { 'registry': { 'onnx': 'pparse.onnx', 'pytoroch': 'pparse.pytorch' } }
 
@@ -104,7 +113,7 @@ def register_analysis_plugin(framework):
     # fine_tuned_proc.add_factor('fine_tuned', factor='fine_tuned', dependencies=fine_tuned_deps)
 
 
-    
+
     pass
 
 

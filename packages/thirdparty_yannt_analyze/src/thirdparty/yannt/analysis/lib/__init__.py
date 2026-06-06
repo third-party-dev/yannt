@@ -19,11 +19,16 @@ class AnalysisFactor():
         self.result_tags = []
 
 
-    def run(self, process):
-        #from pprint import pprint
-        print(f"Running in {type(self)}:{self.name} with result:")
-        #pprint(dict(process.results))
-        return None
+    def get_name(self):
+        return self.name
+
+
+    def run(self):
+        pass
+        # #from pprint import pprint
+        # print(f"Running in {type(self)}:{self.name} with result:")
+        # #pprint(dict(process.results))
+        # return None
 
 
     def __repr__(self):
@@ -36,7 +41,10 @@ class AnalysisInput(AnalysisFactor):
         self.input = None
 
 
-    # TODO: Move this is an AnalysisInput class?
+    def get_input(self):
+        return self.input
+
+
     def missing_input(self):
         return self.input is None
 
@@ -56,6 +64,7 @@ class AnalysisProcess:
         for factor_obj in self.factor_obj_list:
             if isinstance(factor_obj, AnalysisInput):
                 self.input_factors[factor_obj.name] = factor_obj
+            factor_obj._process = self
 
 
     def set_input(self, name, inp):
@@ -72,7 +81,7 @@ class AnalysisProcess:
         # Do the run
         for factor_obj in self.factor_obj_list:
             self.factors_objs[factor_obj.name] = factor_obj
-            self.results[factor_obj.name] = factor_obj.run(self)
+            self.results[factor_obj.name] = factor_obj.run()
 
         return self
 
