@@ -23,6 +23,14 @@ class AnalysisFactor():
         return self.name
 
 
+    def get_results(self):
+        return self._process.results
+
+
+    def get_result(self, name):
+        return self.get_results()[name]
+
+
     def run(self):
         pass
         # #from pprint import pprint
