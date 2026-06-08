@@ -45,7 +45,7 @@ def register_yannt_analyze(subparsers):
         eps = entry_points(group="yannt_analysis_plugin")
 
     for ep in eps:
-        ep.load()(FRAMEWORKS['default'])
+        ep.load()(FRAMEWORKS)
 
 
     analyze_parser = subparsers.add_parser("analyze", help="analyze command")
@@ -643,7 +643,16 @@ def do_analysis(args):
             report.process()
 
     if args.test:
-        do_simple_test()
+        import yaml
+        from dataclasses import asdict
+        # from pprint import pprint
+        with open('tchar_a.txt', 'w') as f:
+            # pprint(processes['default-mine'].results['tensor_character_a'], stream=f)
+            yaml.dump(asdict(processes['default-mine'].results['tensor_character_a']), stream=f)
+        with open('tchar_b.txt', 'w') as f:
+            # pprint(processes['default-mine'].results['tensor_character_b'], stream=f)
+            yaml.dump(asdict(processes['default-mine'].results['tensor_character_b']), stream=f)
+        #do_simple_test()
 
     if args.breakpoint:
         print(f"Locals: {list(locals().keys())}")

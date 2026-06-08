@@ -2,7 +2,11 @@
 
 Note: **WIP**
 
-When getting started with yannt, you need to know if you plan to interact with the code as a developer/builder or a user. If you are going to be in the developer/builder camp, you'll want to start with the "Developer Environment Setup" instructions.
+When getting started with yannt, you need to know if you plan to interact with the code as a developer/builder or a user. If you are going to be in the developer/builder camp, you'll want to start with the "Developer Environment Setup" instructions below.
+
+## User Environment Setup
+
+**WIP**
 
 <!-- ## Pipx
 
@@ -47,50 +51,50 @@ Once you have the environment cloned locally into the workspace (`thirdparty-ws`
 
 Note: As a proposed simplification for running various build, install, or run command, I've added a Justfile and an adhoc implementation of the `just` command to the project as the `do` script. If you have the `just` command, that will work in place of `do`. I will use `do` for the rest of the documentation.
 
-Environment initialization is managed by a collection of configurations stored in the `config` folder. You can see the available configurations via `./do init` (without parameters). For example:
+Environment initialization is managed by a collection of configurations stored in the `config/env` folder. You can see the available configurations via `./do init` (without parameters). For example:
 
 ```text
-yannt-py3.11-conda
-yannt-py3.11-docker
-yannt-py3.11-podman
+yannt-conda-py3.11
+yannt-docker-py3.11
+yannt-podman-py3.11
 ...
 ```
 
-Each of the above strings is a procedure and reference to a development environment that you can build locally on your system. The configurations that start with `yannt` target environments that run the `yannt` command. The `py` part specifies the Python interpreter version that will be used, and the last part of the tuple is the type of environment that will manage the isolation. At the moment, yannt supports conda (for data science setups), docker for stronger isolation w/ GPU based setups, and podman for when conda is not available or discouraged in data science setups.
+Each of the above strings is a procedure and reference to a development environment that you can build locally on your system. The configurations that start with `yannt` target environments that run the `yannt` command. The `py` part specifies the Python interpreter version that will be used, and the rest is usually an indication of the type of environment the python process will be running within. At the moment, yannt supports conda (for data science setups), docker for stronger isolation w/ GPU based setups, podman for when conda is not available or discouraged in data science setups, and plain ole venv (via venv, virtualenv, or uv).
 
 Note: Yannt intends to be available as a wheel that can be installed in any environment within a range of python interpreters. But this is the development environment initialization and therefore is limited to what will be supported and tested.
 
-Once you've identified a configuration to run with (e.g. `yannt-py3.11-podman`), you can run:
+Once you've identified a configuration to run with (e.g. `yannt-podman-py3.11`), you can run:
 
 ```sh
-./do init yannt-py3.11-podman
+./do init yannt-podman-py3.11
 ```
 
-The scripts will attempt to set up a new environment with Python 3.11 and all of the required Python dependencies. As part of the process, the yannt development environment will attempt to download all of the dependencies into a cache folder before performing any installs. This extra cache process is independent of pip caching and ensures that all of the python packages are available for offline usage, keeps the packages more fixed, and allows developers positive control of the packages that are being installed, regardless of the `pyproject.yaml` or requirements/constraints settings. Plus you get a built-in local repository to prevent having to redownload CUDA packages for each re-initialization of the same python version.
+The scripts will attempt to set up a new environment with Python 3.11 and all of the required Python dependencies. As part of the process, the yannt development environment will attempt to download all of the dependencies into a cache folder before performing any installs. This extra cache process is independent of pip caching and ensures that all of the python packages are available for offline usage, keeps the packages more fixed, and allows developers positive control of the packages that are being installed, regardless of the `pyproject.yaml` or requirements/constraints settings. Plus you get a built-in local repository to prevent having to redownload CUDA packages for each re-initialization of the same python version. Note: When using apt in container based builds, we also cache those packages as part of the home folder of the given container.
 
 Once the environment has been initialized, it will drop the user into a shell within the environment. If all went well you'll see something like the following:
 
 ```text
 The environment is now ready. Try 'yannt --help' for information.
-(yannt-py3.11-podman) user@61cc16f975c6:/work$
+(yannt-podman-py3.11) user@61cc16f975c6:/work$
 ```
 
-When you are done using the development environment or want to exit the environment, simply run `exit` (i.e. do not `deactivate` when that would seem appropriate, just `exit`). By design, the development environment is always initialized in a sub-shell of the one that `./do` was executed from. **This pattern prevents the development environment from polluting the original environment.**
+When you are done using the development environment or want to exit the environment, simply run `exit` (i.e. do not `deactivate` when that would seem appropriate, **just `exit`**). By design, the development environment is always initialized in a sub-shell of the one that `./do` was executed from. **This pattern prevents the development environment from polluting the original environment.**
 
 ### Running Already Created Environment
 
-Similar to initialization, there is a process for running an already created (or initialized) environment. If you created `yannt-py3.11-podman`, you can use the pre-cached environment by running:
+Similar to initialization, there is a process for running an already created (or initialized) environment. If you created `yannt-podman-py3.11`, you can use the pre-cached environment by running:
 
 ```sh
-./do run yannt-py3.11-podman
+./do run yannt-podman-py3.11
 ```
 
-Optionally, you don't need to run everything from a shell in the container. You can often accomplish single runs by providing `--` and the command you want to run. For example:
+<!-- Optionally, you don't need to run everything from a shell in the container. You can often accomplish single runs by providing `--` and the command you want to run. For example:
 
 ```sh
 ./do run yannt-py3.11-podman -- yannt --help
-```
+``` -->
 
 ### Bash Tab Completion
 
-As part of the developer environment, bash tab completion is included for `yannt` command. As per the usual `argparse` enabled command, you can also run `yannt --help` to get your barrings.
+As part of the developer environment, bash tab completion is (usually) included for `yannt` command. As per the usual `argparse` enabled command, you can also run `yannt --help` to get your barrings.

@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 from collections import defaultdict, deque
-from typing import Any, Union
+from typing import Any, Union, List
 
 
 AnalysisFactorKey = tuple[type["AnalysisFactor"], str]

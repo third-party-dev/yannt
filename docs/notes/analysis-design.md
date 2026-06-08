@@ -401,3 +401,17 @@ yannt analyze --breakpoint --config config.yaml \
 
 BUG: pparse PyTorch fails to get tensors from yolov5su.pt
 - pparse assumes NewCall or ReduceCall, but yolo returns dict, need to know how its serialized.
+
+
+### Onnx Op Prov
+
+- `node._value['domain']` - namespace/organization that created model (very optional)
+- `node._value['opset_import']._value['version']` - onnx opset
+- `node._value['metadata_props']` - dict about model (very optional)
+
+- `node._value['graph']` - Graph
+  - `node._value['graph']._value['initializer']` - Tensor Values
+  - `node._value['graph']._value['node']` - Nodes in the graph
+
+
+- `op_type`

@@ -10,8 +10,8 @@ Note: When performing any virtual environment updates or resets, I always perfor
 
 ## **thirdpart-ws/yannt** Project Layout
 
-- **bundles** - Ephemeral folder for holding git bundles, used for transferring backups to other systems.
 - **cache** - Ephemeral folder for holding virtual development environment state (conda, venv, docker home folders).
+  - **bundles** - Ephemeral folder for holding git bundles, used for transferring backups to other systems.
   - **conda** - Project local storage for conda environments.
   - **docker** - All project specific things related to docker (e.g. a container home directory for container local caching and command history.)
   - **empty-context** - An always empty folder that can be used for empty container contexts.
@@ -35,4 +35,3 @@ Note: When performing any virtual environment updates or resets, I always perfor
 - **upstream** - Ephemeral folder for holding clones of upstream git repos used for developing and testing yannt.
 - **do** - (Vibe-coded) Clone of `just` for use with the adjacent `Justfile`. (Proper `just` should be usable instead of `do` for a more rich experience.)
 - **Justfile** - Modern-ish version of Makefile with design principles for project management.
-
