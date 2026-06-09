@@ -21,6 +21,28 @@
 
 CHAPTERS="
 docs/0-overview.md
+docs/1-summary.md
+docs/2-end-user/2.1-overview.md
+docs/2-end-user/2.2-concepts.md
+docs/2-end-user/2.3-user-usecases/2.3.1-overview.md
+docs/2-end-user/2.4-troubleshooting.md
+docs/3-integration/3.1-overview.md
+docs/3-integration/3.2-install.md
+docs/3-integration/3.3-quick-start.md
+docs/3-integration/3.4-concepts.md
+docs/3-integration/3.5-api-usecases/3.5.1-overview.md
+docs/3-integration/3.6-gotchas.md
+docs/3-integration/3.7-versioning.md
+docs/4-tutorials/4.1-overview.md
+docs/5-api-reference/5.1-overview.md
+docs/6-maintainer/6.1-overview.md
+docs/6-maintainer/6.2-architecture.md
+docs/6-maintainer/6.3-dev-environment.md
+docs/6-maintainer/6.4-code-base.md
+docs/6-maintainer/6.5-testing/6.5.1-overview.md
+docs/6-maintainer/6.6-release.md
+docs/6-maintainer/6.7-roadmap.md
+docs/6-maintainer/6.8-commentary/6.8.1-overview.md
 "
 
 # --number-sections
