@@ -415,3 +415,35 @@ BUG: pparse PyTorch fails to get tensors from yolov5su.pt
 
 
 - `op_type`
+
+
+
+
+
+
+<!-- The parser framework includes a registry of parsers fed to an initial extraction that represents data from a file. The extraction finds a parser from the registry that can parse its data into a parse tree of decomposed data structure information. The parse tree is mostly made up of a common node structure that _may_ contain context (the data required to perform parsing) and it has a value that _may_ be loaded. If the value is dereferenced and the data is not loaded, it will attempt to parse the data from the context. If the context does not exist, it'll go up the parse tree looking for the next available context to start the parsing replay. Parse trees can contain data that the current parser can not parse. In that case, the encapsulated data becomes a child extraction. Once this extraction exists, the process is repeated by finding a parser to process the child extraction's data. -->
+
+## Progressive Parsing Concepts
+
+When you point the parser at a file, it doesn't try to understand the while thing at once. It starts with an extraction or a chunk of raw data and a question: What is this? To answer that, the tool looks up available format parsers in a registry. The registry finds the parser that recognizes the data and hands it over. That parser decomposes the data into a parse tree (a structured representation of what was found).
+
+Most nodes in the parse tree share a common structure. The nodes carry a value and optionally a context (the data needed to product the value). The value isn't loaded until you ask for it. When you do, if the data isn't there, the node looks to its context. If the context isn't there either, it walks up the tree until it finds one and replays parsing from that point. This means the tree can represent a file far larger than available memory. Only the parts you touch are ever fully resolved is another way to think of it.
+
+Some nodes contain data the current parser doesn't recognize. Instead of failing, that data becomes a child extraction and the whole process repeats. A new parser is found and another subtree is built. The format doesn't need to me monolithic for the tool to make progress.
+
+
+
+<!-- The analysis framework contains analysis procedures. Analysis procedures contain analysis factors. Analysis factors that have no dependencies are analysis inputs and usually represent external resources like pparse results. The pparse results are presented in a common API so that most derived factors do not need to know the format of the model they are performing analysis on. Analysis processes are collections of factors from an analysis procedure that are sorted and then executed. The analysis process has a dictionary where each key represents a factor instance's output. Analysis reports are associated with a procedure and when executed create their own process and then filter the information down to only what the report (or user) wants a summary on. -->
+
+
+## Declarative Analysis Concepts
+
+Reading and parsing the file gives you structure, but the structure alone does not answer: Does this contain executable code?, Where do the weights come from? Answering those requires combining observations and derived observations.
+
+The analysis framework is built around that derived dependency problem. An analysis procedure define a network of factors (i.e. observations), each one a discrete piece of code that declares what it produces and what it needs to process. Factors with no dependencies are inputs. A common input factor is one that reaches into the parser results for initial observations. Everything built on top of an input factor are worker factors. All worker factors receive the outputs of other factors and produce something more specific.
+
+Most derived worker factors don't need to know what model format they're processing because the parser results are presented through a common (domain specific) APIm so the same analysis logic works across most formats.
+
+When you run an analysis process, the framework sorts the factors by their dependencies and executes them in order. The results are added to a dictionary keyed by the factor instance name. The dictionary becomes a complete record of every observation made.
+
+An analysis report is a filter over that process. The report defines which factors matter for a particular question, runs the process, and filters the output down to only what the user asked for. The full analysis happens either way, the report decides what gets exposed.

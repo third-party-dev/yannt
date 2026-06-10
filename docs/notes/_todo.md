@@ -90,3 +90,4 @@
 - pparse (conceptually) uses Filter, Parse, Analyze, Alter, Serialize, but not as automated pipeline.
 
 
+- Check for pyyaml in do? Check for python in do?
