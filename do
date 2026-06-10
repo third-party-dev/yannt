@@ -1,3 +1,29 @@
+#!/usr/bin/env bash
+___SHELL_NOOP=0
+true=0
+true <<___SHELL_NOOP
+'''
+___SHELL_NOOP
+
+# Note, this script runs in both bash and python.
+
+for pkg in python3 pip3; do
+    if ! command -v "$pkg" &>/dev/null; then
+        echo "Missing: $pkg"; exit 1
+    #else
+    #	echo "Found: $pkg";
+    fi
+done
+
+for pkg in pyyaml jinja2; do
+    if ! pip3 show "$pkg" &>/dev/null; then
+        echo "Missing Python package: $pkg"; exit 1
+    fi
+done
+
+exec python3 "$0"
+'''
+
 #!/usr/bin/env python3
 """
 Pure Python implementation of the 'just' command runner.
