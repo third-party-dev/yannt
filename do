@@ -21,7 +21,7 @@ for pkg in pyyaml jinja2; do
     fi
 done
 
-exec python3 "$0"
+exec python3 "$0" $@
 '''
 
 #!/usr/bin/env python3
