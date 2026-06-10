@@ -3,23 +3,38 @@
 ''':'
 # Note, this script runs in both bash and python.
 
-for pkg in python pip; do
-    if ! command -v "$pkg" &>/dev/null; then
-        echo "Missing: $pkg"; exit 1
-    #else
-    #	echo "Found: $pkg";
-    fi
-done
+# Look for python
+PYTHON=${PYTHON:-''}
+if [ -z "$PYTHON" ]; then
+    for pkg in python3 python; do
+        if command -v "$pkg" &>/dev/null; then
+            PYTHON=$pkg
+            break
+        fi
+    done
+fi
+[ -z "$PYTHON" ] && { echo "python3 and python not found in $PATH" ; exit 1; }
+
+# Look for pip
+PIP=${PIP:-''}
+if [ -z "$PIP" ]; then
+    for pkg in pip3 pip; do
+        if command -v "$pkg" &>/dev/null; then
+            PIP=$pkg
+            break
+        fi
+    done
+fi
+[ -z "$PIP" ] && { echo "pip and pip3 not found in $PATH" ; exit 1; }
 
 for pkg in pyyaml jinja2; do
-    if ! pip show "$pkg" &>/dev/null; then
+    if ! $PIP show "$pkg" &>/dev/null; then
         echo "Missing Python package: $pkg"; exit 1
     fi
 done
 
-command -v python3 >/dev/null 2>&1 && exec python3 "$0" "$@"
-command -v python  >/dev/null 2>&1 && exec python  "$0" "$@"
->&2 echo "error: cannot find python"
+command -v $PYTHON >/dev/null 2>&1 && exec $PYTHON "$0" "$@"
+>&2 echo "error: cannot execute $PYTHON"
 exit 1
 '''
 
