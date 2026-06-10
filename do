@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
-___SHELL_NOOP=0
-true=0
-true <<___SHELL_NOOP
-'''
-___SHELL_NOOP
 
+''':'
 # Note, this script runs in both bash and python.
 
-for pkg in python3 pip3; do
+for pkg in python pip; do
     if ! command -v "$pkg" &>/dev/null; then
         echo "Missing: $pkg"; exit 1
     #else
@@ -16,13 +12,17 @@ for pkg in python3 pip3; do
 done
 
 for pkg in pyyaml jinja2; do
-    if ! pip3 show "$pkg" &>/dev/null; then
+    if ! pip show "$pkg" &>/dev/null; then
         echo "Missing Python package: $pkg"; exit 1
     fi
 done
 
-exec python3 "$0" $@
+command -v python3 >/dev/null 2>&1 && exec python3 "$0" "$@"
+command -v python  >/dev/null 2>&1 && exec python  "$0" "$@"
+>&2 echo "error: cannot find python"
+exit 1
 '''
+
 
 #!/usr/bin/env python3
 """
