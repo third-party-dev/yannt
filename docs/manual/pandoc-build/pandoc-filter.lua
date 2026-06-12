@@ -85,3 +85,14 @@ end
 --   -- el.attributes["placement"] = "H"  -- 'H' means "here"
 --   return el
 -- end
+
+-- Replace <a id=""></a> style anchors to LaTeX anchors.
+-- function RawInline(el)
+--   if el.format == "html" then
+--     local id = el.text:match('<a id="([^"]+)"%s*/?>')
+--     if id then
+--       local sanitised = id:gsub("[^%w-]", "-")
+--       return pandoc.Span("", {id = sanitised})
+--     end
+--   end
+-- end

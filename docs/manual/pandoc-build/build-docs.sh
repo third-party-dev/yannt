@@ -45,6 +45,9 @@ docs/6-maintainer/6.7-roadmap.md
 docs/6-maintainer/6.8-commentary/6.8.1-overview.md
 "
 
+# Excluded:
+# - docs/5-api-reference/5.2-python-api.md
+
 # --number-sections
 # --listings
 
