@@ -19,6 +19,32 @@ where = ["src"]
 namespaces = true
 
 
+
+[tool.ruff]
+exclude = [
+    "docs",
+    "outputs",
+    "scripts",
+    "tests",
+]
+line-length = 120
+
+[tool.ruff.format]
+exclude = [
+    "docs",
+    "outputs",
+    "scripts",
+    "tests",
+]
+quote-style = "preserve"
+
+[tool.ruff.lint]
+# E402 - Removing rule defers imports not needed for arg parsing.
+ignore = ["E402"]
+
+
+
+
 [project.entry-points."yannt_command"]
 # Register pparse as a yannt subcommand
 analyze = "thirdparty.yannt.analysis.cli.yannt_plugin:register_yannt_analyze"
