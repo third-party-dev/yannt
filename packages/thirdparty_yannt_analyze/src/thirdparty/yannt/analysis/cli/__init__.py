@@ -3,7 +3,7 @@ from thirdparty.yannt.analysis.cli.registry import get_commands, load_entrypoint
 
 
 # Function called when the scripts CLI entry point is called.
-def main():
+def main() -> None:
     # Create parent parser
     parser = argparse.ArgumentParser(prog="analyze")
     parser.add_argument("--breakpoint",

@@ -1,5 +1,9 @@
+import argparse
 from importlib.metadata import entry_points
+from typing import Any
+
 from thirdparty.yannt.analysis.lib import FRAMEWORKS, AnalysisFramework
+from thirdparty.yannt.analysis.lib.config import Config
 
 
 def parse_process_arg(value: str) -> tuple[str, dict]:
@@ -21,7 +25,7 @@ def parse_process_arg(value: str) -> tuple[str, dict]:
 
 
 # Function called my yannt based on yannt_command entrypoint registration in pyproject.toml
-def register_yannt_analyze(subparsers):
+def register_yannt_analyze(subparsers: Any) -> None:
 
     '''
         Order of precedence (least to most):
@@ -225,7 +229,7 @@ def register_yannt_analyze(subparsers):
 
 # _dedup_name_key_val(args.format or [])
 
-def process_config(config):
+def process_config(config: Config) -> None:
     for framework_config in config.frameworks:
         framework = FRAMEWORKS.setdefault(framework_config.name, AnalysisFramework(name=framework_config.name))
         # ** Note: overwriting any entry point registrations and hard coded defaults.
@@ -253,7 +257,7 @@ def process_config(config):
                 procedure.add_factor(worker.name, factor=worker.factor_class, dependencies=worker.dependencies)
 
 
-def do_simple_test():
+def do_simple_test() -> None:
     print("--- Loaded Analysis Framework Features ---")
 
     print("Registered factors:")
@@ -292,7 +296,7 @@ def do_simple_test():
     pprint(dict(report.results))
 
 
-def handle_load_args(load_args):
+def handle_load_args(load_args: list[tuple[str, dict]]) -> None:
 
     to_load = {
         'factor_classes': {},
@@ -364,7 +368,7 @@ def handle_load_args(load_args):
         FRAMEWORKS['default']._force_register_report(report_name, (report_class['mod'], report_class['cls']), report_class['config'])
 
 
-def handle_factor_args(factor_args):
+def handle_factor_args(factor_args: list[tuple[str, dict]]) -> None:
 
     '''
         When adding factors (inputs and workers) to procedures, there is no configuration. All factor configuration
@@ -466,7 +470,7 @@ def handle_factor_args(factor_args):
             procedure._force_add_factor(worker_name, worker_entry['factor_class'], dependencies=worker_entry['dependencies'])
 
 
-def handle_request_input_args(request_args, input_args):
+def handle_request_input_args(request_args: list[tuple[str, dict]], input_args: list[tuple[str, dict]]) -> tuple[dict, dict]:
     requests = {}
     #requests = 
 
@@ -594,7 +598,7 @@ def handle_request_input_args(request_args, input_args):
     return processes, reports
 
 
-def do_analysis(args):
+def do_analysis(args: argparse.Namespace) -> None:
     '''
         Order of precedence (least to most):
             - Hard coded defaults

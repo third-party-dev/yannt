@@ -1,9 +1,12 @@
 
 
+from typing import Any
+
 from thirdparty.yannt.analysis.lib import (
     AnalysisFactorKey,
     AnalysisFactorRegistry,
     AnalysisFactor,
+    AnalysisFramework,
     AnalysisInput,
     AnalysisProcess,
     AnalysisReport,
@@ -12,32 +15,32 @@ from thirdparty.yannt.analysis.lib import (
 
 
 class TensorsMetrics(AnalysisFactor):
-    def __init__(self, name = "_init", dependencies = []):
+    def __init__(self, name: str = "_init", dependencies: list = []) -> None:
         super().__init__(name=name, dependencies=dependencies)
 
 class FineTuned(AnalysisFactor):
-    def __init__(self, name = "_init", dependencies = []):
+    def __init__(self, name: str = "_init", dependencies: list = []) -> None:
         super().__init__(name=name, dependencies=dependencies)
 
 class BasicProcess(AnalysisProcess):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
 class FineTunedReport(AnalysisReport):
-    def report(self):
+    def report(self) -> dict:
         return {'fine_tuned': self._process.results['fine_tuned']}
 
 
 class TensorMetricsReport(AnalysisReport):
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
 
-def pparse_plugin(cls_name):
+def pparse_plugin(cls_name: str) -> tuple[str, str]:
     return ('thirdparty.yannt.analysis.pparse.plugin', cls_name)
 
 
-def register_analysis_plugin(framework):
+def register_analysis_plugin(framework: AnalysisFramework) -> None:
 
     #from thirdparty.yannt.analysis.pparse import PparseFormat
     #config = { 'registry': { 'onnx': 'pparse.onnx', 'pytoroch': 'pparse.pytorch' } }

@@ -1,10 +1,12 @@
 
 
 
+from typing import Any
+
 from thirdparty.yannt.analysis.lib import AnalysisInput
 
 class PparseViewer(AnalysisInput):
-    def __init__(self, name = "_init", dependencies = []):
+    def __init__(self, name: str = "_init", dependencies: list = []) -> None:
         # Setup base class
         super().__init__(name=name, dependencies=dependencies)
         # Grab config from enclosed class object
@@ -12,7 +14,7 @@ class PparseViewer(AnalysisInput):
         #breakpoint()
 
 
-    def missing_input(self):
+    def missing_input(self) -> bool:
         if self.input is None:
             return True
         
@@ -20,7 +22,7 @@ class PparseViewer(AnalysisInput):
             return True
 
 
-    def run(self):
+    def run(self) -> Any:
         print(f"Running in {type(self)}:{self.name}")
 
         '''

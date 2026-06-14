@@ -3,13 +3,13 @@
 
 from abc import ABC, abstractmethod
 from collections import defaultdict, deque
-from typing import Any, Union, List
+from typing import Any, Union, Optional
 
 
 AnalysisFactorKey = tuple[type["AnalysisFactor"], str]
 AnalysisFactorRegistry = dict[AnalysisFactorKey, "AnalysisFactor"]
 class AnalysisFactor():
-    def __init__(self, name='unnamed', dependencies=None):
+    def __init__(self, name: str = 'unnamed', dependencies: Optional[list] = None) -> None:
         # The name of the factor
         self.name = name
 
@@ -19,19 +19,19 @@ class AnalysisFactor():
         self.result_tags = []
 
 
-    def get_name(self):
+    def get_name(self) -> str:
         return self.name
 
 
-    def get_results(self):
+    def get_results(self) -> dict:
         return self._process.results
 
 
-    def get_result(self, name):
+    def get_result(self, name: str) -> Any:
         return self.get_results()[name]
 
 
-    def run(self):
+    def run(self) -> None:
         pass
         # #from pprint import pprint
         # print(f"Running in {type(self)}:{self.name} with result:")
@@ -39,31 +39,31 @@ class AnalysisFactor():
         # return None
 
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{type(self).__name__}(name={self.name!r})"
 
 
 class AnalysisInput(AnalysisFactor):
-    def __init__(self, name='unnamed', dependencies=None):
+    def __init__(self, name: str = 'unnamed', dependencies: Optional[list] = None) -> None:
         super().__init__(name=name, dependencies=dependencies)
         self.input = None
 
 
-    def get_input(self):
+    def get_input(self) -> Any:
         return self.input
 
 
-    def missing_input(self):
+    def missing_input(self) -> bool:
         return self.input is None
 
 
-    def set_input(self, inp):
+    def set_input(self, inp: Any) -> 'AnalysisInput':
         self.input = inp
         return self
 
 
 class AnalysisProcess:
-    def __init__(self, factor_obj_list):
+    def __init__(self, factor_obj_list: list) -> None:
         self.factor_obj_list = factor_obj_list
         self.factors_objs = defaultdict(dict)
         self.results = defaultdict(dict)
@@ -75,12 +75,12 @@ class AnalysisProcess:
             factor_obj._process = self
 
 
-    def set_input(self, name, inp):
+    def set_input(self, name: str, inp: Any) -> 'AnalysisProcess':
         self.input_factors[name].set_input(inp)
         return self
 
 
-    def run(self):
+    def run(self) -> 'AnalysisProcess':
         # Check all input is not None.
         for input_obj in self.input_factors.values():
             if input_obj.missing_input():
@@ -96,7 +96,7 @@ class AnalysisProcess:
 
 class AnalysisProcedure:
 
-    def __init__(self, name='unnamed', framework=None):
+    def __init__(self, name: str = 'unnamed', framework: Optional['AnalysisFramework'] = None) -> None:
         self.name = name
 
         self.framework = framework
@@ -107,7 +107,7 @@ class AnalysisProcedure:
         self.factors = {}
 
 
-    def _force_add_input(self, name, factor):
+    def _force_add_input(self, name: str, factor: str) -> 'AnalysisProcedure':
         if factor not in self.framework.factor:
             raise KeyError(f"Factor {factor} not registered in framework {self.framework.name}.")
         self.inputs[name] = self.framework.factor[factor]
@@ -115,7 +115,7 @@ class AnalysisProcedure:
         return self
 
 
-    def add_input(self, name, factor):
+    def add_input(self, name: str, factor: str) -> 'AnalysisProcedure':
         if factor not in self.framework.factor:
             raise KeyError(f"Factor {factor} not registered in framework {self.framework.name}.")
         if name in self.inputs:
@@ -125,21 +125,21 @@ class AnalysisProcedure:
         return self
 
 
-    def _force_add_factor(self, name, factor, dependencies=None):
+    def _force_add_factor(self, name: str, factor: str, dependencies: Optional[list] = None) -> 'AnalysisProcedure':
         if factor not in self.framework.factor:
             raise KeyError(f"Factor {factor} not registered in framework {self.framework.name}.")
         self.factors[name] = (self.framework.factor[factor], dependencies or [])
         return self
 
 
-    def add_factor(self, name, factor, dependencies=None):
+    def add_factor(self, name: str, factor: str, dependencies: Optional[list] = None) -> 'AnalysisProcedure':
         if name in self.factors:
             raise ValueError(f"Duplicate factor name {name} added to process {self.name}.")
         self._force_add_factor(name, factor, dependencies=dependencies)
         return self
 
-    
-    def create_process(self):
+
+    def create_process(self) -> AnalysisProcess:
         factor_objs = []
         factor_cls_list = self.topo_sorted_factors()
         for factor_name, factor_cls, factor_deps in factor_cls_list:
@@ -149,12 +149,12 @@ class AnalysisProcedure:
         return AnalysisProcess(factor_objs)
 
 
-    def topo_sorted_factors(self):
+    def topo_sorted_factors(self) -> list[tuple]:
         visited = set()
         visiting = set()
         result = []
 
-        def visit(name):
+        def visit(name: str) -> None:
             if name in visiting:
                 raise ValueError(f"Circular dependency at factor {name} in procedure {self.name}.")
             if name in visited:
@@ -175,7 +175,7 @@ class AnalysisProcedure:
         return [(name, *self.factors[name]) for name in result]
     
 
-    def topo_sorted_levels(self, thread_count: int) -> List[List[tuple]]:
+    def topo_sorted_levels(self, thread_count: int) -> list[list[tuple]]:
         # Parallel topological sort (BFS) with dependency tree level awareness.
         # Allows multi-threaded distribution of factor processing.
 
@@ -222,7 +222,7 @@ class AnalysisProcedure:
 
 
 class AnalysisReport:
-    def __init__(self, name='unnamed', procedure=None, framework=None, process=None):
+    def __init__(self, name: str = 'unnamed', procedure: Optional[str] = None, framework: Optional['AnalysisFramework'] = None, process: Optional[AnalysisProcess] = None) -> None:
         self.name = name
         self.framework = framework or FRAMEWORKS['default']
 
@@ -238,24 +238,24 @@ class AnalysisReport:
             self.results = self.report()
 
 
-    def set_input(self, name, inp):
+    def set_input(self, name: str, inp: Any) -> 'AnalysisReport':
         self._process.set_input(name, inp)
         return self
 
 
-    def process(self):
+    def process(self) -> 'AnalysisReport':
         self._process.run()
 
         self.results = self.report()
         return self
 
 
-    def report(self):
+    def report(self) -> dict:
         return {}
 
 
 class AnalysisFramework:
-    def __init__(self, name='unnamed'):
+    def __init__(self, name: str = 'unnamed') -> None:
         self.name = name
         self._formats = {}
         self._factors = {}
@@ -264,21 +264,21 @@ class AnalysisFramework:
 
 
     @property
-    def factor(self):
+    def factor(self) -> dict[str, type]:
         return self._factors
 
 
     @property
-    def procedure(self):
+    def procedure(self) -> dict[str, 'AnalysisProcedure']:
         return self._procedures
-    
+
 
     @property
-    def report(self):
+    def report(self) -> dict[str, type]:
         return self._reports
 
 
-    def _force_register_factor(self, name, factor, config=None):
+    def _force_register_factor(self, name: str, factor: Union[type, tuple[str, str]], config: Optional[dict] = None) -> type:
         if isinstance(factor, tuple):
             from importlib import import_module
             (module_name, class_name) = factor
@@ -290,7 +290,7 @@ class AnalysisFramework:
         return self._factors[name]
 
 
-    def register_factor(self, name: str, factor: Union[type, tuple[str, str]], config=None):
+    def register_factor(self, name: str, factor: Union[type, tuple[str, str]], config: Optional[dict] = None) -> type:
         '''
             factor can be a tuple of module_name and class_name (or the object class itself):
                 ('thirdparty.yannt.analysis.pparse.plugin', 'PparseFormat')
@@ -302,7 +302,7 @@ class AnalysisFramework:
         return self._force_register_factor(name, factor, config=config)
 
 
-    def _force_register_report(self, name: str, report: Union[type, tuple[str, str]], config=None):
+    def _force_register_report(self, name: str, report: Union[type, tuple[str, str]], config: Optional[dict] = None) -> type:
         if isinstance(report, tuple):
             from importlib import import_module
             (module_name, class_name) = report
@@ -314,7 +314,7 @@ class AnalysisFramework:
         return self._reports[name]
 
     
-    def register_report(self, name: str, report: Union[type, tuple[str, str]], config=None):
+    def register_report(self, name: str, report: Union[type, tuple[str, str]], config: Optional[dict] = None) -> type:
         '''
             report can be a tuple of module_name and class_name (or the object class itself):
                 ('thirdparty.yannt.analysis.pparse.plugin', 'PparseFormat')
@@ -326,20 +326,20 @@ class AnalysisFramework:
         return self._force_register_report(name, report, config=config)
 
 
-    def init_report(self, name, procedure):
+    def init_report(self, name: str, procedure: str) -> AnalysisReport:
         if name not in self._reports:
             raise KeyError(f"Report name {name} not registered in framework.")
         return self._reports[name](name=name, procedure=procedure, framework=self)
 
-    
-    def post_process_report(self, name, process=None):
+
+    def post_process_report(self, name: str, process: Optional[AnalysisProcess] = None) -> AnalysisReport:
         if name not in self._reports:
             raise KeyError(f"Report name {name} not registered in framework.")
         report = self._reports[name](name=name, process=process, framework=self)
         return report
 
 
-    def create_procedure(self, name='unnamed'):
+    def create_procedure(self, name: str = 'unnamed') -> AnalysisProcedure:
         if name in self._procedures:
             raise KeyError(f"Procedure name {name} already used in framework.")
         self._procedures[name] = AnalysisProcedure(name=name, framework=self)

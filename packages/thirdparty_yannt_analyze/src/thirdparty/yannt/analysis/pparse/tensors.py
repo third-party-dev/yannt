@@ -75,7 +75,6 @@ class ModelTensorMetrics:
 
 def calc_stat_metrics(arr: np.ndarray) -> dict[str, float]:
     def _safe_kurtosis(flat: np.ndarray) -> float:
-        # Fisher kurtosis (excess kurtosis, normal=0).
         if flat.std() < 1e-10:
             return 0.0
         z = (flat - flat.mean()) / flat.std()
@@ -145,12 +144,12 @@ def calc_svd_metrics(arr: np.ndarray, max_sv: int = 64) -> dict[str, Optional[fl
     }
 
 
-def calc_tensor_sha256(numpy_arr) -> str:
+def calc_tensor_sha256(numpy_arr: np.ndarray) -> str:
     # sha256 over serialized contiguous numpy array.
     return hashlib.sha256(np.ascontiguousarray(numpy_arr).tobytes()).hexdigest()
 
 
-def calc_arch_sha256(st_entries, keep_lm_head=False):
+def calc_arch_sha256(st_entries: dict, keep_lm_head: bool = False) -> str:
     # Architectural hash calculated as canonical safetensors without data.
     # Hash will survive across training with same training framework.
     import json
@@ -158,7 +157,7 @@ def calc_arch_sha256(st_entries, keep_lm_head=False):
     return hashlib.sha256(sane_json.encode("utf-8")).hexdigest()
 
 
-def calc_shape_seq_sha256(shapes) -> str:
+def calc_shape_seq_sha256(shapes: list) -> str:
     # Shape sequence hash ignores names. Serialized as all shape lists (sorted).
     # Hash will survive training across training frameworks.
     hasher = hashlib.sha256()
@@ -168,7 +167,7 @@ def calc_shape_seq_sha256(shapes) -> str:
 
 
 class TensorsCharacter(AnalysisFactor):
-    def __init__(self, name = "_init", dependencies = []):
+    def __init__(self, name: str = "_init", dependencies: list = []) -> None:
         # Setup base class
         super().__init__(name=name, dependencies=dependencies)
         # Grab config from enclosed class object
@@ -176,7 +175,7 @@ class TensorsCharacter(AnalysisFactor):
         #breakpoint()
 
 
-    def run(self):
+    def run(self) -> ModelTensorMetrics:
         print(f"Running in {type(self)}:{self.name}")
         print(f"  Dependencies: {self.dependencies}")
 

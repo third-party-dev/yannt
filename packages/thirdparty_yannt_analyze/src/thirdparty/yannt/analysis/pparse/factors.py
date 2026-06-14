@@ -6,7 +6,7 @@ from thirdparty.yannt.analysis.lib import AnalysisFactor
 
 
 class TensorsFactor(AnalysisFactor):
-    def __init__(self, name = "_init", dependencies = []):
+    def __init__(self, name: str = "_init", dependencies: list = []) -> None:
         # Setup base class
         super().__init__(name=name, dependencies=dependencies)
         # Grab config from enclosed class object
@@ -14,7 +14,7 @@ class TensorsFactor(AnalysisFactor):
         #breakpoint()
 
 
-    def run(self):
+    def run(self) -> None:
         print(f"Running in {type(self)}:{self.name}")
         print(f"  Dependencies: {self.dependencies}")
 
@@ -22,7 +22,7 @@ class TensorsFactor(AnalysisFactor):
         breakpoint()
 
 class GraphFactor(AnalysisFactor):
-    def __init__(self, name = "_init", dependencies = []):
+    def __init__(self, name: str = "_init", dependencies: list = []) -> None:
         # Setup base class
         super().__init__(name=name, dependencies=dependencies)
         # Grab config from enclosed class object
@@ -30,7 +30,7 @@ class GraphFactor(AnalysisFactor):
         #breakpoint()
 
 
-    def run(self):
+    def run(self) -> None:
         print(f"Running in {type(self)}:{self.name}")
         print(f"  Dependencies: {self.dependencies}")
 
