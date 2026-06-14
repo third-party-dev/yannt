@@ -1,3 +1,5 @@
+"""yannt analyze sub-command: argument parsing, config processing, and analysis execution."""
+
 import argparse
 from importlib.metadata import entry_points
 from typing import Any
@@ -7,6 +9,15 @@ from thirdparty.yannt.analysis.lib.config import Config
 
 
 def parse_process_arg(value: str) -> tuple[str, dict]:
+    """Parse a `name[:key=value,...]` CLI argument into a name and options dict.
+
+    Args:
+        value: The raw CLI argument string, e.g. `'factor:name=foo,mod=bar'`.
+
+    Returns:
+        A tuple of `(name, options_dict)` where options_dict maps each
+        `key` to its string value, or `True` for bare flags.
+    """
     if ":" not in value:
         return value, {}
     name, opts_str = value.split(":", 1)
@@ -26,6 +37,19 @@ def parse_process_arg(value: str) -> tuple[str, dict]:
 
 # Function called my yannt based on yannt_command entrypoint registration in pyproject.toml
 def register_yannt_analyze(subparsers: Any) -> None:
+    """Register the `analyze` subcommand and its arguments with yannt's CLI.
+
+    Called by yannt via the `yannt_command` entry point.  Discovers and
+    loads all `yannt_analysis_plugin` entry points (passing `FRAMEWORKS`
+    to each), then adds the `analyze` sub-parser with the full set of
+    arguments: `--config`, `--load`, `--factor`, `--request`,
+    `--input`, `--test`, and `--breakpoint`.  Sets `do_analysis` as
+    the handler invoked when `yannt analyze` is run.
+
+    Args:
+        subparsers: The argparse subparsers action object provided by yannt
+            into which the `analyze` sub-parser is added.
+    """
 
     '''
         Order of precedence (least to most):
@@ -230,6 +254,14 @@ def register_yannt_analyze(subparsers: Any) -> None:
 # _dedup_name_key_val(args.format or [])
 
 def process_config(config: Config) -> None:
+    """Process loaded Config.
+
+    Registers factor classes, report classes, and procedures for each
+    framework declared in the config.
+
+    Args:
+        config: Parsed configuration object to apply.
+    """
     for framework_config in config.frameworks:
         framework = FRAMEWORKS.setdefault(framework_config.name, AnalysisFramework(name=framework_config.name))
         # ** Note: overwriting any entry point registrations and hard coded defaults.
@@ -297,6 +329,17 @@ def do_simple_test() -> None:
 
 
 def handle_load_args(load_args: list[tuple[str, dict]]) -> None:
+    """Process `--load` arguments to register factor and report classes.
+
+    Args:
+        load_args: List of `(category, options)` tuples produced by
+            ``parse_process_arg`` for each `--load` argument.
+            `category` must be `'factor'` or `'report'`.
+
+    Raises:
+        Exception: If category is not `'factor'` or `'report'`, or if the
+            required `name`, `mod`, or `cls` options are missing.
+    """
 
     to_load = {
         'factor_classes': {},
@@ -369,6 +412,30 @@ def handle_load_args(load_args: list[tuple[str, dict]]) -> None:
 
 
 def handle_factor_args(factor_args: list[tuple[str, dict]]) -> None:
+    """Process `--factor` arguments to add inputs and workers to procedures.
+
+    For each entry, creates or updates a procedure in ``FRAMEWORKS`` and
+    attaches the specified factor as either an input slot or a worker step.
+    All factor configuration must already be bound via ``--load``; this
+    function is purely additive and carries no factor state of its own.
+
+    Args:
+        factor_args: List of `(category, options)` tuples produced by
+            `parse_process_arg` for each `--factor` argument.
+            `category` must be `'input'` or `'worker'`.  Both require
+            `proc` (procedure name) and `name` (factor slot name).
+            Workers additionally accept `dependency` (repeatable); inputs
+            reject it.  An optional `fw` key selects the framework
+            (defaults to `'default'`).
+
+    Raises:
+        Exception: If ``category`` is not ``'input'`` or ``'worker'``, if
+            required options are missing, if an input declares a dependency,
+            if an unrecognised option key is supplied, if a worker's
+            ``factor_class`` is not set, or if a worker has no dependencies
+            after all arguments are processed.
+    """
+
 
     '''
         When adding factors (inputs and workers) to procedures, there is no configuration. All factor configuration
@@ -471,6 +538,25 @@ def handle_factor_args(factor_args: list[tuple[str, dict]]) -> None:
 
 
 def handle_request_input_args(request_args: list[tuple[str, dict]], input_args: list[tuple[str, dict]]) -> tuple[dict, dict]:
+    """Process `--request` and `--input` arguments.
+
+    First processes all `--request` entries to build the request table, then
+    assigns `--input` entries to the matching requests.
+
+    Args:
+        request_args: List of `(category, options)` tuples from `--request`
+            arguments.  `category` must be `'process'` or `'report'`.
+        input_args: List of `(category, options)` tuples from `--input`
+            arguments.  `category` must be `'process'` or ``'report'`.
+
+    Returns:
+        A tuple of `(processes, reports)` where each is a dict mapping
+        `'{framework}-{name}'` keys to instantiated process or report objects.
+
+    Raises:
+        Exception: If required options are missing, or referenced frameworks,
+            procedures, or request names have not been defined.
+    """
     requests = {}
     #requests = 
 
@@ -599,6 +685,18 @@ def handle_request_input_args(request_args: list[tuple[str, dict]], input_args: 
 
 
 def do_analysis(args: argparse.Namespace) -> None:
+    """Execute the `yannt analyze` subcommand.
+
+    Applies configuration in precedence order (least to most): hard-coded
+    defaults, entry-point-installed defaults, config file (`--config`),
+    environment variables, then CLI arguments (`--load`, `--factor`,
+    `--request`, `--input`).  After building the framework state, runs every
+    requested process and report.
+
+    Args:
+        args: Parsed namespace from argparse, as set by ``register_yannt_analyze``.
+    """
+
     '''
         Order of precedence (least to most):
             - Hard coded defaults

@@ -32,6 +32,28 @@ from thirdparty.yannt.analysis.lib import AnalysisFactor
 
 @dataclass
 class TensorMetrics:
+    """Per-tensor statistical and structural metrics.
+
+    Attributes:
+        name: Tensor name as it appears in the model file.
+        shape: Tensor shape tuple.
+        dtype: Data type string (e.g. `'F32'`).
+        sha256: Hex digest of the raw contiguous tensor bytes.
+        mean: Mean of all tensor values.
+        std: Standard deviation of all tensor values.
+        min: Minimum tensor value.
+        max: Maximum tensor value.
+        sparsity: Fraction of values with absolute magnitude below 1e-6.
+        kurtosis: Fisher (excess) kurtosis of tensor values.
+        skewness: Skewness of tensor values.
+        top_sv_ratio: Ratio of the largest to second-largest singular value,
+            or `None` if SVD could not be computed.
+        sv_entropy: Spectral entropy of the normalised singular values,
+            or `None` if SVD could not be computed.
+        effective_rank: Effective rank via squared-SV distribution entropy,
+            or `None` if SVD could not be computed.
+    """
+
     # standard fields
     name: str
     shape: tuple
@@ -57,6 +79,19 @@ class TensorMetrics:
 
 @dataclass
 class ModelTensorMetrics:
+    """Aggregate tensor metrics for an entire model.
+
+    Attributes:
+        dtype_dist: Mapping of dtype string to count of tensors with that dtype.
+        value_count: Total number of scalar values across all tensors
+            (pseudo-parameter count).
+        tensors: Dict mapping tensor name to its :class:`TensorMetrics`.
+        arch_sha256: Architectural hash computed from tensor names, dtypes, and
+            shapes in canonical JSON form.
+        shape_seq_sha256: Shape-sequence hash computed from sorted shape tuples,
+            independent of tensor names.
+    """
+
     # dtype distribution
     dtype_dist: dict[str, int]
 
@@ -74,13 +109,38 @@ class ModelTensorMetrics:
 
 
 def calc_stat_metrics(arr: np.ndarray) -> dict[str, float]:
+    """Compute descriptive statistics for a numpy array.
+
+    Args:
+        arr: Input tensor as a numpy array of any shape.
+
+    Returns:
+        A dict with keys `'mean'`, `'std'`, `'min'`, `'max'`,
+        `'sparsity'`, `'kurtosis'`, and `'skewness'`.
+    """
     def _safe_kurtosis(flat: np.ndarray) -> float:
+        """Compute Fisher (excess) kurtosis, returning 0.0 for near-constant arrays.
+
+        Args:
+            flat: 1-D numpy array of float values.
+
+        Returns:
+            Excess kurtosis as a float.
+        """
         if flat.std() < 1e-10:
             return 0.0
         z = (flat - flat.mean()) / flat.std()
         return float(np.mean(z ** 4) - 3.0)
 
     def _safe_skewness(flat: np.ndarray) -> float:
+        """Compute skewness, returning 0.0 for near-constant arrays.
+
+        Args:
+            flat: 1-D numpy array of float values.
+
+        Returns:
+            Skewness as a float.
+        """
         if flat.std() < 1e-10:
             return 0.0
         z = (flat - flat.mean()) / flat.std()
@@ -99,6 +159,20 @@ def calc_stat_metrics(arr: np.ndarray) -> dict[str, float]:
 
 
 def calc_svd_metrics(arr: np.ndarray, max_sv: int = 64) -> dict[str, Optional[float]]:
+    """Compute singular value decomposition metrics for a tensor.
+
+    Only meaningful for arrays with at least two dimensions and a minimum inner
+    dimension of 4.  Returns `None` values for all metrics when SVD cannot
+    be performed.
+
+    Args:
+        arr: Input tensor as a numpy array.
+        max_sv: Maximum number of singular values to retain.
+
+    Returns:
+        A dict with keys `'top_sv_ratio'`, `'sv_entropy'`, and
+        `'effective_rank'`, each a float or `None`.
+    """
     # Perform singular value decomposition. Note: Only useful for 2D matrices.
     # i.e. spectral analysis of the matrix's eigenvalues
 
@@ -145,11 +219,32 @@ def calc_svd_metrics(arr: np.ndarray, max_sv: int = 64) -> dict[str, Optional[fl
 
 
 def calc_tensor_sha256(numpy_arr: np.ndarray) -> str:
+    """Compute a SHA-256 digest over the contiguous bytes of a numpy array.
+
+    Args:
+        numpy_arr: Input numpy array of any dtype and shape.
+
+    Returns:
+        Hex-encoded SHA-256 digest string.
+    """
     # sha256 over serialized contiguous numpy array.
     return hashlib.sha256(np.ascontiguousarray(numpy_arr).tobytes()).hexdigest()
 
 
 def calc_arch_sha256(st_entries: dict, keep_lm_head: bool = False) -> str:
+    """Compute an architectural SHA-256 hash from tensor metadata.
+
+    Hashes the canonical JSON representation of tensor names, dtypes, and
+    shapes — without tensor data — so the digest is stable across training
+    runs that use the same architecture.
+
+    Args:
+        st_entries: Dict mapping tensor name to `{'dtype': ..., 'shape': ...}`.
+        keep_lm_head: Reserved for future use; currently unused.
+
+    Returns:
+        Hex-encoded SHA-256 digest string.
+    """
     # Architectural hash calculated as canonical safetensors without data.
     # Hash will survive across training with same training framework.
     import json
@@ -158,6 +253,17 @@ def calc_arch_sha256(st_entries: dict, keep_lm_head: bool = False) -> str:
 
 
 def calc_shape_seq_sha256(shapes: list) -> str:
+    """Compute a SHA-256 hash from a sorted sequence of tensor shapes.
+
+    Ignores tensor names so the digest is stable across training frameworks
+    that use different naming conventions for the same architecture.
+
+    Args:
+        shapes: Iterable of shape tuples.
+
+    Returns:
+        Hex-encoded SHA-256 digest string.
+    """
     # Shape sequence hash ignores names. Serialized as all shape lists (sorted).
     # Hash will survive training across training frameworks.
     hasher = hashlib.sha256()
@@ -167,7 +273,21 @@ def calc_shape_seq_sha256(shapes: list) -> str:
 
 
 class TensorsCharacter(AnalysisFactor):
+    """Analysis factor that computes per-tensor and model-level metrics.
+
+    Reads a pparse viewer object from its last declared dependency and
+    iterates over all tensors to produce a :class:`ModelTensorMetrics` result.
+    The factor config may carry additional options via `factor_config`.
+    """
+
     def __init__(self, name: str = "_init", dependencies: list = []) -> None:
+        """Initialize TensorsCharacter.
+
+        Args:
+            name: Factor instance name.
+            dependencies: List of upstream factor names; the last entry is
+                expected to provide a pparse viewer object.
+        """
         # Setup base class
         super().__init__(name=name, dependencies=dependencies)
         # Grab config from enclosed class object
@@ -176,6 +296,16 @@ class TensorsCharacter(AnalysisFactor):
 
 
     def run(self) -> ModelTensorMetrics:
+        """Compute tensor metrics for the model provided by the upstream pparse viewer.
+
+        Iterates over all tensors in sorted name order, computing statistical
+        metrics, SVD metrics, and per-tensor SHA-256 digests, then assembles
+        model-level aggregates.
+
+        Returns:
+            A :class:`ModelTensorMetrics` instance containing per-tensor
+            metrics and model-level summaries.
+        """
         print(f"Running in {type(self)}:{self.name}")
         print(f"  Dependencies: {self.dependencies}")
 

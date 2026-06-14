@@ -1,3 +1,4 @@
+"""Pparse analysis plugin: factor and report classes for the fine-tuned model comparison pipeline."""
 
 
 from typing import Any
@@ -15,32 +16,78 @@ from thirdparty.yannt.analysis.lib import (
 
 
 class TensorsMetrics(AnalysisFactor):
+    """Analysis factor that computes tensor-level metrics for a model."""
+
     def __init__(self, name: str = "_init", dependencies: list = []) -> None:
+        """Initialize TensorsMetrics.
+
+        Args:
+            name: Factor instance name.
+            dependencies: List of upstream factor names this factor depends on.
+        """
         super().__init__(name=name, dependencies=dependencies)
 
 class FineTuned(AnalysisFactor):
+    """Analysis factor that produces a fine-tuned comparison result from upstream metrics."""
+
     def __init__(self, name: str = "_init", dependencies: list = []) -> None:
+        """Initialize FineTuned.
+
+        Args:
+            name: Factor instance name.
+            dependencies: List of upstream factor names this factor depends on.
+        """
         super().__init__(name=name, dependencies=dependencies)
 
 class BasicProcess(AnalysisProcess):
+    """Minimal concrete AnalysisProcess subclass."""
+
     def __init__(self) -> None:
+        """Initialize BasicProcess."""
         super().__init__()
 
 class FineTunedReport(AnalysisReport):
+    """Report that extracts the 'fine_tuned' result from the underlying process."""
+
     def report(self) -> dict:
+        """Generate the fine-tuned comparison report.
+
+        Returns:
+            A dict with a single `'fine_tuned'` key mapping to the
+            corresponding process result.
+        """
         return {'fine_tuned': self._process.results['fine_tuned']}
 
 
 class TensorMetricsReport(AnalysisReport):
+    """Report stub for tensor metrics output (not yet implemented)."""
+
     def __init__(self) -> None:
+        """Initialize TensorMetricsReport."""
         pass
 
 
 def pparse_plugin(cls_name: str) -> tuple[str, str]:
+    """Return a (module, class) descriptor for a class in this plugin module.
+
+    Args:
+        cls_name: Name of the class to reference within this module.
+
+    Returns:
+        A tuple of `(module_path, cls_name)` suitable for use with
+        `AnalysisFramework.register_factor` or
+        `AnalysisFramework.register_report`.
+    """
     return ('thirdparty.yannt.analysis.pparse.plugin', cls_name)
 
 
 def register_analysis_plugin(framework: AnalysisFramework) -> None:
+    """Register pparse analysis factors and procedures with the given framework.
+
+    Args:
+        framework: The `~thirdparty.yannt.analysis.lib.AnalysisFramework`
+            instance to populate.
+    """
 
     #from thirdparty.yannt.analysis.pparse import PparseFormat
     #config = { 'registry': { 'onnx': 'pparse.onnx', 'pytoroch': 'pparse.pytorch' } }
@@ -78,10 +125,3 @@ def register_analysis_plugin(framework: AnalysisFramework) -> None:
 
 
     pass
-
-
-
-
-
-
-

@@ -1,9 +1,12 @@
+"""CLI entry point for the analyze command."""
+
 import argparse
 from thirdparty.yannt.analysis.cli.registry import get_commands, load_entrypoint_plugins
 
 
 # Function called when the scripts CLI entry point is called.
 def main() -> None:
+    """Main entry point for analysis CLI."""
     # Create parent parser
     parser = argparse.ArgumentParser(prog="analyze")
     parser.add_argument("--breakpoint",

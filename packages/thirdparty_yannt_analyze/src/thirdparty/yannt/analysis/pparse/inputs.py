@@ -1,3 +1,4 @@
+"""PparseViewer analysis input factor: loads a file via a configured parser registry."""
 
 
 
@@ -6,7 +7,15 @@ from typing import Any
 from thirdparty.yannt.analysis.lib import AnalysisInput
 
 class PparseViewer(AnalysisInput):
+    """Analysis input that opens a model file using a named parser from the factor config registry."""
+
     def __init__(self, name: str = "_init", dependencies: list = []) -> None:
+        """Initialize PparseViewer.
+
+        Args:
+            name: Factor instance name.
+            dependencies: List of upstream factor names this factor depends on.
+        """
         # Setup base class
         super().__init__(name=name, dependencies=dependencies)
         # Grab config from enclosed class object
@@ -15,14 +24,28 @@ class PparseViewer(AnalysisInput):
 
 
     def missing_input(self) -> bool:
+        """Check whether required input keys are absent.
+
+        Returns:
+            True if input is None or is missing the required 'path' or 'parser' keys.
+        """
         if self.input is None:
             return True
-        
+
         if 'path' not in self.input or 'parser' not in self.input:
             return True
 
 
     def run(self) -> Any:
+        """Load the configured parser and open the target file.
+
+        The parser name and file path are read from the input dict under the
+        'parser' and 'path' keys respectively.  The parser class is resolved
+        from `self.factor_config['registry']`.
+
+        Returns:
+            A parser-specific viewer object for the opened file, or None on error.
+        """
         print(f"Running in {type(self)}:{self.name}")
 
         '''
@@ -32,10 +55,10 @@ class PparseViewer(AnalysisInput):
 
             A more manual and surgical way to deal with this is to make the target
             file format part of the input.
-            
+
             Note: Creating factor registrations for each type would cause a new procedure
                   for all file formats. This is bad.
-                  
+
             To keep the procedure maintenance manageable, we specify the file format as
             input of the module. File formats are made available by a registry of parsers
             specified in the factor configuration during factor registration. Then the
@@ -66,4 +89,3 @@ class PparseViewer(AnalysisInput):
             print(e)
             import traceback
             traceback.print_exc()
-
