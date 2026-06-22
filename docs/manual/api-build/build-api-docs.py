@@ -96,14 +96,19 @@ def render_class(fqns, bigscope, restrictions, klass):
                 if deny in members:
                     member.remove(deny)
 
+    
+    print(f'\n<a id="{klass.path}"></a>\n')
     print("--------------------------------------------------------------")
+    print(f'### {klass_name}')
+    print("--------------------------------------------------------------\n")
+
     if len(decorators) > 0:
         for decorator in decorators:
             print(decorator)
-        print(f"{klass.kind.value} {klass_name}({bases})")
+        print(f"`{klass.kind.value} {klass_name}({bases})`")
     else:
-        print(f"{klass.kind.value} {klass_name}({bases})")
-    print("--------------------------------------------------------------")
+        print(f"`{klass.kind.value} {klass_name}({bases})`")
+    
 
     # # Handle docstring
     # print("Class Documentation:")
@@ -121,20 +126,24 @@ def render_class(fqns, bigscope, restrictions, klass):
     #         breakpoint()
 
     # Add member table.
-    rows = []
+    klass_funcs = []
+    klass_attrs = []
 
     for member_name in members:
         member_api = klass.members[member_name]
 
         if member_api.kind == griffe.Kind.FUNCTION:
-            rows.append({"Prototype": prototype(member_api)})
+            klass_funcs.append({"Prototype": prototype(member_api)})
         elif member_api.kind == griffe.Kind.ATTRIBUTE:
-            print(f"Attribute: {member_api.name} = {member_api.value}")
+            klass_attrs.append({"Attribute": member_api.name, "Default": member_api.value})
         else:
             print(f"Unknown kind in member table: {member_api.path} {member_api.kind}")
             breakpoint()
 
-    print(md_table(rows))
+    print("\n#### Attributes\n")
+    print(md_table(klass_attrs))
+    print("\n#### Functions\n")
+    print(md_table(klass_funcs))
 
 
 # --- Do a preliminary inspection of the all the top level things we want to document ---
