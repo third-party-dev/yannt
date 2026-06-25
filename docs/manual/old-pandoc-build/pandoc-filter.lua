@@ -70,6 +70,42 @@ function Div(el)
       pandoc.RawBlock("latex", "\\end{danger-box}")
     }
   end
+
+  if el.classes:includes("hrule") then
+    if FORMAT:match("latex") or FORMAT:match("pdf") then
+      return pandoc.RawBlock("latex", "\\noindent\\rule{0.5\\textwidth}{0.4pt}")
+    else
+      return pandoc.RawBlock("html", "<hr style='width:50%; margin-left:0;'>")
+    end
+  end
+
+  if el.classes:includes("lefttable") then
+    if FORMAT:match("latex") or FORMAT:match("pdf") then
+      return {
+        pandoc.RawBlock("latex", "\\begingroup\\raggedright"),
+        pandoc.Div(el.content),
+        pandoc.RawBlock("latex", "\\endgroup")
+      }
+    else
+      el.attributes["style"] = "text-align: left; margin-right: auto;"
+      return el
+    end
+  end
+end
+
+function Span(el)
+  if el.classes:includes("largetext") then
+    if FORMAT:match("latex") or FORMAT:match("pdf") then
+      return {
+        pandoc.RawInline("latex", "\\LARGE "),
+        pandoc.Span(el.content),
+        pandoc.RawInline("latex", "\\normalsize ")
+      }
+    else
+      -- In HTML/markdown readers, just return the span as-is (unstyled)
+      return el
+    end
+  end
 end
 
 -- function Image(el)

@@ -1,149 +1,40 @@
 ---
-book: true
-titlepage: true
-# titlepage-logo: path to image
-# titlepage-background: path to image
-# page-background: path to image
-# page-background-opacity: 0.2
-toc-own-page: true
-toc-depth: 5
-# list of figures
-lof: true
-# list of tables
-lot: true
-# code-block-font-size: \small
-code-block-font-size: \scriptsize
-watermark: Work In Progress
-watermark-color: "gray!90"
-title: "Yet Another Neural Network Tool (yannt)"
-# abstract: "Android Application Analysis"
-author: Vinnie
-date: "2025"
-lang: en-US
-#cover-image: cover.jpg
-rights: © 2025 Vinnie
-publisher: vinnie.work
-# titlepage-logo: /absolute/path/to/logo.pdf
-#acknowledgements: "I would like to thank my dog."
-#declaration: "I declare that this book was composed by myself."
+title: "MyLibrary Developer Manual"
 
-# \raggedbottom prevent vertical text spread if image floats off page.
-# \definecolor... - highlights inline monospace text
-header-includes:
-  # Do not vertically space content when images float off page.
-  - \raggedbottom
+subtitle: "Architecture, Integration & API Reference"
+version: "2.1.0"
+date: "June 2026"
 
-  # Highlight inlined monospace text
-  - |
-    \definecolor{inline-code-color}{HTML}{660000}
-    \let\oldtexttt\texttt
-    \renewcommand{\texttt}[1]{{\color{inline-code-color}\oldtexttt{#1}}}
+# author:
+#   - "Alice Nguyen"
+#   - "Bob Petrov"
 
-  # Quotes a blocked.
-  - |
-    \usepackage{xcolor}
-    \usepackage{tcolorbox}
-    \definecolor{quotetext}{HTML}{141414}
-    \definecolor{quotebg}{HTML}{EEEEEE}
-    \definecolor{quoteborder}{HTML}{EEEEEE}
-    \AtBeginDocument{%
-      \renewenvironment{quote}{
-        \begin{tcolorbox}[colback=quotebg,colframe=quoteborder,
-                          boxrule=0.5pt,arc=3pt,left=6pt,right=6pt,top=4pt,bottom=4pt]
-          \color{quotetext}
-      }{
-        \end{tcolorbox}
-      }
-    }
+# abstract: |
+#   This manual covers end-user operation, integration patterns, and the full
+#   Python API for MyLibrary 2.x. It assumes familiarity with Python 3.11+.
 
-  # Note (Gray) Admonition For Pandoc
-  - |
-    \usepackage{xcolor}
-    \usepackage{tcolorbox}
-    \definecolor{notetext}{HTML}{000000}
-    \definecolor{notebg}{HTML}{c9c9c9}
-    \definecolor{noteborder}{HTML}{141414}
-    \newenvironment{note-box}{
-      \begin{tcolorbox}[colback=notebg,
-                        colframe=noteborder,
-                        boxrule=0.8pt,
-                        arc=3pt,
-                        left=6pt,right=6pt,top=4pt,bottom=4pt]
-        \color{notetext}
-      }{\end{tcolorbox}}
+# keywords:
+#   - MyLibrary
+#   - networking
+#   - API reference
 
-  # Tip (Green) Admonition For Pandoc
-  - |
-    \usepackage{xcolor}
-    \usepackage{tcolorbox}
-    \definecolor{tiptext}{HTML}{000000}
-    \definecolor{tipbg}{HTML}{b1e2ae}
-    \definecolor{tipborder}{HTML}{113810}
-    \newenvironment{tip-box}{
-      \begin{tcolorbox}[colback=tipbg,
-                        colframe=tipborder,
-                        boxrule=0.8pt,
-                        arc=3pt,
-                        left=6pt,right=6pt,top=4pt,bottom=4pt]
-        \color{tiptext}
-      }{\end{tcolorbox}}
+# toc: true
+# lot: false   # list of tables  (omit or false to suppress)
+# lof: false   # list of figures (omit or false to suppress)
 
-  # Info (Blue) Admonition For Pandoc
-  - |
-    \usepackage{xcolor}
-    \usepackage{tcolorbox}
-    \definecolor{infotext}{HTML}{000000}
-    \definecolor{infobg}{HTML}{83e2fc}
-    \definecolor{infoborder}{HTML}{010e38}
-    \newenvironment{info-box}{
-      \begin{tcolorbox}[colback=infobg,
-                        colframe=infoborder,
-                        boxrule=0.8pt,
-                        arc=3pt,
-                        left=6pt,right=6pt,top=4pt,bottom=4pt]
-        \color{infotext}
-      }{\end{tcolorbox}}
+# papersize: a4          # a4 | letter | a5 | …  (default: a4)
+# fontsize: 10pt         # 10pt | 11pt | 12pt    (default: 10pt)
+# linestretch: 1.15      # line spacing multiplier (omit for default)
 
-  # Warning (Yellow) Admonition For Pandoc
-  - |
-    \usepackage{xcolor}
-    \usepackage{tcolorbox}
-    \definecolor{warningtext}{HTML}{000000}
-    \definecolor{warningbg}{HTML}{f3fc79}
-    \definecolor{warningborder}{HTML}{2a2d00}
-    \newenvironment{warning-box}{
-      \begin{tcolorbox}[colback=warningbg,
-                        colframe=warningborder,
-                        boxrule=0.8pt,
-                        arc=3pt,
-                        left=6pt,right=6pt,top=4pt,bottom=4pt]
-        \color{warningtext}
-      }{\end{tcolorbox}}
+# Defaults are TeX Gyre Pagella / Heros / Cursor (ship with texlive).
+# Uncomment and set to your preferred fonts:
+# mainfont: "IBM Plex Serif"
+# sansfont: "IBM Plex Sans"
+# monofont: "IBM Plex Mono"
 
-  # Danger (Red) Admonition For Pandoc
-  - |
-    \usepackage{xcolor}
-    \usepackage{tcolorbox}
-    \definecolor{dangertext}{HTML}{000000}
-    \definecolor{dangerbg}{HTML}{e0cfce}
-    \definecolor{dangerborder}{HTML}{b71203}
-    \newenvironment{danger-box}{
-      \begin{tcolorbox}[colback=dangerbg,
-                        colframe=dangerborder,
-                        boxrule=0.8pt,
-                        arc=3pt,
-                        left=6pt,right=6pt,top=4pt,bottom=4pt]
-        \color{dangertext}
-      }{\end{tcolorbox}}
-
-# Links as foot notes
-links-as-notes: true
-colorlinks: true
-linkcolor: blue
-urlcolor: blue
-citecolor: blue
-
-#monofont: "JetBrains Mono"
-#monofontoptions: "Scale=0.9"
-codecolor: red
+# Raw LaTeX blocks inserted before/after the body.
+# include-before:
+#   - "\\input{front-matter-extra.tex}"
+# include-after:
+#   - "\\input{back-matter.tex}"
 ---
