@@ -7,7 +7,7 @@
 
 set -e
 
-export PROJ_PATH=$(realpath $(dirname $0)/../../../..)
+export PROJ_PATH=$(realpath $(dirname $0)/../../..)
 DOCS_PATH=$PROJ_PATH/docs/manual
 TMPL_PATH=$DOCS_PATH/pandoc-build/mine
 
