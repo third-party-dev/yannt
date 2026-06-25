@@ -32,7 +32,7 @@ def md_table(rows: list[dict[str, Any]], columns: Optional[list[str]] = None) ->
     separator = "| " + " | ".join("-" * widths[c] for c in cols) + " |"
     body = [fmt_row([str(row.get(c, "")) for c in cols]) for row in rows]
 
-    return "\n".join([header, separator] + body)
+    return "\n".join(['::: {.lefttable}', header, separator] + body + [':::'])
 
 
 def prototype(func) -> str:
@@ -98,16 +98,19 @@ def render_class(fqns, bigscope, restrictions, klass):
 
     
     print(f'\n<a id="{klass.path}"></a>\n')
-    print("--------------------------------------------------------------")
-    print(f'### {klass_name}')
-    print("--------------------------------------------------------------\n")
+    #print("--------------------------------------------------------------")
+    print("::: {.hrule}\n:::\n")
+    print(f'[{klass_name}]{{.largetext}}\n')
+    #print("--------------------------------------------------------------\n")
 
     if len(decorators) > 0:
+        print("```python")
         for decorator in decorators:
             print(decorator)
-        print(f"`{klass.kind.value} {klass_name}({bases})`")
+        print(f"{klass.kind.value} {klass_name}({bases})")
+        print("```")
     else:
-        print(f"`{klass.kind.value} {klass_name}({bases})`")
+        print(f"```python\n{klass.kind.value} {klass_name}({bases})\n```")
     
 
     # # Handle docstring
@@ -124,9 +127,15 @@ def render_class(fqns, bigscope, restrictions, klass):
     #         print(clean_text(doc_item.value, ()))
     #     else:
     #         breakpoint()
+    
+    # If first line of docstring is text, use as short description.
+    # TODO: Probably will break if it includes anything special (class, function, etc)
+    if len(klass.docstring.parsed) > 0 and klass.docstring.parsed[0].kind == griffe.DocstringSectionKind.text:
+        print(klass.docstring.parsed[0].value)
 
     # Add member table.
     klass_funcs = []
+    klass_funcs_api = []
     klass_attrs = []
 
     for member_name in members:
@@ -134,21 +143,65 @@ def render_class(fqns, bigscope, restrictions, klass):
 
         if member_api.kind == griffe.Kind.FUNCTION:
             klass_funcs.append({"Prototype": prototype(member_api)})
+            klass_funcs_api.append((klass_funcs[-1], member_api))
         elif member_api.kind == griffe.Kind.ATTRIBUTE:
             klass_attrs.append({"Attribute": member_api.name, "Default": member_api.value})
         else:
             print(f"Unknown kind in member table: {member_api.path} {member_api.kind}")
             breakpoint()
 
-    print("\n#### Attributes\n")
-    print(md_table(klass_attrs))
-    print("\n#### Functions\n")
-    print(md_table(klass_funcs))
+    if len(klass_attrs) > 0:
+        print("\n**Attributes**\n")
+        print(md_table(klass_attrs))
+    if len(klass_funcs) > 0:
+        print("\n**Functions**\n")
+        print(md_table(klass_funcs))
+
+    
+
+    # TODO: Display each attribute description
+    # TODO: Display each function description.
+    for method in klass_funcs_api:
+        print("\n--------------------------------------------------------------\n")
+        method_proto = method[0]["Prototype"]
+        method_api = method[1]
+        print(f'\n<a id="{klass.path}.{method_api.name}"></a>\n')
+        # TODO: Add bound to this loop.
+        while method_api.kind == griffe.Kind.ALIAS:
+            method_api = method_api.target
+        # TODO: Add decorators.
+        if member_api.docstring is not None:
+            print(f"**{method_proto}**\n")
+            sections = member_api.docstring.parse("google")
+            for section in sections:
+                if section.kind == griffe.DocstringSectionKind.text:
+                    # TODO: Parse the string for ``
+                    print(section.value)
+                elif section.kind == griffe.DocstringSectionKind.parameters:
+                    print("\n- **Parameters:**")
+                    for param_entry in section.value:
+                        print(f"  - {param_entry.annotation} - {param_entry.description}")
+                elif section.kind == griffe.DocstringSectionKind.returns:
+                    print("\n- **Returns:**")
+                    for ret_entry in section.value:
+                        print(f"  - {ret_entry.annotation} - {ret_entry.description}")
+                elif section.kind == griffe.DocstringSectionKind.raises:
+                    print("\n- **Raises:**")
+                    for exc_entry in section.value:
+                        # TODO: Add link for annotation
+                        print(f"  - {exc_entry.annotation} - {exc_entry.description}")
+                else:
+                    print(section.kind, section.value)
+                    breakpoint()
+        #breakpoint()
 
 
 # --- Do a preliminary inspection of the all the top level things we want to document ---
 
 def main():
+
+    print("## 5.2 Test API")
+
     exports_to_load = [
         'thirdparty.pparse.lib'
     ]
@@ -210,11 +263,21 @@ def main():
             print(f"Attribute: {member.name} = {member.value}")
         elif member.kind == griffe.Kind.CLASS:
             render_class(fqns, bigscope, restrictions, member)
+        elif member.kind == griffe.Kind.ALIAS:
+            print(f"<!-- ALIAS: {member.name} is {member.target_path} -->")
         else:
             print(f"Unknown kind: {member.kind.value}")
             breakpoint()
 
-main()
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        print(e)
+        breakpoint()
 
 
 # to_document = [

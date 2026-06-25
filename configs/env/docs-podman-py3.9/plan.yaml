@@ -29,8 +29,9 @@ config_root:
     - pandoc
     - texlive-xetex
     - texlive-latex-extra
-    - librsvg2-bin
-    - texlive-fonts-extra
+    - texlive-fonts-recommended
+    - texlive-plain-generic
+
 
     cri_home: { from: env, name: CRI_HOME }
     cri_root: { from: env, name: CRI_ROOT }
