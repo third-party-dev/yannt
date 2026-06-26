@@ -6,6 +6,9 @@
 
 import {themes as prismThemes} from 'prism-react-renderer';
 import {visit} from 'unist-util-visit';
+import {existsSync, readFileSync} from 'fs';
+import {dirname, basename, extname, join} from 'path';
+import yaml from 'js-yaml';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -97,6 +100,17 @@ const config = {
 
   markdown: {
     format: 'detect',
+    parseFrontMatter: async ({filePath, fileContent, defaultParseFrontMatter}) => {
+      const result = await defaultParseFrontMatter({filePath, fileContent, defaultParseFrontMatter});
+      const sidecarPath = join(dirname(filePath), basename(filePath, extname(filePath)) + '.toc.yaml');
+      if (existsSync(sidecarPath)) {
+        const items = yaml.load(readFileSync(sidecarPath, 'utf8'));
+        if (Array.isArray(items)) {
+          result.frontMatter.custom_toc = items;
+        }
+      }
+      return result;
+    },
   },
 
   plugins: [

@@ -1,0 +1,9 @@
+- id: mylib.network
+  label: network
+  level: 2
+- id: mylib.network.Connection
+  label: Connection
+  level: 2
+- id: mylib.network.RetryPolicy
+  label: RetryPolicy
+  level: 2
