@@ -31,6 +31,8 @@ config_root:
     - texlive-latex-extra
     - texlive-fonts-recommended
     - texlive-plain-generic
+    - nodejs
+    - npm
 
 
     cri_home: { from: env, name: CRI_HOME }
