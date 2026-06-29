@@ -116,6 +116,11 @@ end
 function Div(el)
   local classes = el.classes or pandoc.List()
 
+  -- ── none (suppress entirely) ────────────────────────────────────────────
+  if classes:find("none") then
+    return pandoc.List()
+  end
+
   -- ── namespace-rule ──────────────────────────────────────────────────────
   if classes:find("namespace-rule") then
     local ns_id = el.identifier

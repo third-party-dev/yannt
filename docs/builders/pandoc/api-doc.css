@@ -142,3 +142,25 @@ hr {
   color: #5d6d7e;
   margin: 0.6rem 0 0.2rem;
 }
+
+:target {
+  scroll-margin-top: 2lh;
+}
+
+.none {
+  display: none;
+}
+
+/* ── Code blocks ────────────────────────────────────────────────────────────
+   Horizontal scroll on screen instead of overflow-clip or forced wrapping.  */
+pre {
+  overflow-x: auto;
+}
+
+@media print {
+  pre {
+    overflow-x: visible;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+}

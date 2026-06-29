@@ -41,3 +41,6 @@ buildenvs:
 
 pytests *args:
     ./scripts/pytests.sh {{args}}
+
+builddocs:
+    ./docs/builders/pandoc/build-docs.sh
