@@ -57,3 +57,7 @@ hr {
   border-top: 4px solid var(--ifm-color-emphasis-500);
   margin: 2rem 0;
 }
+
+.none {
+  display: none;
+}
