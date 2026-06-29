@@ -1,3 +1,25 @@
+## 2.3 Step-by-step task flows (CLI use cases)
+
+### 2.3.1 Overview
+
+
+<div style="display:none">
+
+ TODO
+
+Each use case:
+
+- A situation header: Its a header and its what users scan for.
+  - Example: Does this model contain executable code?
+- One-sentence setup
+  - Must provide start condition
+  - Must provide expected results
+  - May filter out slightly different situations
+- What are you looking at: Explain the results or output.
+
+</div>
+
+
 # Use Cases
 
 ## Overview
