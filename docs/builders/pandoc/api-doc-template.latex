@@ -42,6 +42,7 @@
 \usepackage{graphicx}
 \usepackage{float}
 \floatplacement{figure}{H}
+\raggedbottom
 \usepackage{amsmath}
 \usepackage{needspace}
 \usepackage[normalem]{ulem}       % for \sout strikethrough in markdown
