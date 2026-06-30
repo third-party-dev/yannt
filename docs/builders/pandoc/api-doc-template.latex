@@ -41,6 +41,7 @@
 \usepackage{tocloft}
 \usepackage{graphicx}
 \usepackage{float}
+\floatplacement{figure}{H}
 \usepackage{amsmath}
 \usepackage{needspace}
 \usepackage[normalem]{ulem}       % for \sout strikethrough in markdown
