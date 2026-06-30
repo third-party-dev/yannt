@@ -379,7 +379,9 @@ $endif$
 \renewcommand{\cftsecfont}{\large\sffamily\bfseries\color{ApiBlue}}
 \renewcommand{\cftsecpagefont}{\large\sffamily\color{ApiGray}}
 \setlength{\cftbeforesecskip}{7pt}
-\setlength{\cftbeforesubsecskip}{2pt}
+\setlength{\cftbeforesubsecskip}{7pt}
+\setlength{\cftbeforesubsubsecskip}{2pt}
+\setlength{\cftbeforeparaskip}{2pt}
 \renewcommand{\cftsubsecfont}{\sffamily\bfseries\color{ApiGray}}
 \renewcommand{\cftsubsecpagefont}{\sffamily\color{ApiGray}}
 \renewcommand{\cftsubsubsecfont}{\sffamily\color{ApiTeal}}

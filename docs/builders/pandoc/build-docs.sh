@@ -64,7 +64,13 @@ ${DOCS_PATH}/6-maintainer/6.4-code-base.md
 ${DOCS_PATH}/6-maintainer/6.5-testing/6.5.1-overview.md
 ${DOCS_PATH}/6-maintainer/6.6-release.md
 ${DOCS_PATH}/6-maintainer/6.7-roadmap.md
-${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.1-overview.md
+${DOCS_PATH}/6-maintainer/6.8-commentary/index.md
+${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.1-plugins.md
+${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.2-pparse.md
+${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.3-analysis.md
+${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.4-testing.md
+${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.5-naive.md
+${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.6-releasing.md
 ${DOCS_PATH}/7-tutorials/index.md
 ${PROJ_PATH}/docs/builders/pandoc/api-doc-reference.md
 "
