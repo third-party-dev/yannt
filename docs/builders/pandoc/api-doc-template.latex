@@ -376,8 +376,10 @@ $endif$
 \setcounter{secnumdepth}{0}   % suppress auto section numbers in TOC and headings
 \renewcommand{\cfttoctitlefont}{\color{ApiBlue}\Large\sffamily\bfseries}
 \renewcommand{\cftaftertoctitle}{\\\color{ApiRuleHeavy}\rule{\linewidth}{2pt}}
-\renewcommand{\cftsecfont}{\sffamily\bfseries\color{ApiBlue}}
-\renewcommand{\cftsecpagefont}{\sffamily\color{ApiGray}}
+\renewcommand{\cftsecfont}{\large\sffamily\bfseries\color{ApiBlue}}
+\renewcommand{\cftsecpagefont}{\large\sffamily\color{ApiGray}}
+\setlength{\cftbeforesecskip}{7pt}
+\setlength{\cftbeforesubsecskip}{2pt}
 \renewcommand{\cftsubsecfont}{\sffamily\bfseries\color{ApiGray}}
 \renewcommand{\cftsubsecpagefont}{\sffamily\color{ApiGray}}
 \renewcommand{\cftsubsubsecfont}{\sffamily\color{ApiTeal}}
