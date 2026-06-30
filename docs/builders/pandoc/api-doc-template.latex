@@ -378,10 +378,12 @@ $endif$
 \renewcommand{\cftaftertoctitle}{\\\color{ApiRuleHeavy}\rule{\linewidth}{2pt}}
 \renewcommand{\cftsecfont}{\sffamily\bfseries\color{ApiBlue}}
 \renewcommand{\cftsecpagefont}{\sffamily\color{ApiGray}}
-\renewcommand{\cftsubsecfont}{\sffamily\color{ApiGray}}
+\renewcommand{\cftsubsecfont}{\sffamily\bfseries\color{ApiGray}}
 \renewcommand{\cftsubsecpagefont}{\sffamily\color{ApiGray}}
-\renewcommand{\cftsubsubsecfont}{\ttfamily\small\color{ApiTeal}}
-\renewcommand{\cftsubsubsecpagefont}{\small\color{ApiGray}}
+\renewcommand{\cftsubsubsecfont}{\sffamily\color{ApiTeal}}
+\renewcommand{\cftsubsubsecpagefont}{\sffamily\small\color{ApiGray}}
+\renewcommand{\cftparafont}{\sffamily\small\itshape\color{ApiGray}}
+\renewcommand{\cftparapagefont}{\sffamily\small\color{ApiGray}}
 
 % ─── Document Metadata ────────────────────────────────────────────────────────
 \title{%
