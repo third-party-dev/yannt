@@ -1,3 +1,5 @@
+<div class="pagegroup">
+
 # 1. Summary
 
   As machine learning (ML) models flood into every system on the planet, we need to understand what's on the inside. Do you know if your model has malicious code? The model may be safe to inference, but does it contain hidden behaviors internally?
@@ -13,4 +15,5 @@
   Deliberate trade-offs made, including prioritization of breadth of format support over deep understanding of every edge case (i.e. it will read more formats but may extract less information). Optimizations have been focused on memory footprint and not performance speed.
 
   What this project needs is early adopters, requirement requests, and user experience feedback. Tools built in isolation bias towards what the developer imagines the user needs. Every requirement surfaced by a real workflow, every pain point reported by a real user, pulls the project toward problems that actually exist. That feedback is what separates a tool that works, technically, from one that works in practice.
-  
+
+</div><!-- end of summary pagegroup -->

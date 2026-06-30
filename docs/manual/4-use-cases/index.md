@@ -26,6 +26,8 @@ I do not intend for yannt to be that formal, but I would like to use the notion 
 
 There is a lot of cross over between different components of yannt and therefore I'm a bit undecided on the _best_ way to organize the documented use cases. For now, I am going to lean on the organization of the CLI interface as the ideal use case breakdown.
 
+<div class="pagegroup">
+
 ## Table of Contents
 
 - **4.1** - [Use cases for generating test data.](./4.1-test-usecases.md)
@@ -33,3 +35,5 @@ There is a lot of cross over between different components of yannt and therefore
 - **4.3** - [Use cases for analysis of model files.](./4.3-analysis-usecases.md)
 - **4.4** - [Use cases for other yannt sub-commands.](./4.4-misc-usecases.md)
 - **4.5** - [Use cases for parsing model files the _naive_ way.](./4.5-naive-usecases.md)
+
+</div><!-- end of toc page group -->

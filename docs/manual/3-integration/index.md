@@ -8,4 +8,3 @@ The Integration Documentation is focused on programmatic ways to accomplish task
 
 **Note:** For more example use cases, please see the use cases documentation in section 4.
 
-## 3.1 Overview

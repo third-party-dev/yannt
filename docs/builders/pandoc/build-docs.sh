@@ -26,9 +26,12 @@ ${DOCS_PATH}/2-end-user/2.5-sysscan-cli.md
 ${DOCS_PATH}/2-end-user/2.x-troubleshooting.md
 ${DOCS_PATH}/3-integration/index.md
 ${DOCS_PATH}/3-integration/3.3-quick-start.md
-${DOCS_PATH}/3-integration/3.4-concepts.md
-${DOCS_PATH}/3-integration/3.5-gotchas.md
-${DOCS_PATH}/3-integration/3.6-versioning.md
+${DOCS_PATH}/3-integration/3.4-analyze.md
+${DOCS_PATH}/3-integration/3.5-pparse-view.md
+${DOCS_PATH}/3-integration/3.6-pparse-lazy.md
+${DOCS_PATH}/3-integration/3.7-pparse-lib.md
+${DOCS_PATH}/3-integration/3.8-gotchas.md
+${DOCS_PATH}/3-integration/3.9-versioning.md
 ${DOCS_PATH}/4-use-cases/index.md
 ${DOCS_PATH}/4-use-cases/4.1-test-usecases.md
 ${DOCS_PATH}/4-use-cases/4.1.1-hft-usecases.md
