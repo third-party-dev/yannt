@@ -267,6 +267,11 @@ $endif$
   keepspaces       = true
 }
 
+% fvextra extends fancyvrb with line-breaking; must load before highlighting-macros
+% so that pandoc's Verbatim environment inherits breaklines support.
+\usepackage{fvextra}
+\fvset{breaklines=true,breakanywhere=false}
+
 % Wire up pandoc code blocks to our style
 $if(highlighting-macros)$
 $highlighting-macros$
