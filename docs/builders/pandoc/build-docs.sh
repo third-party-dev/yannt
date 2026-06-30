@@ -19,8 +19,11 @@ ${DOCS_PATH}/1-introduction/1.1-overview.md
 ${DOCS_PATH}/1-introduction/1.2-install.md
 ${DOCS_PATH}/2-end-user/index.md
 ${DOCS_PATH}/2-end-user/2.1-overview.md
-${DOCS_PATH}/2-end-user/2.2-concepts.md
-${DOCS_PATH}/2-end-user/2.3-troubleshooting.md
+${DOCS_PATH}/2-end-user/2.2-primers.md
+${DOCS_PATH}/2-end-user/2.3-pparse-cli.md
+${DOCS_PATH}/2-end-user/2.4-analysis-cli.md
+${DOCS_PATH}/2-end-user/2.5-sysscan-cli.md
+${DOCS_PATH}/2-end-user/2.x-troubleshooting.md
 ${DOCS_PATH}/3-integration/index.md
 ${DOCS_PATH}/3-integration/3.3-quick-start.md
 ${DOCS_PATH}/3-integration/3.4-concepts.md

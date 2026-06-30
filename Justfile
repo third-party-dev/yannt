@@ -44,3 +44,4 @@ pytests *args:
 
 builddocs:
     ./docs/builders/pandoc/build-docs.sh
+    ./docs/builders/docusaurus/build-docs.sh
