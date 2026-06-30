@@ -1,9 +1,8 @@
-## 2.3 Step-by-step task flows (CLI use cases)
+# 4. Use Cases
 
-### 2.3.1 Overview
+<div class="none">
 
-
-<div style="display:none">
+## 4 Step-by-step task flows (CLI use cases)
 
  TODO
 
@@ -19,10 +18,7 @@ Each use case:
 
 </div>
 
-
-# Use Cases
-
-## Overview
+## 4.0.1 Overview
 
 Generally, I view use cases as functional requirements of a product (in contrast to non-functional requirements that are expressed in must/shall/should/may terminology). Those use case (requirements) then become the baseline for a test plan and subsequently lend themselves well to test procedures.
 

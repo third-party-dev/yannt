@@ -87,7 +87,7 @@ pandoc $TMPL_PATH/metadata.yaml $CHAPTERS \
   --template=$TMPL_PATH/api-doc-template.latex \
   --pdf-engine=xelatex \
   --from markdown+raw_html+simple_tables \
-  --toc \
+  --toc --toc-depth=4 \
   -o $OUT_PATH/api-doc-reference.pdf
 
 echo "---- Building HTML"
