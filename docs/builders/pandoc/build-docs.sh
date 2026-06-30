@@ -25,7 +25,8 @@ ${DOCS_PATH}/2-end-user/2.4-analysis-cli.md
 ${DOCS_PATH}/2-end-user/2.5-sysscan-cli.md
 ${DOCS_PATH}/2-end-user/2.x-troubleshooting.md
 ${DOCS_PATH}/3-integration/index.md
-${DOCS_PATH}/3-integration/3.3-quick-start.md
+${DOCS_PATH}/3-integration/3.2-quick-start.md
+${DOCS_PATH}/3-integration/3.3-yannt.md
 ${DOCS_PATH}/3-integration/3.4-analyze.md
 ${DOCS_PATH}/3-integration/3.5-pparse-view.md
 ${DOCS_PATH}/3-integration/3.6-pparse-lazy.md
@@ -81,6 +82,8 @@ ${DOCS_PATH}/7-tutorials/index.md
 ${PROJ_PATH}/docs/builders/pandoc/api-doc-reference.md
 "
 
+RES_PATHS="${DOCS_PATH}/0-contents:${DOCS_PATH}/1-introduction:${DOCS_PATH}/2-end-user:${DOCS_PATH}/3-integration:${DOCS_PATH}/4-use-cases:${DOCS_PATH}/5-api-reference:${DOCS_PATH}/6-maintainer:${DOCS_PATH}/7-tutorials"
+
 # Excluded:
 # - docs/5-api-reference/5.2-python-api.md
 
@@ -100,6 +103,7 @@ pandoc $TMPL_PATH/metadata.yaml $CHAPTERS \
   --pdf-engine=xelatex \
   --from markdown+raw_html+simple_tables \
   --toc --toc-depth=4 \
+  --resource-path="${RES_PATHS}" \
   -o $OUT_PATH/api-doc-reference.pdf
 
 echo "---- Building HTML"
