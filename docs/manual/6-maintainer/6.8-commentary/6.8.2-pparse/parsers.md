@@ -45,7 +45,7 @@ In nearly all cases of the parsers described above (standard library, external l
 
 - Use of a linear multi-phase approach to parsing. For textual formats, this may mean that first the parser will decode and tokenize the whole stream before interpreting the data into a parse tree or data structure. The multi-phased approach requires that the entire stream of data be loaded into memory before you can perform any operations or filtering on the data.
 
-  ![linear-phases](./linear-phases.jpg)
+  ![linear-phases](./6.8.2-linear-phases.jpg)
 
 - Use of end of file (EOF) as an indicator that we have _all of the data_ to be parsed. Initially, using EOF might make sense, but in reality its a **leaky abstraction** and misinterpretation. EOF should only indicate that is all the data available from a given IO source _for now_. It has no knowledge of the application data and the code should only use application data to know when you've hit the end of a document or data format. Another way to put it, EOF indicates "no more data", it should never indicate "we have everything".
 
@@ -59,7 +59,7 @@ The fundamental difference between a stream parser and an incremental parser is 
 
 Here are some different scenarios that involve different type of memory pressure when parsing very large files or buffers:
 
-![partial-parsing](./partial-parsing.jpg)
+![partial-parsing](./6.8.2-partial-parsing.jpg)
 
 ## Goals and Not-Goals
 
@@ -84,7 +84,7 @@ Bigger picture (non-parser specific) goals include:
 
 - Partial parsing pipeline to support nested parsing of different format. For example, parse a truncated data format that is inside a truncated `tar.gz` that itself is inside of a truncated `zip`.
 
-  ![truncated-nested-parsing](./truncated-nested-parsing.jpg)
+  ![truncated-nested-parsing](./6.8.2-truncated-nested-parsing.jpg)
 
 - The ability to pause the entire state of the nested parsing operation, export to XML, move to a different system, import from XML, and continue the parsing or analysis of the parse tree. The is explicitly aimed at supporting the parsing framework in other pipelines that involve multiple systems, virtual machines, or containers.
 
@@ -98,7 +98,7 @@ Foundationally,
 
 - We need to be able to do all of decode, tokenize, and interpret together in much smaller chunks (in contrast to doing all of each phase once). At all times, the parser must be able to handle a "end of data" exception and be able to resume its parsing idempotently when its received more data. The natural pattern to handle this requirement is a state machine where each state is a class with a `parse()` call. This is the key to enabling partial parsing.
 
-  ![chunked-phases](./chunked-phases.jpg)
+  ![chunked-phases](./6.8.2-chunked-phases.jpg)
 
 * We want to be able to parse loosely coupled multiple nested file formats (e.g. bin file inside tar.gz inside zip). When we're parsing loosely coupled data, there is less assumption of type and more demand for dynamic identification of the type of data in the seralized data. Therefore, when we have a loosely coupled string of bytes we need to be able to map file identification with parser capabilities or file format targets, we call this an extraction.
 
@@ -106,7 +106,7 @@ Foundationally,
 
 To summarize, all of our parsers are fundamentally a state machine that reads an extraction and generates zero to many child extractions along with a single result node tree for the original extraction. A higher level orchestraction is what reads data in from a given IO stream and feeds the machine to continually resume parsing until there is no more data or we've extracted the value we desire.
 
-![extraction-tree](./extraction-tree.jpg)
+![extraction-tree](./6.8.2-extraction-tree.jpg)
 
 ## A Data Source
 
@@ -154,7 +154,7 @@ A parser's results are always expressed as a node tree (or parse tree of nodes).
 
 It was a very deliberate decision to only have 3 references in the node itself and put all of the other parsing state into node context. The reason this was done was to know that a node could exist as a 16 bytes struct plus whatever the value needed to be. It makes the operation of freeing parsing state memory (state data required to peform the parsing itself) as easy as wiping the reference to the node context and either doing the cleanup or allowing garbage collection to come around. Then we're only left with the node, its value, and the origin of the data we extracted the value from.
 
-![node-tree](./node-tree.jpg)
+![node-tree](./6.8.2-node-tree.jpg)
 
 By design, we can be more clever and keep a cache of node contexts in another pool of references. If we detect memory pressure, we could start to prune the lower level node contexts higher and higher. For replay-ability, the root node is the only node that must always have a node context. In the event we have memory pressue but want to force a branch of the tree to remain parsable, we can replay the parsing from the point that we have a node context to the value. (Not currently implemented.)
 
@@ -269,6 +269,6 @@ One of the parsers I've written is an XML parser. The XML parser uses a lot of t
 
 <details><summary>Example XML Node Tree & States Diagram</summary>
 
-  ![xml-states-portrait](./xml-states-portrait.jpg)
+  ![xml-states-portrait](./6.8.2-xml-states-portrait.jpg)
 </details>
 

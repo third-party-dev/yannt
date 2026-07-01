@@ -1,8 +1,7 @@
 ---
-title: "MyLibrary Developer Manual"
-
-subtitle: "Architecture, Integration & API Reference"
-version: "2.1.0"
+title: "Yet Another Neural Network Tool (yannt)"
+subtitle: "Progressive Parsing and Analysis of ML Model Files"
+version: "0.0.4"
 date: "June 2026"
 
 # author:

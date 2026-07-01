@@ -82,7 +82,29 @@ ${DOCS_PATH}/7-tutorials/index.md
 ${PROJ_PATH}/docs/builders/pandoc/api-doc-reference.md
 "
 
-RES_PATHS="${DOCS_PATH}/0-contents:${DOCS_PATH}/1-introduction:${DOCS_PATH}/2-end-user:${DOCS_PATH}/3-integration:${DOCS_PATH}/4-use-cases:${DOCS_PATH}/5-api-reference:${DOCS_PATH}/6-maintainer:${DOCS_PATH}/7-tutorials"
+RES_PATH_LIST="
+${DOCS_PATH}/0-contents
+${DOCS_PATH}/1-introduction
+${DOCS_PATH}/2-end-user
+${DOCS_PATH}/3-integration
+${DOCS_PATH}/4-use-cases
+${DOCS_PATH}/5-api-reference
+${DOCS_PATH}/6-maintainer
+${DOCS_PATH}/6-maintainer/6.5-testing
+${DOCS_PATH}/6-maintainer/6.8-commentary
+${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.2-pparse
+${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.2-analysis
+${DOCS_PATH}/7-tutorials
+"
+
+RES_PATHS=""
+for item in $RES_PATH_LIST; do
+    if [ -z "$RES_PATHS" ]; then
+        RES_PATHS="$item"
+    else
+        RES_PATHS="$RES_PATHS:$item"
+    fi
+done
 
 # Excluded:
 # - docs/5-api-reference/5.2-python-api.md
@@ -91,13 +113,13 @@ mkdir -p $OUT_PATH
 cp $TMPL_PATH/api-doc.css $OUT_PATH/
 
 echo "---- Building JSON"
-pandoc $TMPL_PATH/metadata.yaml $CHAPTERS \
+pandoc $TMPL_PATH/metadata.yaml $CHAPTERS $TMPL_PATH/metadata-tail.yaml \
   --lua-filter=$TMPL_PATH/api-doc-filter.lua \
   --from markdown+raw_html+simple_tables \
   -o $OUT_PATH/api-doc-reference.json
 
 echo "---- Building PDF"
-pandoc $TMPL_PATH/metadata.yaml $CHAPTERS \
+pandoc $TMPL_PATH/metadata.yaml $CHAPTERS $TMPL_PATH/metadata-tail.yaml \
   --lua-filter=$TMPL_PATH/api-doc-filter.lua \
   --template=$TMPL_PATH/api-doc-template.latex \
   --pdf-engine=xelatex \
@@ -107,7 +129,7 @@ pandoc $TMPL_PATH/metadata.yaml $CHAPTERS \
   -o $OUT_PATH/api-doc-reference.pdf
 
 echo "---- Building HTML"
-pandoc $TMPL_PATH/metadata.yaml $CHAPTERS \
+pandoc $TMPL_PATH/metadata.yaml $CHAPTERS $TMPL_PATH/metadata-tail.yaml \
   --lua-filter=$TMPL_PATH/api-doc-filter.lua \
   --from markdown+raw_html+simple_tables \
   --toc \
@@ -116,7 +138,7 @@ pandoc $TMPL_PATH/metadata.yaml $CHAPTERS \
   -o $OUT_PATH/api-doc-reference.html
 
 echo "---- Building EPUB"
-pandoc $TMPL_PATH/metadata.yaml $CHAPTERS \
+pandoc $TMPL_PATH/metadata.yaml $CHAPTERS $TMPL_PATH/metadata-tail.yaml \
   --lua-filter=$TMPL_PATH/api-doc-filter.lua \
   --from markdown+raw_html+simple_tables \
   --toc \
