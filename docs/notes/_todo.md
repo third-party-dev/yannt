@@ -91,3 +91,24 @@
 
 
 - Check for pyyaml in do? Check for python in do?
+
+
+## Type Checking
+
+mypy
+pyrefly
+pyright
+ty
+zuban
+
+ruff format
+black
+
+pytest
+unittest
+
+### ruff
+
+- removes double line breaks between methods
+- E501 line too long
+- quote-style = "preserve"
