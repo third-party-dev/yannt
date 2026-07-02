@@ -134,7 +134,6 @@ build_json() {
 }
 
 
-
 build_typ() {
   echo "---- Building TYP"
   #local typ_out="$BUILD_DIR/manual.typ"
@@ -152,15 +151,16 @@ build_typ() {
     $(filter_args) \
     --trace \
     -o "$OUT_PATH/yannt-manual.typ" \
-    2> "$OUT_PATH/yannt-manual-pandoc-typ-stderr.log"
+    2>&1 | tee "$OUT_PATH/yannt-manual-pandoc-typ-stderr.log" 2>&1 >/dev/null
 }
+
 
 build_pdf() {
   echo "---- Building PDF"
 
   if command -v $TYPST >/dev/null 2>&1; then
     $TYPST compile "$OUT_PATH/yannt-manual.typ" "$OUT_PATH/yannt-manual.pdf" \
-      2>&1 | tee "$DEBUG_DIR/pdf-typst-stderr.log"
+      2>&1 | tee "$OUT_PATH/pdf-typst-stderr.log"
   else
     echo "WARNING: 'typst' binary not found on PATH; skipping typst compile step."
     echo "  Install from https://github.com/typst/typst and re-run, or:"
@@ -169,25 +169,76 @@ build_pdf() {
 }
 
 
-# --pdf-engine=lualatex
+build_single_html() {
+  echo "---- Building Single HTML"
+  cp $TMPL_PATH/manual.css $OUT_PATH/
+  trace="$OUT_PATH/yannt-manual-pandoc-html-single-trace.json" \
+  pandoc \
+    $TMPL_PATH/metadata.yaml $CHAPTERS $TMPL_PATH/metadata-tail.yaml \
+    -f markdown \
+    -t html5 \
+    -s --toc --toc-depth=3 \
+    -M crosslink_mode=internal \
+    --css=$OUT_PATH/manual.css \
+    $(filter_args) \
+    --trace \
+    -o $OUT_PATH/yannt-manual-single.html \
+    2>&1 | tee "$OUT_PATH/yannt-manual-pandoc-single-html-stderr.log" 2>&1 >/dev/null
 
-#max_print_line=1000 lualatex -interaction=nonstopmode \
-#  $OUT_PATH/api-doc-reference.tex
-
-  #-o $OUT_PATH/api-doc-reference.pdf
-  #2>&1 | tee $OUT_PATH/api-doc-reference-pdf.log
-  #-o $OUT_PATH/api-doc-reference.tex
-
-build_html() {
-  echo "---- Building HTML"
-  pandoc $TMPL_PATH/metadata.yaml $CHAPTERS $TMPL_PATH/metadata-tail.yaml \
-    --lua-filter=$TMPL_PATH/api-doc-filter.lua \
-    --from markdown+raw_html+simple_tables \
-    --toc \
-    --standalone \
-    --css=$TMPL_PATH/api-doc.css \
-    -o $OUT_PATH/api-doc-reference.html
 }
+
+
+build_multi_html() {
+  echo "---- Building Multiple HTML"
+  cp $TMPL_PATH/manual.css $OUT_PATH/
+  local out_dir="$OUT_PATH/html"
+  local stderr_log=$OUT_PATH/yannt-manual-pandoc-multi-html-stderr.log
+  mkdir -p $out_dir
+
+  echo "" > $stderr_log
+
+  for src in $CHAPTERS; do
+    local rel="${src#"${DOCS_PATH}"/}"
+    local out="$out_dir/${rel%.md}.html"
+    mkdir -p "$(dirname "$out")"
+    pandoc "$src" \
+      -f markdown \
+      -t html5 \
+      -s --toc --toc-depth=3 \
+      -M crosslink_mode=html-multipage \
+      --css=$OUT_PATH/manual.css \
+      $(filter_args) \
+      -o "$out" \
+      2>&1 | tee -a "$stderr_log" 2>&1 >/dev/null
+  done
+}
+
+
+build_commonmark() {
+  echo "---- Building Multiple CommonMark"
+  cp $TMPL_PATH/manual.css $OUT_PATH/
+  local out_dir="$OUT_PATH/commonmark"
+  local stderr_log=$OUT_PATH/yannt-manual-pandoc-multi-commonmark-stderr.log
+  mkdir -p $out_dir
+
+  echo "" > $stderr_log
+
+  for src in $CHAPTERS; do
+    local rel="${src#"${DOCS_PATH}"/}"
+    local out="$out_dir/$rel"
+    mkdir -p "$(dirname "$out")"
+
+    pandoc "$src" \
+      -f markdown \
+      -t commonmark_x \
+      --standalone \
+      -M crosslink_mode=commonmark \
+      $(filter_args) \
+      -o "$out" \
+      2>&1 | tee -a $stderr_log 2>&1 >/dev/null
+  done
+}
+
 
 build_epub() {
   echo "---- Building EPUB"
@@ -205,20 +256,23 @@ case "$TARGET" in
     build_typ
     build_pdf
     ;;
-  # html)
-  #   step_preprocess
-  #   step_html_monolithic
-  #   step_html_multipage
-  #   ;;
-  # commonmark)
-  #   step_preprocess
-  #   step_commonmark
-  #   ;;
+  html)
+    # preprocess
+    build_single_html
+    build_multi_html
+    ;;
+  commonmark)
+    # preprocess
+    build_commonmark
+    ;;
   all)
     # preprocess
     build_json
     build_typ
     build_pdf
+    build_single_html
+    build_multi_html
+    build_commonmark
     ;;
   *)
     echo "usage: $0 [pdf|html|commonmark|all]" >&2
