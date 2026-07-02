@@ -58,22 +58,48 @@
 % Override any of these at the pandoc command line with:
 %   -V mainfont="My Serif" -V sansfont="My Sans" -V monofont="My Mono"
 % or install your preferred fonts and edit the defaults below.
+
+
+\directlua{
+  local fontdir = "$fontdir$"
+  luaotfload.add_fallback("myfallback", {
+    "[" .. fontdir .. "/NotoColorEmoji.ttf]:mode=harf;",
+    "[" .. fontdir .. "/GoNotoCurrent-Regular.ttf]:;",
+  })
+}
+
+
 $if(mainfont)$
-\setmainfont{$mainfont$}
+\setmainfont{[$mainfont$]}
 $else$
-\setmainfont{TeX Gyre Pagella}[Ligatures=TeX]
+\setmainfont{GoNotoCurrent-Regular}[
+  Path = $fontdir$/,
+  Extension = .ttf,
+  RawFeature={fallback=myfallback},
+]
+%% \setmainfont{TeX Gyre Pagella}[Ligatures=TeX]
 $endif$
 
 $if(sansfont)$
 \setsansfont{$sansfont$}
 $else$
-\setsansfont{TeX Gyre Heros}[Ligatures=TeX]
+\setsansfont{GoNotoCurrent-Regular}[
+  Path = $fontdir$/,
+  Extension = .ttf,
+  RawFeature={fallback=myfallback},
+]
+%% \setsansfont{TeX Gyre Heros}[Ligatures=TeX]
 $endif$
 
 $if(monofont)$
 \setmonofont{$monofont$}
 $else$
-\setmonofont{TeX Gyre Cursor}[Scale=0.92]
+\setmonofont{NotoSansMono-Regular}[
+  Path = $fontdir$/,
+  Extension = .ttf,
+  RawFeature={fallback=myfallback},
+]
+%% \setmonofont{TeX Gyre Cursor}[Scale=0.92]
 $endif$
 
 % ─── Colour Palette ──────────────────────────────────────────────────────────
@@ -270,7 +296,7 @@ $endif$
 % fvextra extends fancyvrb with line-breaking; must load before highlighting-macros
 % so that pandoc's Verbatim environment inherits breaklines support.
 \usepackage{fvextra}
-\fvset{breaklines=true,breakanywhere=false}
+\fvset{breaklines=true,breakanywhere=false,fontfamily=\ttdefault}
 
 % Wire up pandoc code blocks to our style
 $if(highlighting-macros)$

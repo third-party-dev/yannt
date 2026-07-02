@@ -1,6 +1,6 @@
 <div class="pagegroup">
 
-# Summary
+# 1. Summary
 
   As machine learning (ML) models flood into every system on the planet, we need to understand what's on the inside. Do you know if your model has malicious code? The model may be safe to inference, but does it contain hidden behaviors internally?
 

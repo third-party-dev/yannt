@@ -1,0 +1,37 @@
+# Various File System Layouts
+
+## Workspace Layout
+
+- **thirdparty-ws** - The name of this folder can be anything, but I will normally name _workspace_ folders after the larger effort or epic that it is contributing too. (Sometimes it becomes the forge organization.)
+- **thirdparty-ws/yannt** - Top level git repo folder for yannt.
+- **thirdparty-ws/pparse** - Commonly a symlink to `yannt/packages/thirdparty_pparse`.
+
+Note: When performing any virtual environment updates or resets, I always perform them from the `thirdparty-ws/yannt` folder so I can make assumptions like: "all in-place installs will exist in `configs/auto_install` relative to `yannt` top folder.".
+
+## **thirdpart-ws/yannt** Project Layout
+
+- **cache** - Ephemeral folder for holding virtual development environment state (conda, venv, docker home folders).
+  - **bundles** - Ephemeral folder for holding git bundles, used for transferring backups to other systems.
+  - **conda** - Project local storage for conda environments.
+  - **docker** - All project specific things related to docker (e.g. a container home directory for container local caching and command history.)
+  - **empty-context** - An always empty folder that can be used for empty container contexts.
+  - **pip_pkgs** - Project local pip package cache built with `pip download`.
+  - **venv** - Project local storage for python virtual environments.
+  - **podman** - All project specific things related to podman containers (e.g. home folder and all image cache/databases.)
+- **configs** - Directory of virtual development environment configurations.
+  - **env** - Development environment specific configurations.
+  - **pyver** - Version specific Python requirements/constraints shared between development environments.
+  - **auto_install** - Ephemeral folder use to configure what packages to auto install with initializing a new environment. Note: The environment becomes bound to the `configs/auto_install/...` path so any changes to this folder may require a re-init of the environment.
+- **docs** - Documentation
+  - **manual** - Proper "manual" for rendering to HTML and PDF.
+  - **notes** - Chicken scratch notes that I'm not ready to delete.
+
+- **models** - Ephemeral folder for holding various models on the system for testing and development.
+- **outputs** - Ephemeral yannt output folder.
+- **packages** - Folder for storage of all packages associated or coupled with yannt use cases.
+  - **thirdparty_pparse** - An external package (pparse) that is treated special by having its own repository and clone embedded within the yannt project packages folder. Note: We point `thirdparty-ws/pparse` at this folder.
+- **scripts** - Scripts for building development environments, testing, and building of yannt package suites.
+  - **_** - Dragons be here.
+- **upstream** - Ephemeral folder for holding clones of upstream git repos used for developing and testing yannt.
+- **do** - (Vibe-coded) Clone of `just` for use with the adjacent `Justfile`. (Proper `just` should be usable instead of `do` for a more rich experience.)
+- **Justfile** - Modern-ish version of Makefile with design principles for project management.

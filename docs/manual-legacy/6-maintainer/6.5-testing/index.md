@@ -1,0 +1,1 @@
+## 6.5 Testing strategy and how to run tests
