@@ -48,14 +48,49 @@
 
   // Slightly heavier rule under H1s so major sections read clearly even
   // without relying on numbering alone.
+  //show heading.where(level: 1): it => {
+  //  // THIS BREAKS BUILD pagebreak(weak: true)
+  //  v(0.4em)
+  //  it
+  //  v(0.2em)
+  //  line(length: 100%, stroke: 1.2pt)
+  //  v(0.6em)
+  //}
+
+  // let min-runway-lines = 8
+  // show heading.where(level: 1): it => context {
+  //   let line-height = 1.3 * text.size
+  //   let m = page.margin
+  //   let bottom-margin = if type(m) == dictionary { m.bottom } else { m }
+  //   let remaining = (page.height - bottom-margin) - here().position().y
+  //   if remaining < min-runway-lines * line-height {
+  //     pagebreak(weak: true)
+  //   }
+  //   v(0.4em)
+  //   it
+  //   v(0.2em)
+  //   line(length: 100%, stroke: 1.2pt)
+  //   v(0.6em)
+  // }
+
   show heading.where(level: 1): it => {
-    // THIS BREAKS BUILD pagebreak(weak: true)
     v(0.4em)
     it
     v(0.2em)
     line(length: 100%, stroke: 1.2pt)
     v(0.6em)
   }
+
+  show raw.where(block: true): it => block(
+    clip: true,
+    width: 100%,
+    inset: (x: 0.8em, y: 0.6em),
+    radius: 3pt,
+    fill: luma(240),
+    stroke: 0.5pt + luma(180),
+    it,
+  )
+
 
   // -------- Title page --------
   if title != none {
