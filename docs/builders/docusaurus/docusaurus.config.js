@@ -33,8 +33,8 @@ function remarkReplaceHiddenDivs() {
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
+  title: 'Yannt Docs',
+  tagline: 'Yet Another Neural Network Tool Documentation',
   favicon: 'img/favicon.ico',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -50,8 +50,8 @@ const config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'thirdparty', // Usually your GitHub org/user name.
+  projectName: 'yannt', // Usually your repo name.
 
   onBrokenAnchors: 'ignore',
   onBrokenLinks: 'ignore', //'throw',
@@ -125,6 +125,17 @@ const config = {
     },
   ],
 
+  themes: [
+    [
+      "@easyops-cn/docusaurus-search-local",
+      /** @type {import("@easyops-cn/docusaurus-search-local").PluginOptions} */
+      ({
+        hashed: true,
+        docsRouteBasePath: "/docs",
+      }),
+    ],
+  ],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -136,8 +147,8 @@ const config = {
       navbar: {
         title: 'Yannt Manual',
         logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          alt: 'yannt logo',
+          src: 'img/logo-dark.svg',
         },
         items: [
           // {
@@ -197,7 +208,7 @@ const config = {
             ],
           },*/
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Yannt Docs. Built with Docusaurus.`,
       },
       prism: {
         theme: prismThemes.github,
