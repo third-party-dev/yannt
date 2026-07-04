@@ -1,5 +1,6 @@
 ---
 title: Summary
+first-section-number: "2"
 ---
 
 ::: {.pagegroup}

@@ -100,7 +100,7 @@ mkdir -p $OUT_PATH
 cp ${DOCS_PATH}/assets/manual.css $OUT_PATH/
 
 
-FILTERS=( "$TMPL_PATH/toc-control.lua" "$TMPL_PATH/crosslink.lua" "$TMPL_PATH/rules.lua" )
+FILTERS=( "$TMPL_PATH/toc-control.lua" "$TMPL_PATH/crosslink.lua" "$TMPL_PATH/rules.lua" "$TMPL_PATH/num-headings-md.lua" )
 filter_args() {
   local args=()
   for f in "${FILTERS[@]}"; do args+=(--lua-filter "$f"); done
