@@ -84,6 +84,11 @@ function Pandoc(doc)
   if doc.meta.crosslink_mode then
     mode = pandoc.utils.stringify(doc.meta.crosslink_mode)
   end
+  -- Pipeline-internal bookkeeping, not content: strip it so it never shows
+  -- up as a stray key in rendered frontmatter (this matters most for the
+  -- CommonMark/Docusaurus target, since --standalone dumps the full
+  -- metadata map back out as a YAML frontmatter block).
+  doc.meta.crosslink_mode = nil
   doc.blocks = pandoc.walk_block(pandoc.Div(doc.blocks), { Link = Link }).content
   return doc
 end

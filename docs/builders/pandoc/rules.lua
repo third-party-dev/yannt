@@ -49,31 +49,29 @@ local function handle_pagebreak_marker(el, isPagebreak)
   return {} -- commonmark and anything else: no-op, drop the empty div
 end
 
-
 function Div(el)
   local isNamespace = el.classes:includes("namespace-rule")
   local isMember     = el.classes:includes("member-rule")
-  if not (isNamespace or isMember) then
-    return nil
+
+  if (isNamespace or isMember) then
+    if FORMAT == "typst" then
+      local raw = isNamespace and TYPST_THICK or TYPST_THIN
+      return pandoc.RawBlock("typst", raw)
+    elseif FORMAT:match("html") then
+      local raw = isNamespace and HTML_THICK or HTML_THIN
+      return pandoc.RawBlock("html", raw)
+    elseif FORMAT:match("commonmark") or FORMAT:match("markdown") then
+      -- Raw HTML block passes straight through CommonMark/Docusaurus (MDX
+      -- renders bare <hr> tags fine) and still degrades to *** in editors
+      -- that don't render raw HTML if you ever inspect the source directly.
+      local raw = isNamespace and HTML_THICK or HTML_THIN
+      return pandoc.RawBlock("html", raw)
+    end
   end
 
   local isPagebreak  = el.classes:includes("pagebreak-before")
   if isPagebreak then
     return handle_pagebreak_marker(el, true)
-  end
-
-  if FORMAT == "typst" then
-    local raw = isNamespace and TYPST_THICK or TYPST_THIN
-    return pandoc.RawBlock("typst", raw)
-  elseif FORMAT:match("html") then
-    local raw = isNamespace and HTML_THICK or HTML_THIN
-    return pandoc.RawBlock("html", raw)
-  elseif FORMAT:match("commonmark") or FORMAT:match("markdown") then
-    -- Raw HTML block passes straight through CommonMark/Docusaurus (MDX
-    -- renders bare <hr> tags fine) and still degrades to *** in editors
-    -- that don't render raw HTML if you ever inspect the source directly.
-    local raw = isNamespace and HTML_THICK or HTML_THIN
-    return pandoc.RawBlock("html", raw)
   end
 
   return nil -- unknown format: leave the empty div as-is rather than guess

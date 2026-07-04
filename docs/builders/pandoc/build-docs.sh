@@ -11,15 +11,19 @@ export PROJ_PATH=$(realpath $(dirname $0)/../../..)
 DOCS_PATH=$PROJ_PATH/docs/manual
 TMPL_PATH=$PROJ_PATH/docs/builders/pandoc
 OUT_PATH=$PROJ_PATH/outputs/docs/pandoc
+RESOURCE_PATH="$(find "${DOCS_PATH}" -type d | paste -sd: -)"
 TARGET="${1:-all}"
 TYPST=${TYPST:-typst}
 
-CHAPTERS="
-${DOCS_PATH}/0-contents/index.md
-${DOCS_PATH}/1-introduction/index.md
-${DOCS_PATH}/1-introduction/1.1-overview.md
-${DOCS_PATH}/1-introduction/1.2-install.md
-"
+MANUAL_FILES=(
+  "${DOCS_PATH}/0-contents/index.md"
+  "${DOCS_PATH}/1-introduction/index.md"
+  "${DOCS_PATH}/1-introduction/1.1-overview.md"
+  "${DOCS_PATH}/1-introduction/1.2-install.md"
+  "${DOCS_PATH}/guides/advanced-usage.md"
+  "${DOCS_PATH}/guides/getting-started.md"
+  "${DOCS_PATH}/api/api-reference.md"
+)
 # ${DOCS_PATH}/2-end-user/index.md
 # ${DOCS_PATH}/2-end-user/2.1-overview.md
 # ${DOCS_PATH}/2-end-user/2.2-primers.md
@@ -85,36 +89,15 @@ ${DOCS_PATH}/1-introduction/1.2-install.md
 # ${PROJ_PATH}/docs/builders/pandoc/api-doc-reference.md
 # "
 
-RES_PATH_LIST="
-${DOCS_PATH}/0-contents
-${DOCS_PATH}/1-introduction
-${DOCS_PATH}/2-end-user
-${DOCS_PATH}/3-integration
-${DOCS_PATH}/4-use-cases
-${DOCS_PATH}/5-api-reference
-${DOCS_PATH}/6-maintainer
-${DOCS_PATH}/6-maintainer/6.5-testing
-${DOCS_PATH}/6-maintainer/6.8-commentary
-${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.2-pparse
-${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.2-analysis
-${DOCS_PATH}/7-tutorials
-"
 
-RES_PATHS=""
-for item in $RES_PATH_LIST; do
-    if [ -z "$RES_PATHS" ]; then
-        RES_PATHS="$item"
-    else
-        RES_PATHS="$RES_PATHS:$item"
-    fi
-done
 
 # Excluded:
 # - docs/5-api-reference/5.2-python-api.md
 
 # TODO: Consider putting side effect in create_folders procedure.
 mkdir -p $OUT_PATH
-cp $TMPL_PATH/manual.css $OUT_PATH/
+# TODO: Is this copy needed?
+cp ${DOCS_PATH}/assets/manual.css $OUT_PATH/
 
 
 FILTERS=( "$TMPL_PATH/toc-control.lua" "$TMPL_PATH/crosslink.lua" "$TMPL_PATH/rules.lua" )
@@ -125,9 +108,28 @@ filter_args() {
 }
 
 
+# UNUSED
+step_preprocess() {
+  log "Pre-processing: refreshing generated sections"
+  python3 "$ROOT_DIR/scripts/update_use_cases.py" \
+    "$DOCS_DIR/guides/advanced-usage.md" \
+    --debug-json "$DEBUG_DIR/use-case-refresh.json"
+
+  log "Pre-processing: regenerating API reference"
+  python3 "$ROOT_DIR/scripts/gen_api_docs.py" \
+    "$DOCS_DIR/api/api-spec.json" \
+    "$DOCS_DIR/api/api-reference.md" \
+    --debug-json "$DEBUG_DIR/api-gen-report.json"
+}
+
+
 build_json() {
   echo "---- Building JSON"
-  pandoc $TMPL_PATH/metadata.yaml $CHAPTERS $TMPL_PATH/metadata-tail.yaml \
+  pandoc "${MANUAL_FILES[@]}" \
+    --metadata-file="${DOCS_PATH}/_meta/book.yaml" \
+    --toc --toc-depth=3 --number-sections \
+    --resource-path="$RESOURCE_PATH" \
+    --extract-media=media \
     $(filter_args) \
     -f markdown -t json \
     -o $OUT_PATH/api-doc-reference.json
@@ -140,18 +142,22 @@ build_typ() {
   #local pdf_out="$BUILD_DIR/manual.pdf"
   #local trace="$DEBUG_DIR/pdf-pandoc-trace.json"
 
-  # shellcheck disable=SC2046
-  trace="$OUT_PATH/yannt-manual-pandoc-typ-trace.json" \
-  pandoc \
-    $TMPL_PATH/metadata.yaml $CHAPTERS $TMPL_PATH/metadata-tail.yaml \
-    -f markdown -t typst \
-    --template "$TMPL_PATH/manual.typst" \
-    --toc --toc-depth=3 \
-    -M crosslink_mode=internal \
-    $(filter_args) \
-    --trace \
-    -o "$OUT_PATH/yannt-manual.typ" \
-    2>&1 | tee "$OUT_PATH/yannt-manual-pandoc-typ-stderr.log" 2>&1 >/dev/null
+  (
+    cd $OUT_PATH
+    trace="$OUT_PATH/yannt-manual-pandoc-typ-trace.json" \
+    pandoc "${MANUAL_FILES[@]}" \
+      --metadata-file="${DOCS_PATH}/_meta/book.yaml" \
+      -f markdown -t typst \
+      --template "$TMPL_PATH/manual.typst" \
+      --toc --toc-depth=3 --number-sections \
+      -M crosslink_mode=internal \
+      --resource-path="$RESOURCE_PATH" \
+      --extract-media=media \
+      $(filter_args) \
+      --trace \
+      -o "$OUT_PATH/yannt-manual.typ" \
+      2>&1 | tee "$OUT_PATH/yannt-manual-pandoc-typ-stderr.log" 2>&1 >/dev/null
+  )
 }
 
 
@@ -171,42 +177,52 @@ build_pdf() {
 
 build_single_html() {
   echo "---- Building Single HTML"
-  cp $TMPL_PATH/manual.css $OUT_PATH/
-  trace="$OUT_PATH/yannt-manual-pandoc-html-single-trace.json" \
-  pandoc \
-    $TMPL_PATH/metadata.yaml $CHAPTERS $TMPL_PATH/metadata-tail.yaml \
-    -f markdown \
-    -t html5 \
-    -s --toc --toc-depth=3 \
-    -M crosslink_mode=internal \
-    --css=$OUT_PATH/manual.css \
-    $(filter_args) \
-    --trace \
-    -o $OUT_PATH/yannt-manual-single.html \
-    2>&1 | tee "$OUT_PATH/yannt-manual-pandoc-single-html-stderr.log" 2>&1 >/dev/null
-
+  cp ${DOCS_PATH}/assets/manual.css $OUT_PATH/
+  (
+    cd $OUT_PATH
+    trace="$OUT_PATH/yannt-manual-pandoc-html-single-trace.json" \
+    pandoc "${MANUAL_FILES[@]}" \
+      --metadata-file="${DOCS_PATH}/_meta/book.yaml" \
+      -f markdown -t html5 \
+      -s --toc --toc-depth=3 --number-sections \
+      -M crosslink_mode=internal \
+      --resource-path="$RESOURCE_PATH" \
+      --extract-media=media \
+      --css=$OUT_PATH/manual.css \
+      $(filter_args) \
+      --trace \
+      -o $OUT_PATH/yannt-manual-single.html \
+      2>&1 | tee "$OUT_PATH/yannt-manual-pandoc-single-html-stderr.log" 2>&1 >/dev/null
+  )
 }
 
 
 build_multi_html() {
   echo "---- Building Multiple HTML"
-  cp $TMPL_PATH/manual.css $OUT_PATH/
+  cp ${DOCS_PATH}/assets/manual.css $OUT_PATH/
   local out_dir="$OUT_PATH/html"
   local stderr_log=$OUT_PATH/yannt-manual-pandoc-multi-html-stderr.log
-  mkdir -p $out_dir
+  mkdir -p $out_dir/assets
+  cp -r "${DOCS_PATH}/assets/." "$out_dir/assets/"
 
   echo "" > $stderr_log
 
-  for src in $CHAPTERS; do
+  for src in "${MANUAL_FILES[@]}"; do
     local rel="${src#"${DOCS_PATH}"/}"
     local out="$out_dir/${rel%.md}.html"
     mkdir -p "$(dirname "$out")"
+
+    # Fixup CSS reference
+    local depth
+    depth="$(tr -cd '/' <<< "$rel" | wc -c)"
+    local css_prefix="../../"
+    for ((i = 0; i < depth; i++)); do css_prefix="../$css_prefix"; done
+
     pandoc "$src" \
-      -f markdown \
-      -t html5 \
-      -s --toc --toc-depth=3 \
+      -f markdown -t html5 \
+      -s --toc --toc-depth=3 --number-sections \
       -M crosslink_mode=html-multipage \
-      --css=$OUT_PATH/manual.css \
+      --css="${css_prefix}assets/manual.css" \
       $(filter_args) \
       -o "$out" \
       2>&1 | tee -a "$stderr_log" 2>&1 >/dev/null
@@ -216,27 +232,41 @@ build_multi_html() {
 
 build_commonmark() {
   echo "---- Building Multiple CommonMark"
-  cp $TMPL_PATH/manual.css $OUT_PATH/
+  cp ${DOCS_PATH}/assets/manual.css $OUT_PATH/
   local out_dir="$OUT_PATH/commonmark"
   local stderr_log=$OUT_PATH/yannt-manual-pandoc-multi-commonmark-stderr.log
-  mkdir -p $out_dir
+  mkdir -p $out_dir/assets
+  cp -r "${DOCS_PATH}/assets/." "$out_dir/assets/"
 
   echo "" > $stderr_log
 
-  for src in $CHAPTERS; do
+  local position=5
+  for src in "${MANUAL_FILES[@]}"; do
     local rel="${src#"${DOCS_PATH}"/}"
     local out="$out_dir/$rel"
     mkdir -p "$(dirname "$out")"
 
     pandoc "$src" \
-      -f markdown \
-      -t commonmark_x \
-      --standalone \
+      -f markdown -t commonmark_x-fenced_divs \
+      --standalone --number-sections \
       -M crosslink_mode=commonmark \
+      -M sidebar_position="$position" \
       $(filter_args) \
       -o "$out" \
       2>&1 | tee -a $stderr_log 2>&1 >/dev/null
+    position=$((position + 5))
   done
+
+  # _category_.json controls a folder's label/position/collapsed-state in
+  # Docusaurus's autogenerated sidebar. These are authored once, alongside
+  # the content they describe, and just need to land in the same relative
+  # spot in the output tree -- copy them over unmodified, same as assets/.
+  while IFS= read -r -d '' cat_file; do
+    local rel="${cat_file#"${DOCS_PATH}"/}"
+    local out="$out_dir/$rel"
+    mkdir -p "$(dirname "$out")"
+    cp "$cat_file" "$out"
+  done < <(find "${DOCS_PATH}" -name "_category_.json" -print0)
 }
 
 
@@ -245,7 +275,7 @@ build_epub() {
   pandoc $TMPL_PATH/metadata.yaml $CHAPTERS $TMPL_PATH/metadata-tail.yaml \
     --lua-filter=$TMPL_PATH/api-doc-filter.lua \
     --from markdown+raw_html+simple_tables \
-    --toc \
+    --toc --number-sections \
     -o $OUT_PATH/api-doc-reference.epub
 }
 

@@ -1,4 +1,4 @@
-<div class="pagegroup">
+::: {.pagegroup}
 
 # Summary
 
@@ -16,4 +16,4 @@
 
   What this project needs is early adopters, requirement requests, and user experience feedback. Tools built in isolation bias towards what the developer imagines the user needs. Every requirement surfaced by a real workflow, every pain point reported by a real user, pulls the project toward problems that actually exist. That feedback is what separates a tool that works, technically, from one that works in practice.
 
-</div><!-- end of summary pagegroup -->
+:::

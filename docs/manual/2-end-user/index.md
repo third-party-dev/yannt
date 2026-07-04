@@ -1,4 +1,4 @@
-<div class="pagegroup">
+::: {.pagegroup}
 
 # 2 End User Documentation
 
@@ -13,4 +13,4 @@ In general, you can see all of the features that yannt tools have by utilizing t
 
 **Note:** For installation, please see the installation procedures in section 1.
 
-</div><!-- end of end user documentation page group>
+:::
