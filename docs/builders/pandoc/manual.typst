@@ -18,7 +18,7 @@
   paper: "us-letter",
   lang: "en",
   region: "US",
-  font: ("New Computer Modern"),
+  font: ("Noto Sans", "Noto Color Emoji"),
   fontsize: 11pt,
   sectionnumbering: "1.1",
   doc,

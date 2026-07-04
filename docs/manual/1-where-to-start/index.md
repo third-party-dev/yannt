@@ -1,6 +1,10 @@
-# Yet Another Neural Network Tool Documentation
+---
+title: Where To Start
+---
 
-<div style="display:none"> TODO: Make these links </div>
+# Where To Start
+
+<!-- TODO: Make these links -->
 
 - What is this tool and what does it do? -&gt; Goto summary.
 

@@ -1,0 +1,104 @@
+{
+  "namespaces": [
+    {
+      "id": "acmewidget",
+      "kind": "class",
+      "name": "AcmeWidget",
+      "signature": "class AcmeWidget(config: WidgetConfig)",
+      "summary": "Primary entry point for creating and processing widgets.",
+      "description": [
+        "AcmeWidget wraps a single configured connection to the widget",
+        "registry. Instances are cheap to create but expensive to",
+        "reconfigure, so most applications should construct one instance",
+        "at startup and reuse it."
+      ],
+      "members": [
+        {
+          "id": "acmewidget-process",
+          "kind": "method",
+          "name": "process",
+          "signature": "process(item: Widget) -> Result",
+          "summary": "Process a single widget synchronously.",
+          "description": [
+            "Runs the full validation and transformation pipeline on",
+            "`item` and blocks until a result is available."
+          ],
+          "args": [
+            {"name": "item", "type": "Widget", "desc": "The widget to process."}
+          ],
+          "returns": "Result -- the processed output, or raises on validation failure.",
+          "raises": [
+            {"type": "ValidationError", "desc": "if `item` fails schema validation."}
+          ]
+        },
+        {
+          "id": "acmewidget-process_batch",
+          "kind": "method",
+          "name": "process_batch",
+          "signature": "process_batch(items: list[Widget], *, parallelism: int = 8) -> list[Result]",
+          "summary": "Process many widgets concurrently.",
+          "description": [
+            "Prefer this over calling `process` in a loop for more than a",
+            "few hundred widgets; it batches network round-trips to the",
+            "registry and processes up to `parallelism` items at once."
+          ],
+          "args": [
+            {"name": "items", "type": "list[Widget]", "desc": "Widgets to process."},
+            {"name": "parallelism", "type": "int", "desc": "Maximum concurrent workers. Defaults to 8."}
+          ],
+          "returns": "list[Result] -- results in the same order as `items`.",
+          "raises": []
+        },
+        {
+          "id": "acmewidget-region",
+          "kind": "attribute",
+          "name": "region",
+          "signature": "region: str",
+          "summary": "The AWS-style region this client is bound to.",
+          "description": [
+            "Read-only after construction; create a new `AcmeWidget` to",
+            "target a different region."
+          ],
+          "args": [],
+          "returns": null,
+          "raises": []
+        }
+      ]
+    },
+    {
+      "id": "widgetconfig",
+      "kind": "class",
+      "name": "WidgetConfig",
+      "signature": "class WidgetConfig(name: str, region: str = \"us-east\")",
+      "summary": "Immutable configuration object passed to AcmeWidget.",
+      "description": [
+        "A plain value object. Construct once and share across as many",
+        "AcmeWidget instances as needed."
+      ],
+      "members": [
+        {
+          "id": "widgetconfig-name",
+          "kind": "attribute",
+          "name": "name",
+          "signature": "name: str",
+          "summary": "Human-readable workspace name.",
+          "description": ["Shown in the Acme dashboard; has no functional effect."],
+          "args": [],
+          "returns": null,
+          "raises": []
+        },
+        {
+          "id": "widgetconfig-region",
+          "kind": "attribute",
+          "name": "region",
+          "signature": "region: str",
+          "summary": "Target region identifier.",
+          "description": ["Defaults to `\"us-east\"` when not supplied."],
+          "args": [],
+          "returns": null,
+          "raises": []
+        }
+      ]
+    }
+  ]
+}

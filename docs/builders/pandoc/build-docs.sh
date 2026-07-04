@@ -16,10 +16,10 @@ TARGET="${1:-all}"
 TYPST=${TYPST:-typst}
 
 MANUAL_FILES=(
-  "${DOCS_PATH}/0-contents/index.md"
-  "${DOCS_PATH}/1-introduction/index.md"
-  "${DOCS_PATH}/1-introduction/1.1-overview.md"
-  "${DOCS_PATH}/1-introduction/1.2-install.md"
+  "${DOCS_PATH}/1-where-to-start/index.md"
+  "${DOCS_PATH}/2-introduction/index.md"
+  "${DOCS_PATH}/2-introduction/2.1-overview.md"
+  "${DOCS_PATH}/2-introduction/2.2-install.md"
   "${DOCS_PATH}/guides/advanced-usage.md"
   "${DOCS_PATH}/guides/getting-started.md"
   "${DOCS_PATH}/api/api-reference.md"
@@ -165,7 +165,9 @@ build_pdf() {
   echo "---- Building PDF"
 
   if command -v $TYPST >/dev/null 2>&1; then
-    $TYPST compile "$OUT_PATH/yannt-manual.typ" "$OUT_PATH/yannt-manual.pdf" \
+    $TYPST compile \
+      --font-path "$PROJ_PATH/docs/builders/pandoc-latex" \
+      "$OUT_PATH/yannt-manual.typ" "$OUT_PATH/yannt-manual.pdf" \
       2>&1 | tee "$OUT_PATH/pdf-typst-stderr.log"
   else
     echo "WARNING: 'typst' binary not found on PATH; skipping typst compile step."
@@ -188,7 +190,7 @@ build_single_html() {
       -M crosslink_mode=internal \
       --resource-path="$RESOURCE_PATH" \
       --extract-media=media \
-      --css=$OUT_PATH/manual.css \
+      --css=manual.css \
       $(filter_args) \
       --trace \
       -o $OUT_PATH/yannt-manual-single.html \
@@ -199,34 +201,25 @@ build_single_html() {
 
 build_multi_html() {
   echo "---- Building Multiple HTML"
-  cp ${DOCS_PATH}/assets/manual.css $OUT_PATH/
   local out_dir="$OUT_PATH/html"
   local stderr_log=$OUT_PATH/yannt-manual-pandoc-multi-html-stderr.log
-  mkdir -p $out_dir/assets
+
+  rm -rf "$out_dir"
+
+  pandoc "${MANUAL_FILES[@]}" \
+    --metadata-file="${DOCS_PATH}/_meta/book.yaml" \
+    -f markdown -t chunkedhtml \
+    --toc --toc-depth=3 --number-sections \
+    -M crosslink_mode=html-multipage \
+    --resource-path="$RESOURCE_PATH" \
+    --extract-media=media \
+    --css="assets/manual.css" \
+    $(filter_args) \
+    -o "$out_dir" \
+    2>&1 | tee "$stderr_log"
+
+  mkdir -p "$out_dir/assets"
   cp -r "${DOCS_PATH}/assets/." "$out_dir/assets/"
-
-  echo "" > $stderr_log
-
-  for src in "${MANUAL_FILES[@]}"; do
-    local rel="${src#"${DOCS_PATH}"/}"
-    local out="$out_dir/${rel%.md}.html"
-    mkdir -p "$(dirname "$out")"
-
-    # Fixup CSS reference
-    local depth
-    depth="$(tr -cd '/' <<< "$rel" | wc -c)"
-    local css_prefix="../../"
-    for ((i = 0; i < depth; i++)); do css_prefix="../$css_prefix"; done
-
-    pandoc "$src" \
-      -f markdown -t html5 \
-      -s --toc --toc-depth=3 --number-sections \
-      -M crosslink_mode=html-multipage \
-      --css="${css_prefix}assets/manual.css" \
-      $(filter_args) \
-      -o "$out" \
-      2>&1 | tee -a "$stderr_log" 2>&1 >/dev/null
-  done
 }
 
 
