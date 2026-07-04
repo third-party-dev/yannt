@@ -166,7 +166,7 @@ build_pdf() {
 
   if command -v $TYPST >/dev/null 2>&1; then
     $TYPST compile \
-      --font-path "$PROJ_PATH/docs/builders/pandoc-latex" \
+      --font-path "$TMPL_PATH" \
       "$OUT_PATH/yannt-manual.typ" "$OUT_PATH/yannt-manual.pdf" \
       2>&1 | tee "$OUT_PATH/pdf-typst-stderr.log"
   else
