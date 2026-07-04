@@ -225,9 +225,10 @@ build_multi_html() {
 
 build_commonmark() {
   echo "---- Building Multiple CommonMark"
-  cp ${DOCS_PATH}/assets/manual.css $OUT_PATH/
   local out_dir="$OUT_PATH/commonmark"
   local stderr_log=$OUT_PATH/yannt-manual-pandoc-multi-commonmark-stderr.log
+
+  rm -rf "$out_dir"
   mkdir -p $out_dir/assets
   cp -r "${DOCS_PATH}/assets/." "$out_dir/assets/"
 
