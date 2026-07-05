@@ -20,9 +20,10 @@ MANUAL_FILES=(
   "${DOCS_PATH}/2-introduction/index.md"
   "${DOCS_PATH}/2-introduction/2.1-overview.md"
   "${DOCS_PATH}/2-introduction/2.2-install.md"
-  "${DOCS_PATH}/guides/advanced-usage.md"
-  "${DOCS_PATH}/guides/getting-started.md"
-  "${DOCS_PATH}/api/api-reference.md"
+  "${DOCS_PATH}/6-api-reference/6.2-pparse-lib-api.md"
+  #"${DOCS_PATH}/guides/advanced-usage.md"
+  #"${DOCS_PATH}/guides/getting-started.md"
+  #"${DOCS_PATH}/api/api-reference.md"
 )
 # ${DOCS_PATH}/2-end-user/index.md
 # ${DOCS_PATH}/2-end-user/2.1-overview.md
@@ -241,7 +242,7 @@ build_commonmark() {
     mkdir -p "$(dirname "$out")"
 
     pandoc "$src" \
-      -f markdown -t commonmark_x-fenced_divs \
+      -f markdown -t commonmark+raw_html \
       --standalone --number-sections \
       -M crosslink_mode=commonmark \
       -M sidebar_position="$position" \

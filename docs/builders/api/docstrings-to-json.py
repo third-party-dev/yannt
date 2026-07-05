@@ -8,10 +8,13 @@
     cause a reverse lookup and hyperref to the fqn anchor in the same way.
 '''
 
+import logging
+log = logging.getLogger(__name__)
 
 from pprint import pprint
 
 import griffe
+import json
 
 from typing import Any, Optional
 
@@ -91,12 +94,12 @@ def get_namespaces(ns_list = [], p_target = None, allowed_module=''):
 
     if isinstance(target, griffe.Class) or isinstance(target, griffe.Function) or isinstance(target, griffe.Module):
         if len(target.members) > 0:
-            print(f"Adding {target.canonical_path} {type(target)}")
+            log.debug(f"Adding {target.canonical_path} {type(target)}")
             ns_list.append(target)
             for name, member in target.members.items():
                 ns_list = get_namespaces(ns_list, member)
     else:
-        print(f"Found {type(target)}")
+        log.debug(f"Found {type(target)}")
         breakpoint()
 
     return ns_list
@@ -219,12 +222,12 @@ def process_docstring(docstring, member_dict):
                 for name, description in parse_list_admonition(section.value.description):
                     see_also.append({'name': name, 'description': description})
             else:
-                print(section.kind, section.value)
+                log.debug(section.kind, section.value)
                 breakpoint()
         except Exception as exc:
             import traceback
             traceback.print_exc()
-            print(exc)
+            log.debug(exc)
             breakpoint()
     
     member_dict['docstring'] = {
@@ -257,12 +260,12 @@ def main():
         for name, g_member in exports_dict[fq_export]['griffe'].members.items():
             exports_dict[fq_export]['namespaces'] = get_namespaces(export_namespaces, g_member)
 
-        print("GOT NAMESPACES")
+        log.debug("GOT NAMESPACES")
 
         ns_dict = {}
         for ns in exports_dict[fq_export]['namespaces']:
 
-            print(f"PROCESSING NAMESPACE {ns}")
+            log.debug(f"PROCESSING NAMESPACE {ns}")
 
             # Populate ns_dict for use as is_namespace lookup.
             ns_dict[ns.canonical_path] = {
@@ -280,10 +283,10 @@ def main():
         
         # ! TODO: Consider the members that are namespaces. Do we duplicate, defer, skip?
 
-        print("PROCESSING ALL NAMESPACE MEMBERS")
+        log.debug("PROCESSING ALL NAMESPACE MEMBERS")
         for ns in exports_dict[fq_export]['namespaces']:
             for name, p_member in ns.members.items():
-                print(f"PROCESSING NAMESPACE MEMBER {name}")
+                log.debug(f"PROCESSING NAMESPACE MEMBER {name}")
                 fqn = f'{ns.canonical_path}.{name}'
 
                 member = p_member
@@ -291,12 +294,12 @@ def main():
                     try:
                         member.resolve_target()
                     except Exception as exc:
-                        print(f"Skipping alias {fqn}")
+                        log.debug(f"Skipping alias {fqn}")
                         continue
                     member = member.final_target
 
-                if fqn == 'thirdparty.pparse.lib.EndOfNodeException':
-                    breakpoint()
+                # if fqn == 'thirdparty.pparse.lib.EndOfNodeException':
+                #     breakpoint()
 
                 ns_dict[ns.canonical_path]['members'][name] = {
                     'fqn': fqn,
@@ -327,12 +330,13 @@ def main():
 
         # ** At this point ns_dict should be complete an ready for json to markdown conversion.
 
-        print("SAVING TO JSON")
+        log.debug("SAVING TO JSON")
 
         # TODO: Control the output path.
-        with open(f'{fq_export}-api.json', 'w') as fobj:
-            import json
-            fobj.write(json.dumps(ns_dict))
+        #with open(f'{fq_export}-api.json', 'w') as fobj:
+        #    import json
+        #    fobj.write(json.dumps(ns_dict))
+        print(json.dumps(ns_dict))
 
 if __name__ == "__main__":
     try:

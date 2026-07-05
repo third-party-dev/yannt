@@ -76,3 +76,14 @@ function Div(el)
 
   return nil -- unknown format: leave the empty div as-is rather than guess
 end
+
+-- function Span(el)
+--   local id = el.identifier
+--   if id ~= "" and #el.content == 0 then
+--     if FORMAT == "typst" then
+--       return pandoc.RawInline("typst", '#label("' .. id .. '")')
+--     elseif FORMAT:match("commonmark") then
+--       return pandoc.RawInline("html", '<a id="' .. id .. '"></a>')
+--     end
+--   end
+-- end
