@@ -27,6 +27,47 @@ We want the namespace list flat:
 '''
 
 
+def klass_signature(klass) -> str:
+    klass_name = klass.name
+    bases = ', '.join([base.name for base in klass.bases])
+    decorators = [f"@{str(d.value)}" for d in klass.decorators]
+    signature_list = []
+    if len(decorators) > 0:
+        for decorator in decorators:
+            signature_list.append(decorator)
+    signature_list.append(f"{klass.kind.value} {klass_name}({bases})")
+    return '\n'.join(signature_list)
+
+
+def func_signature(func) -> str:
+    parts = []
+    for p in func.parameters:
+        if p.name == "self" or p.name == "cls":
+            continue
+
+        # prefix for *args and **kwargs
+        if p.kind == griffe.ParameterKind.var_positional:
+            name = f"*{p.name}"
+        elif p.kind == griffe.ParameterKind.var_keyword:
+            name = f"**{p.name}"
+        elif p.kind == griffe.ParameterKind.keyword_only:
+            name = p.name          # caller must add bare * separator
+        else:
+            name = p.name
+
+        segment = name
+        if p.annotation:
+            segment += f": {p.annotation}"
+            # TODO: Consider adding cross references to annotations that include registered classes
+        if p.default:
+            segment += f" = {p.default}"
+
+        parts.append(segment)
+
+    returns = f" -> {func.returns}" if func.returns else ""
+    return f"def [`{func.name}`](#{func.path})({', '.join(parts)}){returns}"
+
+
 def get_namespaces(ns_list = [], p_target = None):
     if p_target is None:
         return ns_list
@@ -57,6 +98,7 @@ def get_namespaces(ns_list = [], p_target = None):
         breakpoint()
 
     return ns_list
+
 
 def process_docstring(docstring, member_dict):
 
@@ -126,6 +168,9 @@ def main():
                 'fqn': ns.canonical_path,
             }
 
+            if isinstance(ns, griffe.Class):
+                ns_dict[ns.canonical_path]['signature'] = klass_signature(ns)
+
             if hasattr(ns, 'docstring') and ns.docstring is not None:
                 process_docstring(ns.docstring, ns_dict[ns.canonical_path])
 
@@ -145,6 +190,10 @@ def main():
                     'fqn': fqn,
                     'is_namespace': fqn in ns_dict,
                 }
+                member_entry = ns_dict[ns.canonical_path]['members'][name]
+
+                if isinstance(member, griffe.Function):
+                    member_entry['signature'] = func_signature(member)
 
                 # Parse docstring.
                 if hasattr(member, 'docstring') and member.docstring is not None:
