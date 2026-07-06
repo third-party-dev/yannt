@@ -1,11 +1,15 @@
+---
+title: Progressive Parsing
+first-section-number: "7.8.2"
+---
 
-# Progressive Parsing
+### Progressive Parsing
 
 Common parsers only find value in a complete picture. Progressive parsing finds value in the frame as it comes into focus.
 
 <!-- "Le mieux est l'ennemi du bien" (English: "The better is the enemy of the good") — Voltaire, La Bégueule (1772). -->
 
-## Intro
+#### Intro
 
 For about a year now, I've been working on a parser of data file formats. I've wanted to write something about the effort, but its been difficult to isolate what's different about it without talking through _yet another_ parsing concept. Is what I've done novel? Probably not. But its something I don't see often and there appears to be even less documentation on the approach. Maybe its an anti-pattern? Don't know, but I do have a real problem that its solving.
 
@@ -13,7 +17,7 @@ Writing a parser is something that every software developer should have tried at
 
 I agree that junior developers should not be writing parsers for production. The major exception to "don't write a parser" is, any level of developer writing a parser for any particular target format is an incredible way to analyze a data format and learn from its construction. Looking at a schema doesn't often give a sense of how the data flows within a serialized data format (unless you've written a fair number of parsers).
 
-## Terms
+#### Terms
 
 **Parsing** - If you look up [**parsing**](https://en.wikipedia.org/wiki/Parsing) on Wikipedia, you'll get something that talks about how to partition human languages or sentences. Further down the page, it mentions parsing of computer languages. In fact, if you attempt to look up any general knowledge for **parsing** on the internet, you'll mostly get articles and papers about parsing computer languages (e.g. LL parsers, LR parsers, and so forth). These computer languages are the ones that have grammars and usually defined what source code looks like or some other domain specific language.
 
@@ -29,7 +33,7 @@ Encoding can also be abused (for good?) by considering data that is wrapped in a
 
 **Serialization** is the act of reading/writing a string of bytes from/to a storage location. Ideally in a way that is reusable, in constrast to saving something like runtime only pointers to disk that are likely never relevant again. (Note: IMO, serializing non-reloadable data is a **dump**.)
 
-## Parser Resources
+#### Parser Resources
 
 Lets suppose you listened a peer developer on your team and decided that there is no way you'll write your own parser. Where might you find the parser you need/want and what exactly do you end up with? Here is a _pessimistic_ list I've developed:
 
@@ -39,13 +43,13 @@ Lets suppose you listened a peer developer on your team and decided that there i
 
 - **Parser Generator** - Some parsers are developed based on a descriptor (e.g. Kaitai struct) or based on schemas (e.g. protobuf, flatbuffers). Often, these types of parsers are pre-packaged as pre-generated external libraries, but as a developer you can regenerate the parser at any time with the schema or descriptor in hand. Like the external library, we're giving blind trust to the output of the parser generator and may perform any number of quality control mitigations that we would have done to our own code. Note: I've observed some formats that started out as schema-parser generated and then one day the developers decided that they were pivoting to a code only parser, solidifying the generated code as authoritative and making the schema secondary.
 
-## The Common Parser
+#### The Common Parser
 
 In nearly all cases of the parsers described above (standard library, external library, and parser generator), there are common properties they likely share that may or may not matter to a user:
 
 - Use of a linear multi-phase approach to parsing. For textual formats, this may mean that first the parser will decode and tokenize the whole stream before interpreting the data into a parse tree or data structure. The multi-phased approach requires that the entire stream of data be loaded into memory before you can perform any operations or filtering on the data.
 
-  ![linear-phases](./6.8.2-linear-phases.jpg)
+  ![linear-phases](./7.8.2-linear-phases.jpg)
 
 - Use of end of file (EOF) as an indicator that we have _all of the data_ to be parsed. Initially, using EOF might make sense, but in reality its a **leaky abstraction** and misinterpretation. EOF should only indicate that is all the data available from a given IO source _for now_. It has no knowledge of the application data and the code should only use application data to know when you've hit the end of a document or data format. Another way to put it, EOF indicates "no more data", it should never indicate "we have everything".
 
@@ -59,9 +63,9 @@ The fundamental difference between a stream parser and an incremental parser is 
 
 Here are some different scenarios that involve different type of memory pressure when parsing very large files or buffers:
 
-![partial-parsing](./6.8.2-partial-parsing.jpg)
+![partial-parsing](./7.8.2-partial-parsing.jpg)
 
-## Goals and Not-Goals
+#### Goals and Not-Goals
 
 Naturally, I've brought up all of the above negatives about common parsers because those are the goals of the parsing framework I intend to describe.
 
@@ -84,7 +88,7 @@ Bigger picture (non-parser specific) goals include:
 
 - Partial parsing pipeline to support nested parsing of different format. For example, parse a truncated data format that is inside a truncated `tar.gz` that itself is inside of a truncated `zip`.
 
-  ![truncated-nested-parsing](./6.8.2-truncated-nested-parsing.jpg)
+  ![truncated-nested-parsing](./7.8.2-truncated-nested-parsing.jpg)
 
 - The ability to pause the entire state of the nested parsing operation, export to XML, move to a different system, import from XML, and continue the parsing or analysis of the parse tree. The is explicitly aimed at supporting the parsing framework in other pipelines that involve multiple systems, virtual machines, or containers.
 
@@ -92,13 +96,13 @@ Bigger picture (non-parser specific) goals include:
 
 - Everything is currently implemented in pure python. Having the core parser re-implemented in a compiled systems language has many benefits.
 
-## Design
+#### Design
 
 Foundationally,
 
 - We need to be able to do all of decode, tokenize, and interpret together in much smaller chunks (in contrast to doing all of each phase once). At all times, the parser must be able to handle a "end of data" exception and be able to resume its parsing idempotently when its received more data. The natural pattern to handle this requirement is a state machine where each state is a class with a `parse()` call. This is the key to enabling partial parsing.
 
-  ![chunked-phases](./6.8.2-chunked-phases.jpg)
+  ![chunked-phases](./7.8.2-chunked-phases.jpg)
 
 * We want to be able to parse loosely coupled multiple nested file formats (e.g. bin file inside tar.gz inside zip). When we're parsing loosely coupled data, there is less assumption of type and more demand for dynamic identification of the type of data in the seralized data. Therefore, when we have a loosely coupled string of bytes we need to be able to map file identification with parser capabilities or file format targets, we call this an extraction.
 
@@ -106,9 +110,9 @@ Foundationally,
 
 To summarize, all of our parsers are fundamentally a state machine that reads an extraction and generates zero to many child extractions along with a single result node tree for the original extraction. A higher level orchestraction is what reads data in from a given IO stream and feeds the machine to continually resume parsing until there is no more data or we've extracted the value we desire.
 
-![extraction-tree](./6.8.2-extraction-tree.jpg)
+![extraction-tree](./7.8.2-extraction-tree.jpg)
 
-## A Data Source
+#### A Data Source
 
 At the moment, the parse framework we're developing is primarily a (generic) _incremental_ parser. That is to say that there is a reasonable assumption that any data source provided will be able to be re-read and ideally have a mechanism for seeking forward and backward into a stream.
 
@@ -124,7 +128,7 @@ At the moment, the three data sources we've considering are:
 - Persistent File
 - Remote Http Data (e.g. S3 provider)
 
-## The Extraction
+#### The Extraction
 
 All parsing pipelines start with extractions. Extractions are the chunks of loosely coupled data that are intended to be automatically identified and have parsers delegated for their decomposition. The primary example of loosely coupled data are files that exist in container/archive formats: tar balls, zip files are the most common. Other formats that come to mind are ar, cpio.
 
@@ -144,7 +148,7 @@ class Extraction:
 ```
 
 
-## The Node
+#### The Node
 
 A parser's results are always expressed as a node tree (or parse tree of nodes). The node has exactly 3 references:
 
@@ -154,7 +158,7 @@ A parser's results are always expressed as a node tree (or parse tree of nodes).
 
 It was a very deliberate decision to only have 3 references in the node itself and put all of the other parsing state into node context. The reason this was done was to know that a node could exist as a 16 bytes struct plus whatever the value needed to be. It makes the operation of freeing parsing state memory (state data required to peform the parsing itself) as easy as wiping the reference to the node context and either doing the cleanup or allowing garbage collection to come around. Then we're only left with the node, its value, and the origin of the data we extracted the value from.
 
-![node-tree](./6.8.2-node-tree.jpg)
+![node-tree](./7.8.2-node-tree.jpg)
 
 By design, we can be more clever and keep a cache of node contexts in another pool of references. If we detect memory pressure, we could start to prune the lower level node contexts higher and higher. For replay-ability, the root node is the only node that must always have a node context. In the event we have memory pressue but want to force a branch of the tree to remain parsable, we can replay the parsing from the point that we have a node context to the value. (Not currently implemented.)
 
@@ -179,13 +183,13 @@ class Node:
         self._value = default_value
 ```
 
-## The Parser
+#### The Parser
 
 A parser class is misleading in this parsing framework. The parser is responsible for identifying extractions/data sources it can parse, creating an initial node tree root, holding global state for parser state machine or utility functions for the parser state machine.
 
 The parser is a unifying reference to represent all of the states of a format parser. Meanwhile the states of the parser are what are actually performing the parsing of the bytes.
 
-## The State Machine
+#### The State Machine
 
 The bulk of the work for the parser falls within the state machine itself, which is owned by the `Node`, not the parser. A parser class initializes the extraction result as a node with a offset and state. Calling `node.load()` or dereferencing `node.value` will kick off any parsing that has not been completed from the point of that node. Load or dereference from the root node and you parse the entire string of bytes the parser has access too.
 
@@ -219,7 +223,7 @@ class ExampleParsingNumber(JsonParsingState):
 
 In this way, when a state is used, it is given the node reference and therefore the node context and the parser reference.
 
-## The Node Driven Parser (`node.load()`)
+#### The Node Driven Parser (`node.load()`)
 
 To revisit the Node and its role in driving the parsing of the data, given it has data to consume, its `load()` call contains the primary loop. One thing I did not mention yet is that a node context can contain a stack of states. If a parser knows its going to go through a specific series of states, we can stack the states instead of jumping back and forth between a manager state. State stacks become useful in the cases like with XML attributes where you know you'll always have to parse a attribute name, an equal sign delimiter, and an attribute value, not to mention all the possible white space.
 
@@ -263,12 +267,12 @@ The core of the `load()` loop:
 
 Note: At any time, `parse_data()` may return an EndOfData exception or a UnsupportedFormat exception. At which time, the caller can feed more data into the data source and re-run `load()` to continue the parsing of unparsed data.
 
-### XML Use Case
+##### XML Use Case
 
 One of the parsers I've written is an XML parser. The XML parser uses a lot of the mechanisms that the parsing framework has to manage the complexity of a modern format: variable length characters (UTF8), state stacks, many different states, and can stream to extremely large data. Below I show a diagram that shows how the different states flow in and out of the different nodes. When the state flows to a parent node, its an ASCEND, and when it flows to a child node, its a _descendant being handled. AGAIN and NEXT states are the flows within a single node.
 
 <details><summary>Example XML Node Tree & States Diagram</summary>
 
-  ![xml-states-portrait](./6.8.2-xml-states-portrait.jpg)
+  ![xml-states-portrait](./7.8.2-xml-states-portrait.jpg)
 </details>
 

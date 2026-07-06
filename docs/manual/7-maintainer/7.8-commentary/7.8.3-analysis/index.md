@@ -1,12 +1,17 @@
-### 6.8.3 Analysis Framework
+---
+title: Analysis Framework
+first-section-number: "7.8.3"
+---
 
-## Analysis
+### Analysis Framework
+
+#### Analysis
 
 We have the pparse parsing framework that is responsible for generating the extraction tree and associated node/parse tree. The parse trees have some partial interpretation by the very nature of the design of their formats. In an effort to make them have more meaningful interfaces like "get_tensor()" or "get_graph()" and return a numpy array or netx graph, we have what pparse calls the "view" wrapper. This is an intermediate representation (IR) or interpretation of the node tree. Is is this IR that should be used by the analysis tools. We intentionally also leak the original parse tree to the analyzer because it may have more insight from the IR into extra bit of information to pull from the parse tree.
 
 I believe, in the big pisture, the correct was to perform the analysis is to generate a directed acyclic graph (DAG) of analyzers that can leverage the inputs and outputs of each other. Initially, this is over-engineered by a mile. We also want researchers to have the ability to simply run "analyze file-x and tell me information-y about it". Perhaps the hybrid are analyzer plugins that a independent from analyzer jobs.
 
-### PLAN
+#### PLAN
 
 "AnalysisFactors" are nodes in a DAG graph. Each AnalysisFactor declares its dependencies (other AnalysisFactors) and we use a topological sort on the nodes of the graph to make the graph acyclic and each node only needs to be executed once ... sharing its results with all other AnalysisFactors that have declared it as a dependency. The results of a dependency should be accessible via the object class itself (as the key) or a string of the object classes FQN to be translated into the object class itself (as the key).
 
@@ -61,7 +66,7 @@ IDEA #2:
 
 Instead of a vocabulary, taxonomoy, ontology ... we consider each node its own universe. Dependents should expect that specific universe since its marked the node as a dependency. The dynamic nature of what the provider can ship is advertised based on an array of tags that are specific to the node itself. An AnalysisFactor called `thirdparty.yannt.analysis.factors.pparse.Tensors` may include tags `['ops', 'weights', 'bias']` for one model and `['ops', 'bias']` for another model. Dependent AnalysisFactors must decide whether they are going to perform their intended operation based on these tags. Subsequent AnalysisFactors will also know if the previous factor was able to complete based on the tags available to it. Therefore, a string of AnalysisFactor classes should always be able to finish execution regardless of whether a node in the middle of the graph failed or not. Note: child factors can determine this based on the results dictionary as well if desired. The expected behavior is specified by each individual node ... but all nodes should provide their resulting tags in the associated results database section.
 
-### DEMO
+#### DEMO
 
 ```sh
 yannt analyze \
@@ -83,7 +88,7 @@ yannt analyze \
 
 
 
-### THINGS
+#### THINGS
 
 What does it mean when we provide a format configuration to AnalysisFramework?
   - Are we configuring a format that will be registered into pparse framework?
@@ -100,7 +105,7 @@ What does it mean when we provide a format configuration to AnalysisFramework?
 
 
 
-### Multi-Input Managements
+#### Multi-Input Managements
 
 In the "simple" scenario, we may limit a user request to a single target file/path. How does the AnalysisProcess get the model format type and how do we map that process to that format if there are multiple inputs with multiple formats?
 
@@ -372,7 +377,7 @@ And `((R1, input_a), (R2, input_b), A, B, C)` becomes the unique ID for the node
 
 
 
-## Impl Notes
+#### Impl Notes
 
 PyTorch, recursive tensor construction:
 
@@ -405,7 +410,7 @@ BUG: pparse PyTorch fails to get tensors from yolov5su.pt
 - pparse assumes NewCall or ReduceCall, but yolo returns dict, need to know how its serialized.
 
 
-### Onnx Op Prov
+#### Onnx Op Prov
 
 - `node._value['domain']` - namespace/organization that created model (very optional)
 - `node._value['opset_import']._value['version']` - onnx opset
@@ -425,7 +430,7 @@ BUG: pparse PyTorch fails to get tensors from yolov5su.pt
 
 <!-- The parser framework includes a registry of parsers fed to an initial extraction that represents data from a file. The extraction finds a parser from the registry that can parse its data into a parse tree of decomposed data structure information. The parse tree is mostly made up of a common node structure that _may_ contain context (the data required to perform parsing) and it has a value that _may_ be loaded. If the value is dereferenced and the data is not loaded, it will attempt to parse the data from the context. If the context does not exist, it'll go up the parse tree looking for the next available context to start the parsing replay. Parse trees can contain data that the current parser can not parse. In that case, the encapsulated data becomes a child extraction. Once this extraction exists, the process is repeated by finding a parser to process the child extraction's data. -->
 
-## Progressive Parsing Concepts
+#### Progressive Parsing Concepts
 
 When you point the parser at a file, it doesn't try to understand the while thing at once. It starts with an extraction or a chunk of raw data and a question: What is this? To answer that, the tool looks up available format parsers in a registry. The registry finds the parser that recognizes the data and hands it over. That parser decomposes the data into a parse tree (a structured representation of what was found).
 
@@ -438,7 +443,7 @@ Some nodes contain data the current parser doesn't recognize. Instead of failing
 <!-- The analysis framework contains analysis procedures. Analysis procedures contain analysis factors. Analysis factors that have no dependencies are analysis inputs and usually represent external resources like pparse results. The pparse results are presented in a common API so that most derived factors do not need to know the format of the model they are performing analysis on. Analysis processes are collections of factors from an analysis procedure that are sorted and then executed. The analysis process has a dictionary where each key represents a factor instance's output. Analysis reports are associated with a procedure and when executed create their own process and then filter the information down to only what the report (or user) wants a summary on. -->
 
 
-## Declarative Analysis Concepts
+#### Declarative Analysis Concepts
 
 Reading and parsing the file gives you structure, but the structure alone does not answer: Does this contain executable code?, Where do the weights come from? Answering those requires combining observations and derived observations.
 
