@@ -21,6 +21,8 @@ first-section-number: "6.2"
 
 ## Pparse Library API
 
+The public API of pparse.
+
 END_OF_MD_HEADER
 
 $SCRIPT_PATH/json-to-pandoc-md.py $JSON_PATH/thirdparty.pparse.lib-api.json \

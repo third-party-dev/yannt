@@ -189,13 +189,14 @@ def process_docstring(docstring, member_dict):
     """
 
 
-    text = []
+    description = []
     parameters = {}
     returns = {}
     raises = {}
     see_also = []
 
     sections = docstring.parse("google")
+    summary = docstring.value.split("\n", 1)[0]
 
     #if member_dict['fqn'] == 'thirdparty.pparse.lib.node.RecursiveControl':
     #    breakpoint()
@@ -203,7 +204,10 @@ def process_docstring(docstring, member_dict):
     for section in sections:
         try:
             if isinstance(section, griffe.DocstringSectionText): #section.kind == griffe.DocstringSectionKind.text:
-                text.append(section.value)
+                desc_part = section.value
+                if len(description) == 0 and len(summary) > 0 and desc_part.startswith(summary):
+                    desc_part = desc_part[len(summary):]
+                description.append(desc_part)
             elif isinstance(section, griffe.DocstringSectionParameters): #section.kind == griffe.DocstringSectionKind.parameters:
                 for param_entry in section.value:
                     parameters[str(param_entry.name)] = {
@@ -231,7 +235,8 @@ def process_docstring(docstring, member_dict):
             breakpoint()
     
     member_dict['docstring'] = {
-        'text': ' '.join(text),
+        'summary': summary,
+        'description': ' '.join(description),
         'parameters': parameters,
         'returns': returns,
         'raises': raises,

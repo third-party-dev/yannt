@@ -45,8 +45,12 @@ def main():
         if 'members' in ns:
             member_list = []
             for name, member in ns['members'].items():
-                member_list.append({ 'Name': f"[`{name}`](#{member['fqn']})" })
-            print(f"{md_table(member_list, ['Name'])}\n")
+                entry = { 'Name': f"[`{name}`](#{member['fqn']})", 'Summary': '' }
+                if 'docstring' in member and 'summary' in member['docstring']:
+                    entry['Summary'] = member['docstring']['summary']
+                member_list.append(entry)
+                
+            print(f"{md_table(member_list, ['Name', 'Summary'])}\n")
 
         if 'members' in ns:
             for name, member in ns['members'].items():
@@ -61,8 +65,11 @@ def main():
 
                 if 'docstring' in member:
                     docstr = member['docstring']
-                    if 'text' in docstr:
-                        print(f"{docstr['text']}\n")
+                    if 'summary' in docstr:
+                        print(f"{docstr['summary']}\n")
+
+                    if 'description' in docstr:
+                        print(f"{docstr['description']}\n")
 
                     if 'parameters' in docstr and len(docstr['parameters']) > 0:
                         print("**Parameters:**\n")
