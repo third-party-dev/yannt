@@ -1,8 +1,15 @@
-# 4. Use Cases
+---
+title: Use Cases
+first-section-number: "5"
+---
 
-<div class="none">
+# Use Cases
 
-## 4 Step-by-step task flows (CLI use cases)
+TBD
+
+<!-- <div class="none">
+
+## Step-by-step task flows (CLI use cases)
 
  TODO
 
@@ -16,9 +23,9 @@ Each use case:
   - May filter out slightly different situations
 - What are you looking at: Explain the results or output.
 
-</div>
+</div> -->
 
-## 4.0.1 Overview
+## Overview
 
 Generally, I view use cases as functional requirements of a product (in contrast to non-functional requirements that are expressed in must/shall/should/may terminology). Those use case (requirements) then become the baseline for a test plan and subsequently lend themselves well to test procedures.
 
@@ -28,12 +35,12 @@ There is a lot of cross over between different components of yannt and therefore
 
 ::: {.pagegroup}
 
-## Table of Contents
+### Table of Contents
 
-- **4.1** - [Use cases for generating test data.](./4.1-test-usecases.md)
-- **4.2** - [Use cases for parsing model files the _pparse_ way.](./4.2-pparse-usecases.md)
-- **4.3** - [Use cases for analysis of model files.](./4.3-analysis-usecases.md)
-- **4.4** - [Use cases for other yannt sub-commands.](./4.4-misc-usecases.md)
-- **4.5** - [Use cases for parsing model files the _naive_ way.](./4.5-naive-usecases.md)
+- **5.2** - [Use cases for generating test data.](./5.2-test-usecases.md)
+- **5.3** - [Use cases for parsing model files the _pparse_ way.](./5.3-pparse-usecases.md)
+- **5.4** - [Use cases for analysis of model files.](./5.4-analysis-usecases.md)
+- **5.5** - [Use cases for other yannt sub-commands.](./5.5-misc-usecases.md)
+- **5.6** - [Use cases for parsing model files the _naive_ way.](./5.6-naive-usecases.md)
 
 :::
