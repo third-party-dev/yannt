@@ -91,6 +91,8 @@
     text(size: 0.85em, it),
   )
 
+  show table: set align(left)
+
 
   // -------- Title page --------
   if title != none {

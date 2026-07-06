@@ -20,56 +20,62 @@ MANUAL_FILES=(
   "${DOCS_PATH}/2-introduction/index.md"
   "${DOCS_PATH}/2-introduction/2.1-overview.md"
   "${DOCS_PATH}/2-introduction/2.2-install.md"
+
+  "${DOCS_PATH}/3-end-user/index.md"
+  "${DOCS_PATH}/3-end-user/3.1-overview.md"
+  "${DOCS_PATH}/3-end-user/3.2-primers.md"
+  "${DOCS_PATH}/3-end-user/3.3-pparse-cli.md"
+  "${DOCS_PATH}/3-end-user/3.4-analysis-cli.md"
+  "${DOCS_PATH}/3-end-user/3.5-sysscan-cli.md"
+  "${DOCS_PATH}/3-end-user/3.6-troubleshooting.md"
+  "${DOCS_PATH}/4-integration/index.md"
+  "${DOCS_PATH}/4-integration/4.2-quick-start.md"
+  "${DOCS_PATH}/4-integration/4.3-yannt.md"
+  "${DOCS_PATH}/4-integration/4.4-analyze.md"
+  "${DOCS_PATH}/4-integration/4.5-pparse-view.md"
+  "${DOCS_PATH}/4-integration/4.6-pparse-lazy.md"
+  "${DOCS_PATH}/4-integration/4.7-pparse-lib.md"
+  "${DOCS_PATH}/4-integration/4.8-gotchas.md"
+  "${DOCS_PATH}/4-integration/4.9-versioning.md"
+
+  "${DOCS_PATH}/5-use-cases/index.md"
+  "${DOCS_PATH}/5-use-cases/5.2-test-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.2.1-hft-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.2.2-yolo-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3-pparse-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3.1-pparse-ident-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3.2-pparse-safetensors-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3.3-pparse-pytorch-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3.4-pparse-protobuf-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3.5-pparse-om-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3.6-pparse-pickle-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3.7-pparse-onnx-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3.8-pparse-mnn-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3.9-pparse-flatbuffer-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3.10-pparse-tflite-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3.11-pparse-zip-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.3.12-pparse-json-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.4-analysis-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.4.1.1-analysis-factors-pparse-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.4.1.2-analysis-factors-tensorcharacter-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.5-misc-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.5.1-sysscan-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.5.2-python-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.6-naive-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.6.1-naive-mnn-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.6.2-naive-onnx-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.6.3-naive-pytorch-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.6.4-naive-safetensors-usecases.md"
+  "${DOCS_PATH}/5-use-cases/5.6.5-naive-tflite-usecases.md"
+
+  "${DOCS_PATH}/6-api-reference/index.md"
   "${DOCS_PATH}/6-api-reference/6.2-pparse-lib-api.md"
   #"${DOCS_PATH}/guides/advanced-usage.md"
   #"${DOCS_PATH}/guides/getting-started.md"
   #"${DOCS_PATH}/api/api-reference.md"
 )
-# ${DOCS_PATH}/2-end-user/index.md
-# ${DOCS_PATH}/2-end-user/2.1-overview.md
-# ${DOCS_PATH}/2-end-user/2.2-primers.md
-# ${DOCS_PATH}/2-end-user/2.3-pparse-cli.md
-# ${DOCS_PATH}/2-end-user/2.4-analysis-cli.md
-# ${DOCS_PATH}/2-end-user/2.5-sysscan-cli.md
-# ${DOCS_PATH}/2-end-user/2.x-troubleshooting.md
-# ${DOCS_PATH}/3-integration/index.md
-# ${DOCS_PATH}/3-integration/3.2-quick-start.md
-# ${DOCS_PATH}/3-integration/3.3-yannt.md
-# ${DOCS_PATH}/3-integration/3.4-analyze.md
-# ${DOCS_PATH}/3-integration/3.5-pparse-view.md
-# ${DOCS_PATH}/3-integration/3.6-pparse-lazy.md
-# ${DOCS_PATH}/3-integration/3.7-pparse-lib.md
-# ${DOCS_PATH}/3-integration/3.8-gotchas.md
-# ${DOCS_PATH}/3-integration/3.9-versioning.md
-# ${DOCS_PATH}/4-use-cases/index.md
-# ${DOCS_PATH}/4-use-cases/4.1-test-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.1.1-hft-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.1.2-yolo-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2-pparse-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2.1-pparse-ident-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2.2-pparse-safetensors-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2.3-pparse-pytorch-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2.4-pparse-protobuf-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2.5-pparse-om-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2.6-pparse-pickle-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2.7-pparse-onnx-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2.8-pparse-mnn-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2.9-pparse-flatbuffer-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2.10-pparse-tflite-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2.11-pparse-zip-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.2.12-pparse-json-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.3-analysis-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.3.1.1-analysis-factors-pparse-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.3.1.2-analysis-factors-tensorcharacter-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.4-misc-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.4.1-sysscan-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.4.x-python-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.5-naive-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.5.x-naive-mnn-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.5.x-naive-onnx-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.5.x-naive-pytorch-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.5.x-naive-safetensors-usecases.md
-# ${DOCS_PATH}/4-use-cases/4.5.x-naive-tflite-usecases.md
+
+
 # ${DOCS_PATH}/5-api-reference/index.md
 # ${DOCS_PATH}/5-api-reference/5.2-test.md
 # ${DOCS_PATH}/6-maintainer/index.md
