@@ -92,6 +92,7 @@
   )
 
   show table: set align(left)
+  set image(width: 100%)
 
 
   // -------- Title page --------
