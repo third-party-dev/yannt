@@ -43,5 +43,6 @@ pytests *args:
     ./scripts/pytests.sh {{args}}
 
 builddocs:
+    ./docs/builders/api/build-docs.sh
     ./docs/builders/pandoc/build-docs.sh
     ./docs/builders/docusaurus/build-docs.sh

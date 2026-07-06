@@ -10,9 +10,9 @@
 
 import logging
 log = logging.getLogger(__name__)
-
 from pprint import pprint
 
+import sys
 import griffe
 import json
 
@@ -245,7 +245,7 @@ def main():
     fqns = {}
     griffe_exports = {}
 
-    exports_list = ['thirdparty.pparse.lib']
+    exports_list = sys.argv[1:] #['thirdparty.pparse.lib']
     exports_dict = {}
 
     # TODO: Consider adding filters or restrictions.
