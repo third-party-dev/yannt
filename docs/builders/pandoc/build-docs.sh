@@ -216,6 +216,23 @@ build_multi_html() {
 }
 
 
+copy_images_for_md() {
+  local src="$1" out="$2"
+  local src_dir out_dir img_path img_src img_dst
+  src_dir="$(dirname "$src")"
+  out_dir="$(dirname "$out")"
+
+  while IFS= read -r img_path; do
+    [[ "$img_path" =~ ^https?:// ]] && continue
+    img_src="$src_dir/$img_path"
+    img_dst="$out_dir/$img_path"
+    [ -f "$img_src" ] || continue
+    mkdir -p "$(dirname "$img_dst")"
+    cp "$img_src" "$img_dst"
+  done < <(grep -oP '!\[[^\]]*\]\(\K[^ )]+' "$src")
+}
+
+
 build_gfm() {
   echo "---- Building Multiple GFM Markdown"
   local out_dir="$OUT_PATH/gfm"
@@ -238,11 +255,10 @@ build_gfm() {
       --standalone --number-sections \
       -M crosslink_mode=commonmark \
       -M sidebar_position="$position" \
-      --resource-path="$RESOURCE_PATH" \
-      --extract-media=media \
       $(filter_args) \
       -o "$out" \
       2>&1 | tee -a $stderr_log 2>&1 >/dev/null
+    copy_images_for_md "$src" "$out"
     position=$((position + 5))
   done
 
