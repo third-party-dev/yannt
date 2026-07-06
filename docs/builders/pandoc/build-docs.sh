@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-# sudo apt-get update
-# sudo apt install -y pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended texlive-plain-generic
-
-# pandoc *.md --toc --number-sections --pdf-engine=xelatex -o book.pdf
+# Note: Set env var TYPST to location of typst binary.
+#   Example: TYPST=./typst ./do builddocs
 
 set -e
 
@@ -70,36 +68,30 @@ MANUAL_FILES=(
 
   "${DOCS_PATH}/6-api-reference/index.md"
   "${DOCS_PATH}/6-api-reference/6.2-pparse-lib-api.md"
-  #"${DOCS_PATH}/guides/advanced-usage.md"
-  #"${DOCS_PATH}/guides/getting-started.md"
-  #"${DOCS_PATH}/api/api-reference.md"
+
+  "${DOCS_PATH}/7-maintainer/index.md"
+  "${DOCS_PATH}/7-maintainer/7.2-architecture.md"
+  "${DOCS_PATH}/7-maintainer/7.3-dev-environment.md"
+  "${DOCS_PATH}/7-maintainer/7.4-code-base.md"
+  "${DOCS_PATH}/7-maintainer/7.5-testing/index.md"
+  "${DOCS_PATH}/7-maintainer/7.5-testing/7.5.1-overview.md"
+  "${DOCS_PATH}/7-maintainer/7.6-release.md"
+  "${DOCS_PATH}/7-maintainer/7.7-roadmap.md"
+  "${DOCS_PATH}/7-maintainer/7.8-commentary/index.md"
+  "${DOCS_PATH}/7-maintainer/7.8-commentary/7.8.1-plugins.md"
+  # ?? "${DOCS_PATH}/7-maintainer/7.8-commentary/7.8.2-pparse.md"
+  "${DOCS_PATH}/7-maintainer/7.8-commentary/7.8.2-pparse/index.md"
+  # ?? "${DOCS_PATH}/7-maintainer/7.8-commentary/7.8.3-analysis.md"
+  "${DOCS_PATH}/7-maintainer/7.8-commentary/7.8.3-analysis/index.md"
+  "${DOCS_PATH}/7-maintainer/7.8-commentary/7.8.4-testing.md"
+  "${DOCS_PATH}/7-maintainer/7.8-commentary/7.8.5-naive.md"
+  "${DOCS_PATH}/7-maintainer/7.8-commentary/7.8.6-releasing.md"
+
+  "${DOCS_PATH}/8-tutorials/index.md"
+
+  "${TMPL_PATH}/metadata-tail.yaml"
 )
 
-
-# ${DOCS_PATH}/5-api-reference/index.md
-# ${DOCS_PATH}/5-api-reference/5.2-test.md
-# ${DOCS_PATH}/6-maintainer/index.md
-# ${DOCS_PATH}/6-maintainer/6.2-architecture.md
-# ${DOCS_PATH}/6-maintainer/6.3-dev-environment.md
-# ${DOCS_PATH}/6-maintainer/6.4-code-base.md
-# ${DOCS_PATH}/6-maintainer/6.5-testing/6.5.1-overview.md
-# ${DOCS_PATH}/6-maintainer/6.6-release.md
-# ${DOCS_PATH}/6-maintainer/6.7-roadmap.md
-# ${DOCS_PATH}/6-maintainer/6.8-commentary/index.md
-# ${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.1-plugins.md
-# ${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.2-pparse.md
-# ${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.3-analysis.md
-# ${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.4-testing.md
-# ${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.5-naive.md
-# ${DOCS_PATH}/6-maintainer/6.8-commentary/6.8.6-releasing.md
-# ${DOCS_PATH}/7-tutorials/index.md
-# ${PROJ_PATH}/docs/builders/pandoc/api-doc-reference.md
-# "
-
-
-
-# Excluded:
-# - docs/5-api-reference/5.2-python-api.md
 
 # TODO: Consider putting side effect in create_folders procedure.
 mkdir -p $OUT_PATH
@@ -107,7 +99,12 @@ mkdir -p $OUT_PATH
 cp ${DOCS_PATH}/assets/manual.css $OUT_PATH/
 
 
-FILTERS=( "$TMPL_PATH/toc-control.lua" "$TMPL_PATH/crosslink.lua" "$TMPL_PATH/rules.lua" "$TMPL_PATH/num-headings-md.lua" )
+FILTERS=(
+  "$TMPL_PATH/toc-control.lua"
+  "$TMPL_PATH/crosslink.lua"
+  "$TMPL_PATH/rules.lua"
+  "$TMPL_PATH/num-headings-md.lua"
+)
 filter_args() {
   local args=()
   for f in "${FILTERS[@]}"; do args+=(--lua-filter "$f"); done
@@ -116,17 +113,11 @@ filter_args() {
 
 
 # UNUSED
-step_preprocess() {
+update_usecases() {
   log "Pre-processing: refreshing generated sections"
   python3 "$ROOT_DIR/scripts/update_use_cases.py" \
     "$DOCS_DIR/guides/advanced-usage.md" \
     --debug-json "$DEBUG_DIR/use-case-refresh.json"
-
-  log "Pre-processing: regenerating API reference"
-  python3 "$ROOT_DIR/scripts/gen_api_docs.py" \
-    "$DOCS_DIR/api/api-spec.json" \
-    "$DOCS_DIR/api/api-reference.md" \
-    --debug-json "$DEBUG_DIR/api-gen-report.json"
 }
 
 
@@ -145,10 +136,6 @@ build_json() {
 
 build_typ() {
   echo "---- Building TYP"
-  #local typ_out="$BUILD_DIR/manual.typ"
-  #local pdf_out="$BUILD_DIR/manual.pdf"
-  #local trace="$DEBUG_DIR/pdf-pandoc-trace.json"
-
   (
     cd $OUT_PATH
     trace="$OUT_PATH/yannt-manual-pandoc-typ-trace.json" \
@@ -178,8 +165,7 @@ build_pdf() {
       2>&1 | tee "$OUT_PATH/pdf-typst-stderr.log"
   else
     echo "WARNING: 'typst' binary not found on PATH; skipping typst compile step."
-    echo "  Install from https://github.com/typst/typst and re-run, or:"
-    echo "    typst compile $OUT_PATH/yannt-manual.typ $OUT_PATH/yannt-manual.pdf"
+    echo "  Install from https://github.com/typst/typst and re-run."
   fi
 }
 
@@ -227,6 +213,90 @@ build_multi_html() {
 
   mkdir -p "$out_dir/assets"
   cp -r "${DOCS_PATH}/assets/." "$out_dir/assets/"
+}
+
+
+build_gfm() {
+  echo "---- Building Multiple GFM Markdown"
+  local out_dir="$OUT_PATH/gfm"
+  local stderr_log=$OUT_PATH/yannt-manual-pandoc-multi-gfm-stderr.log
+
+  rm -rf "$out_dir"
+  mkdir -p $out_dir/assets
+  cp -r "${DOCS_PATH}/assets/." "$out_dir/assets/"
+
+  echo "" > $stderr_log
+
+  local position=5
+  for src in "${MANUAL_FILES[@]}"; do
+    local rel="${src#"${DOCS_PATH}"/}"
+    local out="$out_dir/$rel"
+    mkdir -p "$(dirname "$out")"
+
+    pandoc "$src" \
+      -f markdown -t gfm \
+      --standalone --number-sections \
+      -M crosslink_mode=commonmark \
+      -M sidebar_position="$position" \
+      --resource-path="$RESOURCE_PATH" \
+      --extract-media=media \
+      $(filter_args) \
+      -o "$out" \
+      2>&1 | tee -a $stderr_log 2>&1 >/dev/null
+    position=$((position + 5))
+  done
+
+  # _category_.json controls a folder's label/position/collapsed-state in
+  # Docusaurus's autogenerated sidebar. These are authored once, alongside
+  # the content they describe, and just need to land in the same relative
+  # spot in the output tree -- copy them over unmodified, same as assets/.
+  while IFS= read -r -d '' cat_file; do
+    local rel="${cat_file#"${DOCS_PATH}"/}"
+    local out="$out_dir/$rel"
+    mkdir -p "$(dirname "$out")"
+    cp "$cat_file" "$out"
+  done < <(find "${DOCS_PATH}" -name "_category_.json" -print0)
+}
+
+
+build_commonmark_x() {
+  echo "---- Building Multiple (Extended) CommonMark"
+  local out_dir="$OUT_PATH/commonmark_x"
+  local stderr_log=$OUT_PATH/yannt-manual-pandoc-multi-commonmark_x-stderr.log
+
+  rm -rf "$out_dir"
+  mkdir -p $out_dir/assets
+  cp -r "${DOCS_PATH}/assets/." "$out_dir/assets/"
+
+  echo "" > $stderr_log
+
+  local position=5
+  for src in "${MANUAL_FILES[@]}"; do
+    local rel="${src#"${DOCS_PATH}"/}"
+    local out="$out_dir/$rel"
+    mkdir -p "$(dirname "$out")"
+
+    pandoc "$src" \
+      -f markdown -t commonmark_x \
+      --standalone --number-sections \
+      -M crosslink_mode=commonmark \
+      -M sidebar_position="$position" \
+      $(filter_args) \
+      -o "$out" \
+      2>&1 | tee -a $stderr_log 2>&1 >/dev/null
+    position=$((position + 5))
+  done
+
+  # _category_.json controls a folder's label/position/collapsed-state in
+  # Docusaurus's autogenerated sidebar. These are authored once, alongside
+  # the content they describe, and just need to land in the same relative
+  # spot in the output tree -- copy them over unmodified, same as assets/.
+  while IFS= read -r -d '' cat_file; do
+    local rel="${cat_file#"${DOCS_PATH}"/}"
+    local out="$out_dir/$rel"
+    mkdir -p "$(dirname "$out")"
+    cp "$cat_file" "$out"
+  done < <(find "${DOCS_PATH}" -name "_category_.json" -print0)
 }
 
 
@@ -295,6 +365,8 @@ case "$TARGET" in
   commonmark)
     # preprocess
     build_commonmark
+    build_commonmark_x
+    build_gfm
     ;;
   all)
     # preprocess
@@ -304,6 +376,8 @@ case "$TARGET" in
     build_single_html
     build_multi_html
     build_commonmark
+    build_commonmark_x
+    build_gfm
     ;;
   *)
     echo "usage: $0 [pdf|html|commonmark|all]" >&2
@@ -312,78 +386,5 @@ case "$TARGET" in
 esac
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 exit 0
 
-# 
-
-# cd $PROJ_PATH/docs/manual/pandoc-build
-
-
-
-# --number-sections
-# --listings
-
-# NOTE: Ensure images have sufficiently high DPI. A standard 96 DPI image from a screenshot
-#       will be oversized in the PDF. Try something like 300DPI or higher. FYI, most home
-#       inkjet printers are 300-600 DPI, so this lines up. You can scale image DPI up and
-#       down all day long and it will create zero pixel loss. Only the DPI header value
-#       changes.
-
-echo "Building JSON."
-# pandoc metadata.yaml $CHAPTERS metadata-tail.yaml -t json > book.json
-pandoc api-doc-reference.md \
-  --lua-filter=api-doc-filter.lua \
-  --from markdown+raw_html+simple_tables \
-  -o api-doc-reference.json
-
-echo "Building PDF."
-# pandoc metadata.yaml $CHAPTERS metadata-tail.yaml \
-#   --toc --pdf-engine=xelatex --template=template/eisvogel.tex \
-#   --lua-filter=pandoc-filter.lua -o book.pdf #--verbose
-
-pandoc api-doc-reference.md \
-  --lua-filter=api-doc-filter.lua \
-  --template=api-doc-template.latex \
-  --pdf-engine=xelatex \
-  --from markdown+raw_html+simple_tables \
-  --toc \
-  -V title="MyLibrary API Reference" \
-  -V version="2.1.0" \
-  -o api-doc-reference.pdf
-
-echo "Building HTML"
-pandoc api-doc-reference.md \
-  --lua-filter=api-doc-filter.lua \
-  --from markdown+raw_html+simple_tables \
-  --toc \
-  --standalone \
-  -o api-doc-reference.html
-
-echo "Building EPUB."
-# pandoc metadata.yaml $CHAPTERS metadata-tail.yaml --toc -o book.epub
-
-# pandoc api-doc-reference.md \
-#   --lua-filter=api-doc-filter.lua \
-#   --from markdown+raw_html+simple_tables \
-#   --toc \
-#   --epub-cover-image=cover.png \
-#   -o api-doc-reference.epub
-
-# pandoc api-doc-reference.md \
-#   --lua-filter=api-doc-filter.lua \
-#   --from markdown+raw_html+simple_tables \
-#   --toc \
-#   --css=api-doc.css \
-#   -o api-doc-reference.epub
