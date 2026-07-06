@@ -33,6 +33,7 @@ config_root:
     - texlive-plain-generic
     - nodejs
     - npm
+    - rsync
 
 
     cri_home: { from: env, name: CRI_HOME }
