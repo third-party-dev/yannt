@@ -19,9 +19,8 @@ npm run build -- --out-dir $OUT_PATH
 rsync -a \
   --include='*/' \
   --include='*.jpg' \
-  --include='*.JPG' \
   --include='*.png' \
-  --include='*.PNG' \
+  --include='*.svg' \
   --exclude='*' \
   $PROJ_PATH/docs/builders/docusaurus/docs/ $OUT_PATH/docs/
 

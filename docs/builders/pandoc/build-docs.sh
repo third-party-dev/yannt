@@ -162,7 +162,7 @@ build_pdf() {
     $TYPST compile \
       --font-path "$TMPL_PATH" \
       "$OUT_PATH/yannt-manual.typ" "$OUT_PATH/yannt-manual.pdf" \
-      2>&1 | tee "$OUT_PATH/pdf-typst-stderr.log"
+      2>"$OUT_PATH/pdf-typst-stderr.log"
   else
     echo "WARNING: 'typst' binary not found on PATH; skipping typst compile step."
     echo "  Install from https://github.com/typst/typst and re-run."
@@ -247,9 +247,8 @@ build_gfm() {
   rsync -a \
     --include='*/' \
     --include='*.jpg' \
-    --include='*.JPG' \
     --include='*.png' \
-    --include='*.PNG' \
+    --include='*.svg' \
     --exclude='*' \
     "${DOCS_PATH}/" "${out_dir}/"
 
