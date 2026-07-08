@@ -61,6 +61,14 @@ def test_data(generated_data_dir):
         assert numpy.array_equal(tfdata, ppdata)
 
 
+def test_view_cli(generated_data_dir):
+    import subprocess
+    tgt_path = "./models/yolov5su_float32.tflite"
+    result = subprocess.run(["yannt", "pparse", "tflite", "view", tgt_path], capture_output=True, text=True)
+    # TODO: Verify result.stdout and result.stderr
+    assert result.returncode == 0
+
+
 if __name__ == "__main__":
     run_test_independently(log, [[test_data, [None], None]])
 
